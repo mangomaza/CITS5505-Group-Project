@@ -1,19 +1,18 @@
 # Project Title
 
-## Team members
+## Team Members
 | UWA ID | Name | GitHub Username |
 |:--------:|:------------:|:-----------:|
 | 21211711 | Asad Maza | mangomaza |
 | 24923772 | Jianing Chen |  |
-| 24169259 | Wendy Song | |
+| 24563207 | Wendy Song | |
+
+## Contributing
 
 ## Project Description
 
+## Project Features
 
-## Getting Started
+## Design and Development
 
-
-## Usage
-
-
-## Project Structure
+## Technology Stack
