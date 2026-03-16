@@ -5,7 +5,7 @@
 |:--------:|:------------:|:-----------:|
 | 21211711 | Asad Maza | mangomaza |
 | 24923772 | Jianing Chen |  |
-| 24563207 | Wendy Song | |
+| 24563207 | Wendy Song | WendySong1 |
 
 ## Contributing
 
