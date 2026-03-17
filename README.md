@@ -4,7 +4,7 @@
 | UWA ID | Name | GitHub Username |
 |:--------:|:------------:|:-----------:|
 | 21211711 | Asad Maza | mangomaza |
-| 24923772 | Jianing Chen |  |
+| 24923772 | Jianing Chen | Ricky101087 |
 | 24563207 | Wendy Song | WendySong1 |
 
 ## Contributing
