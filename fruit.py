@@ -1,1 +1,2 @@
-print('watermelon','lemon','rasberry')
+def favourite_fruits():
+    return ['watermelon','lemon','rasberry']
