@@ -16,6 +16,8 @@ Mix It Up is a web app for creating, logging, and sharing cocktail, mocktail, an
 
 All work happens on feature branches off main. Open a pull request when your feature or fix is ready, and it needs at least one review before merging. Keep commits small and meaningful, and reference the relevant issue in your PR where it makes sense.
 
+For the full workflow, including branch naming, commit messages, and the PR process, see the [Git Contribution Guide](docs/git-contribution-guide.md).
+
 ## Project Features
 
 The app lets users sign up, log in, and manage their own recipe collection. You can create, edit, and delete your recipes, and choose to share them with specific friends rather than making everything public. There's a rating system so people can give feedback on shared recipes, and a random recipe generator that pulls from the community pool when you want something new. The whole thing is responsive so it works on both desktop and mobile.
