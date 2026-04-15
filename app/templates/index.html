@@ -31,11 +31,144 @@
     </nav>
   </header>
 
-  <main class="container my-4">
-    <!-- page content goes here -->
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container text-center">
+        <h1>Mix It Up</h1>
+        <p>Create, share, and discover recipes. Or let fate decide.</p>
+        <div>
+          <button class="btn btn-primary" id="heroShuffle" title="Surprise me">Surprise me</button>
+        </div>
+        <a href="recipes.html" class="btn btn-outline-secondary mt-3">Browse Recipes</a>
+      </div>
+    </section>
+
+    <!-- Random result (hidden by default) -->
+    <section class="container my-4 d-none" id="randomResult">
+      <div class="text-center mb-3">
+        <small class="text-muted">Here's what the universe thinks you should make tonight:</small>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
+              <div class="card-body">
+                <span class="badge bg-secondary">Cocktail</span>
+                <h3 class="card-title mt-2">Old Fashioned</h3>
+                <p class="text-muted">by the universe &middot; just now</p>
+                <p>A timeless whiskey cocktail. Simple, strong, and perfect.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Recipes -->
+    <section class="container my-5">
+      <h2 class="mb-4">What people are making</h2>
+      <div class="row g-4">
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
+              <div class="card-body">
+                <span class="badge bg-secondary">Cocktail</span>
+                <h3 class="card-title mt-2">Margarita</h3>
+                <p class="text-muted">by mixmaster &middot; 2 days ago</p>
+                <p>4.3 / 5</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
+              <div class="card-body">
+                <span class="badge bg-secondary">Cocktail</span>
+                <h3 class="card-title mt-2">Mojito</h3>
+                <p class="text-muted">by limelife &middot; 5 days ago</p>
+                <p>4.0 / 5</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="card">
+              <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
+              <div class="card-body">
+                <span class="badge bg-secondary">Food</span>
+                <h3 class="card-title mt-2">Spicy Arrabiata Penne</h3>
+                <p class="text-muted">by pastaqueen &middot; 1 week ago</p>
+                <p>4.8 / 5</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
+              <div class="card-body">
+                <span class="badge bg-secondary">Cocktail</span>
+                <h3 class="card-title mt-2">Old Fashioned</h3>
+                <p class="text-muted">by bourbonboy &middot; 3 days ago</p>
+                <p>4.1 / 5</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Browse by Category -->
+    <section class="container my-5">
+      <h2 class="mb-4">Browse by category</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <a href="recipes.html" class="text-decoration-none">
+            <div class="card text-center p-4">
+              <h3>Cocktails</h3>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="recipes.html" class="text-decoration-none">
+            <div class="card text-center p-4">
+              <h3>Food</h3>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="recipes.html" class="text-decoration-none">
+            <div class="card text-center p-4">
+              <h3>Mocktails</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feeling Adventurous -->
+    <section class="container my-5 text-center">
+      <h2>Feeling adventurous?</h2>
+      <p class="text-muted mb-4">Let us pick something random for you. Could be a cocktail, could be dinner. Who knows.</p>
+      <button class="btn btn-primary" id="randomShuffle" title="Surprise me">Lucky dip</button>
+    </section>
+
   </main>
 
-  <footer class="bg-dark text-light py-3 mt-auto">
+  <footer class="py-3 mt-auto">
     <div class="container text-center">
       <p class="mb-0">&copy; 2026 Mix It Up</p>
     </div>
