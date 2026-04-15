@@ -3,13 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - Mix It Up</title>
+  <title>Home &mdash; Mix It Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../static/css/style.css">
+  <link rel="stylesheet" href="../static/css/index.css">
 </head>
 <body>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
         <a class="navbar-brand" href="index.html">Mix It Up</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -31,16 +36,189 @@
     </nav>
   </header>
 
-  <main class="container my-4">
-    <!-- page content goes here -->
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-overlay"></div>
+      <div class="container hero-content text-center">
+        <h1 class="hero-title">Mix It Up</h1>
+        <p class="hero-subtitle">Create, share, and discover recipes. Or let fate decide.</p>
+        <div class="hero-actions">
+          <button class="btn-shuffle" id="heroShuffle" title="Surprise me">
+            <i class="bi bi-shuffle"></i>
+          </button>
+          <p class="hero-shuffle-label">Surprise me</p>
+        </div>
+        <a href="recipes.html" class="btn btn-outline-mix mt-3">Browse Recipes</a>
+      </div>
+    </section>
+
+    <!-- Random result (hidden by default) -->
+    <section class="container my-4 d-none" id="randomResult">
+      <div class="text-center mb-3">
+        <small class="font-mono text-muted">Here's what the universe thinks you should make tonight:</small>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="recipe-card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
+              <div class="card-body">
+                <span class="badge-cocktail">Cocktail</span>
+                <h3 class="card-title mt-2">Old Fashioned</h3>
+                <p class="card-meta">by the universe &middot; just now</p>
+                <p class="card-text">A timeless whiskey cocktail. Simple, strong, and perfect.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Recipes -->
+    <section class="container my-5">
+      <h2 class="mb-4">What people are making</h2>
+      <div class="row g-4">
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="recipe-card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
+              <div class="card-body">
+                <span class="badge-cocktail">Cocktail</span>
+                <h3 class="card-title mt-2">Margarita</h3>
+                <p class="card-meta">by mixmaster &middot; 2 days ago</p>
+                <div class="star-rating">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-half"></i>
+                  <span class="ms-1 font-mono">4.3</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="recipe-card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
+              <div class="card-body">
+                <span class="badge-cocktail">Cocktail</span>
+                <h3 class="card-title mt-2">Mojito</h3>
+                <p class="card-meta">by limelife &middot; 5 days ago</p>
+                <div class="star-rating">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                  <span class="ms-1 font-mono">4.0</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="recipe-card">
+              <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
+              <div class="card-body">
+                <span class="badge-food">Food</span>
+                <h3 class="card-title mt-2">Spicy Arrabiata Penne</h3>
+                <p class="card-meta">by pastaqueen &middot; 1 week ago</p>
+                <div class="star-rating">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <span class="ms-1 font-mono">4.8</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6">
+          <a href="recipe_detail.html" class="text-decoration-none">
+            <div class="recipe-card">
+              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
+              <div class="card-body">
+                <span class="badge-cocktail">Cocktail</span>
+                <h3 class="card-title mt-2">Old Fashioned</h3>
+                <p class="card-meta">by bourbonboy &middot; 3 days ago</p>
+                <div class="star-rating">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                  <span class="ms-1 font-mono">4.1</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Browse by Category -->
+    <section class="container my-5">
+      <h2 class="mb-4">Browse by category</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <a href="recipes.html" class="text-decoration-none">
+            <div class="category-card category-cocktail">
+              <i class="bi bi-cup-straw"></i>
+              <h3>Cocktails</h3>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="recipes.html" class="text-decoration-none">
+            <div class="category-card category-food">
+              <i class="bi bi-egg-fried"></i>
+              <h3>Food</h3>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="recipes.html" class="text-decoration-none">
+            <div class="category-card category-mocktail">
+              <i class="bi bi-cup-straw"></i>
+              <h3>Mocktails</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feeling Adventurous -->
+    <section class="container my-5 text-center random-section">
+      <h2>Feeling adventurous?</h2>
+      <p class="text-muted mb-4">Let us pick something random for you. Could be a cocktail, could be dinner. Who knows.</p>
+      <button class="btn-shuffle btn-shuffle-lg" id="randomShuffle" title="Surprise me">
+        <i class="bi bi-shuffle"></i>
+      </button>
+      <p class="mt-2"><small class="font-mono text-muted">Lucky dip</small></p>
+    </section>
+
   </main>
 
-  <footer class="bg-dark text-light py-3 mt-auto">
+  <footer class="py-3 mt-auto">
     <div class="container text-center">
       <p class="mb-0">&copy; 2026 Mix It Up</p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/js/main.js"></script>
+  <script src="../static/js/index.js"></script>
 </body>
 </html>
