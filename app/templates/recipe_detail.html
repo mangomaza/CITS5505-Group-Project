@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recipe - Mix It Up</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../static/css/style.css">
 
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -19,7 +19,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-            <li class="nav-item"><a class="nav-link active" href="recipe.html">Recipes</a></li>
+            <li class="nav-item"><a class="nav-link active" href="recipes.html">Recipes</a></li>
             <li class="nav-item"><a class="nav-link" href="create_recipe.html">Create</a></li>
             <li class="nav-item"><a class="nav-link" href="share.html">Share</a></li>
           </ul>
@@ -38,7 +38,7 @@
  
   <footer class="bg-dark text-light py-3 mt-auto">
     <div class="container text-center">
-      <p class="mb-0">Mix It Up</p>
+      <p class="mb-0">© 2026 Mix It Up</p>
     </div>
   </footer>
  
@@ -67,27 +67,7 @@
         tags: ["Summer", "Easy", "Aperitivo"],
       },
       2: {
-        id: 2, name: "Berry Bliss", type: "dessert", emoji: "🍰",
-        author: "Ricky", rating: 5.0, ratings: 3,
-        description: "A light and fruity berry dessert that comes together in minutes. Crowd-pleaser every time.",
-        heroColor: "#E1F5EE",
-        ingredients: [
-          { name: "Mixed berries",   amount: "200g"   },
-          { name: "Cream cheese",    amount: "150g"   },
-          { name: "Icing sugar",     amount: "2 tbsp" },
-          { name: "Vanilla extract", amount: "1 tsp"  },
-          { name: "Digestive base",  amount: "4"      },
-        ],
-        steps: [
-          "Beat cream cheese with icing sugar and vanilla until smooth.",
-          "Spoon mixture onto digestive bases.",
-          "Top generously with mixed berries.",
-          "Chill for 15 minutes before serving.",
-        ],
-        tags: ["Dessert", "No-bake", "Quick"],
-      },
-      3: {
-        id: 3, name: "Garlic Flatbread", type: "food", emoji: "🍞",
+        id: 2, name: "Garlic Flatbread", type: "food", emoji: "🍞",
         author: "Wendy", rating: 3.9, ratings: 12,
         description: "Crispy, garlicky flatbread straight from the pan. Great as a side or a snack.",
         heroColor: "#FAEEDA",
@@ -107,8 +87,8 @@
         ],
         tags: ["Side dish", "Vegetarian", "Quick"],
       },
-      4: {
-        id: 4, name: "Classic Negroni", type: "cocktail", emoji: "🍸",
+      3: {
+        id: 3, name: "Classic Negroni", type: "cocktail", emoji: "🍸",
         author: "Wendy", rating: 4.5, ratings: 20,
         description: "The timeless Italian aperitivo. Equal parts gin, Campari, and sweet vermouth stirred over ice.",
         heroColor: "#EEEDFE",
@@ -127,28 +107,8 @@
         ],
         tags: ["Classic", "Italian", "Stirred"],
       },
-      5: {
-        id: 5, name: "Citrus Cooler", type: "dessert", emoji: "🍊",
-        author: "Asad Maza", rating: 4.1, ratings: 5,
-        description: "A refreshing citrus-flavoured dessert, light and zesty with a creamy finish.",
-        heroColor: "#E1F5EE",
-        ingredients: [
-          { name: "Orange juice",   amount: "200ml"              },
-          { name: "Lemon juice",    amount: "50ml"               },
-          { name: "Condensed milk", amount: "100ml"              },
-          { name: "Whipped cream",  amount: "100ml"              },
-          { name: "Zest",           amount: "1 lemon & 1 orange" },
-        ],
-        steps: [
-          "Whisk orange juice, lemon juice, and condensed milk together.",
-          "Fold in whipped cream gently until just combined.",
-          "Pour into serving glasses and refrigerate for at least 1 hour.",
-          "Top with zest before serving.",
-        ],
-        tags: ["Dessert", "Chilled", "Citrus"],
-      },
-      6: {
-        id: 6, name: "Summer Salad", type: "food", emoji: "🥗",
+      4: {
+        id: 4, name: "Summer Salad", type: "food", emoji: "🥗",
         author: "Asad Maza", rating: 4.0, ratings: 7,
         description: "A bright, crunchy salad packed with seasonal veg and a zingy lemon dressing.",
         heroColor: "#FAEEDA",
@@ -169,8 +129,8 @@
         ],
         tags: ["Healthy", "Vegetarian", "Quick"],
       },
-      7: {
-        id: 7, name: "Mango Daiquiri", type: "cocktail", emoji: "🥭",
+      5: {
+        id: 5, name: "Mango Daiquiri", type: "cocktail", emoji: "🥭",
         author: "Wenmin", rating: 4.5, ratings: 15,
         description: "Tropical, fruity, and dangerously easy to drink. Blend it frozen or shake it up.",
         heroColor: "#EEEDFE",
@@ -189,29 +149,9 @@
         ],
         tags: ["Tropical", "Fruity", "Shaken"],
       },
-      8: {
-        id: 8, name: "Mint Lemonade", type: "dessert", emoji: "🍮",
-        author: "Wenmin", rating: 4.2, ratings: 9,
-        description: "A creamy mint-infused dessert with a bright lemon flavour — cool and refreshing.",
-        heroColor: "#E1F5EE",
-        ingredients: [
-          { name: "Double cream", amount: "200ml"    },
-          { name: "Lemon curd",   amount: "4 tbsp"   },
-          { name: "Fresh mint",   amount: "10 leaves"},
-          { name: "Icing sugar",  amount: "1 tbsp"   },
-          { name: "Lemon zest",   amount: "1 lemon"  },
-        ],
-        steps: [
-          "Finely chop mint leaves and mix with icing sugar until fragrant.",
-          "Whip double cream to soft peaks, fold in lemon curd and mint mixture.",
-          "Spoon into glasses and refrigerate for 30 minutes.",
-          "Finish with lemon zest before serving.",
-        ],
-        tags: ["Dessert", "Chilled", "Creamy"],
-      },
     };
  
-    const badgeClass = { cocktail: "badge-cocktail", dessert: "badge-dessert", food: "badge-food" };
+    const badgeClass = { cocktail: "badge-cocktail", food: "badge-food" };
 
     let userRating = 0;
 
@@ -285,7 +225,7 @@ function setRating() {
       document.title = `${r.name} - Mix It Up`;
  
       document.getElementById("mainContent").innerHTML = `
-        <a href="recipe.html" class="text-muted text-decoration-none small d-inline-flex align-items-center gap-1 mb-3">
+        <a href="recipes.html" class="text-muted text-decoration-none small d-inline-flex align-items-center gap-1 mb-3">
           ← Back to recipes
         </a>
  
@@ -360,7 +300,7 @@ function setRating() {
       document.getElementById("mainContent").innerHTML = `
         <div class="text-center py-5">
           <p class="text-muted">Recipe not found.</p>
-          <a href="recipe.html" class="btn btn-outline-secondary btn-sm">Back to recipes</a>
+          <a href="recipes.html" class="btn btn-outline-secondary btn-sm">Back to recipes</a>
         </div>`;
     }
   </script>
