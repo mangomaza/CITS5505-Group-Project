@@ -1,0 +1,114 @@
+/* ============================================================
+   Mix It Up: Home Page Styles
+   ============================================================ */
+
+/* ---- Hero Section ---- */
+.hero {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2C2421 0%, #1A1614 50%, #2A201C 100%);
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 22, 20, 0.75) 0%,
+    rgba(26, 22, 20, 0.85) 60%,
+    var(--mix-bg) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 60px 20px 80px;
+}
+
+.hero-title {
+  font-family: var(--mix-font-display);
+  font-size: 3.2rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+  color: var(--mix-text);
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--mix-text-muted);
+  max-width: 480px;
+  margin: 0 auto 2rem;
+}
+
+.hero-actions {
+  margin-bottom: 1rem;
+}
+
+.hero-shuffle-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  color: var(--mix-text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ---- Category Cards ---- */
+.category-card {
+  background-color: var(--mix-card);
+  border-radius: var(--mix-radius);
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: var(--mix-shadow);
+  transition: transform 250ms ease-out, box-shadow 250ms ease-out;
+  cursor: pointer;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--mix-shadow-hover);
+}
+
+.category-card i {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.category-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.category-cocktail i { color: var(--mix-secondary); }
+.category-food i     { color: var(--mix-tertiary); }
+.category-mocktail i { color: #C4868E; }
+
+/* ---- Random Section ---- */
+.random-section {
+  padding: 48px 0;
+}
+
+.random-section h2 {
+  font-size: 1.8rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 575.98px) {
+  .hero {
+    min-height: 340px;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+}

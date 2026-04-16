@@ -3,13 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Recipe - Mix It Up</title>
+  <title>Create Recipe &mdash; Mix It Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../static/css/style.css">
+  <link rel="stylesheet" href="../static/css/create_recipe.css">
 </head>
 <body>
+
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
         <a class="navbar-brand" href="index.html">Mix It Up</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -32,15 +38,111 @@
   </header>
 
   <main class="container my-4">
-    <!-- page content goes here -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <h1 class="mb-4">Create a recipe</h1>
+
+        <div class="form-card create-form">
+          <form>
+
+            <!-- Basic Info -->
+            <div class="form-section">
+              <div class="section-title">Basic info</div>
+              <div class="mb-3">
+                <label for="recipeName" class="form-label">Recipe name</label>
+                <input type="text" class="form-control" id="recipeName" placeholder="e.g. Spicy Mango Margarita" required>
+              </div>
+              <div class="mb-3">
+                <label for="recipeDesc" class="form-label">Description</label>
+                <textarea class="form-control" id="recipeDesc" rows="2" placeholder="A short description of your recipe"></textarea>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="recipeCategory" class="form-label">Category</label>
+                  <select class="form-select" id="recipeCategory">
+                    <option value="">Select a category</option>
+                    <option value="cocktail">Cocktail</option>
+                    <option value="mocktail">Mocktail</option>
+                    <option value="food">Food</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="recipeGlass" class="form-label">Glass type (optional)</label>
+                  <input type="text" class="form-control" id="recipeGlass" placeholder="e.g. Cocktail glass">
+                </div>
+              </div>
+            </div>
+
+            <!-- Image -->
+            <div class="form-section">
+              <div class="section-title">Photo</div>
+              <div class="upload-area" id="uploadArea">
+                <div class="upload-placeholder">
+                  <i class="bi bi-camera"></i>
+                  <p>Click to upload a photo</p>
+                </div>
+                <img class="upload-preview" id="imagePreview" alt="Preview">
+              </div>
+              <input type="file" id="recipeImage" accept="image/*" hidden>
+            </div>
+
+            <!-- Ingredients -->
+            <div class="form-section">
+              <div class="section-title">Ingredients</div>
+              <div id="ingredientList">
+                <div class="ingredient-row">
+                  <input type="text" class="form-control" placeholder="Ingredient name">
+                  <input type="text" class="form-control" placeholder="Qty">
+                  <input type="text" class="form-control" placeholder="Unit">
+                  <button type="button" class="btn-remove" title="Remove"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <div class="ingredient-row">
+                  <input type="text" class="form-control" placeholder="Ingredient name">
+                  <input type="text" class="form-control" placeholder="Qty">
+                  <input type="text" class="form-control" placeholder="Unit">
+                  <button type="button" class="btn-remove" title="Remove"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <div class="ingredient-row">
+                  <input type="text" class="form-control" placeholder="Ingredient name">
+                  <input type="text" class="form-control" placeholder="Qty">
+                  <input type="text" class="form-control" placeholder="Unit">
+                  <button type="button" class="btn-remove" title="Remove"><i class="bi bi-x-lg"></i></button>
+                </div>
+              </div>
+              <button type="button" class="btn-add-ingredient mt-2" id="addIngredient">
+                <i class="bi bi-plus"></i> Add ingredient
+              </button>
+            </div>
+
+            <!-- Instructions -->
+            <div class="form-section">
+              <div class="section-title">Instructions</div>
+              <div class="mb-3">
+                <textarea class="form-control" rows="6" placeholder="Describe how to make this recipe..."></textarea>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="form-actions">
+              <button type="submit" class="btn btn-mix">Create Recipe</button>
+              <a href="recipes.html" class="cancel-link">Cancel</a>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
   </main>
 
-  <footer class="bg-dark text-light py-3 mt-auto">
+  <footer class="py-3 mt-auto">
     <div class="container text-center">
       <p class="mb-0">&copy; 2026 Mix It Up</p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../static/js/main.js"></script>
 </body>
 </html>

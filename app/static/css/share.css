@@ -1,0 +1,62 @@
+/* ============================================================
+   Mix It Up: Share Page Styles
+   ============================================================ */
+
+/* ---- Share Form Layout ---- */
+.share-form {
+  max-width: 600px;
+}
+
+.share-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+
+/* ---- Share History Table ---- */
+.share-history {
+  margin-top: 3rem;
+}
+
+.share-history h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.share-table {
+  background-color: var(--mix-card);
+  border-radius: var(--mix-radius);
+  overflow: hidden;
+}
+
+.share-table .table {
+  margin-bottom: 0;
+}
+
+.share-table .table td,
+.share-table .table th {
+  padding: 14px 20px;
+}
+
+.share-table .btn-unshare {
+  background: transparent;
+  border: none;
+  color: var(--mix-danger);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 200ms ease;
+}
+
+.share-table .btn-unshare:hover {
+  color: #E06050;
+  text-decoration: underline;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 575.98px) {
+  .share-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}

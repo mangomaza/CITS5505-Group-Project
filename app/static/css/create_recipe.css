@@ -1,0 +1,133 @@
+/* ============================================================
+   Mix It Up: Create/Edit Recipe Page Styles
+   ============================================================ */
+
+/* ---- Form Sections ---- */
+.create-form .form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(155, 142, 130, 0.12);
+}
+
+.create-form .form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.create-form .section-title {
+  font-family: var(--mix-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--mix-accent);
+  margin-bottom: 1rem;
+}
+
+/* ---- Image Upload ---- */
+.upload-area {
+  border: 2px dashed rgba(155, 142, 130, 0.3);
+  border-radius: var(--mix-radius);
+  padding: 40px 20px;
+  text-align: center;
+  background-color: var(--mix-card-elevated);
+  transition: border-color 200ms ease;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  border-color: var(--mix-accent);
+}
+
+.upload-area i {
+  font-size: 2rem;
+  color: var(--mix-text-muted);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.upload-area p {
+  color: var(--mix-text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.upload-preview {
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: var(--mix-radius);
+  display: none;
+}
+
+/* ---- Dynamic Ingredient Rows ---- */
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.ingredient-row .btn-remove {
+  background: transparent;
+  border: none;
+  color: var(--mix-danger);
+  font-size: 1.1rem;
+  padding: 10px 8px;
+  cursor: pointer;
+  transition: color 200ms ease;
+  line-height: 1;
+}
+
+.ingredient-row .btn-remove:hover {
+  color: #E06050;
+}
+
+.btn-add-ingredient {
+  background: transparent;
+  border: 1px dashed var(--mix-accent);
+  color: var(--mix-accent);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-ingredient:hover {
+  background-color: rgba(212, 148, 76, 0.1);
+}
+
+/* ---- Form Actions ---- */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.form-actions .cancel-link {
+  color: var(--mix-text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.form-actions .cancel-link:hover {
+  color: var(--mix-text);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 575.98px) {
+  .ingredient-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .ingredient-row .form-control:first-child {
+    grid-column: 1 / -1;
+  }
+}
