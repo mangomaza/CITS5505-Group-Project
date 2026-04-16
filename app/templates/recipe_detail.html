@@ -6,8 +6,9 @@
   <title>Recipe - Mix It Up</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../static/css/style.css">
+
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
       <div class="container">
@@ -30,17 +31,278 @@
       </div>
     </nav>
   </header>
-
-  <main class="container my-4">
-    <!-- page content goes here -->
+ 
+  <main class="container my-4 flex-grow-1" id="mainContent">
+    <div class="text-center py-5 text-muted">Loading recipe…</div>
   </main>
-
+ 
   <footer class="bg-dark text-light py-3 mt-auto">
     <div class="container text-center">
-      <p class="mb-0">&copy; 2026 Mix It Up</p>
+      <p class="mb-0">© 2026 Mix It Up</p>
     </div>
   </footer>
-
+ 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+
+    const recipeDB = {
+      1: {
+        id: 1, name: "Sunset Spritz", type: "cocktail", emoji: "🍹",
+        author: "Ricky", rating: 4.2, ratings: 8,
+        description: "A vibrant, easy-drinking aperitivo spritz with gorgeous sunset colours. Perfect for warm evenings.",
+        heroColor: "#EEEDFE",
+        ingredients: [
+          { name: "Prosecco",     amount: "120ml"   },
+          { name: "Aperol",       amount: "60ml"    },
+          { name: "Soda water",   amount: "30ml"    },
+          { name: "Orange slice", amount: "1"       },
+          { name: "Ice cubes",    amount: "handful" },
+        ],
+        steps: [
+          "Fill a large wine glass generously with ice cubes.",
+          "Pour in the Aperol, then slowly top up with Prosecco.",
+          "Add a splash of soda water to taste.",
+          "Garnish with an orange slice and serve immediately.",
+        ],
+        tags: ["Summer", "Easy", "Aperitivo"],
+      },
+      2: {
+        id: 2, name: "Garlic Flatbread", type: "food", emoji: "🍞",
+        author: "Wendy", rating: 3.9, ratings: 12,
+        description: "Crispy, garlicky flatbread straight from the pan. Great as a side or a snack.",
+        heroColor: "#FAEEDA",
+        ingredients: [
+          { name: "Plain flour",   amount: "200g"    },
+          { name: "Greek yoghurt", amount: "150g"    },
+          { name: "Garlic cloves", amount: "3"       },
+          { name: "Butter",        amount: "30g"     },
+          { name: "Fresh parsley", amount: "handful" },
+          { name: "Salt",          amount: "½ tsp"   },
+        ],
+        steps: [
+          "Mix flour, yoghurt, and salt into a soft dough. Rest 10 minutes.",
+          "Divide into 4 balls and roll each out thinly.",
+          "Cook in a dry hot pan for 2–3 minutes per side until charred spots appear.",
+          "Melt butter with crushed garlic, brush over flatbreads and top with parsley.",
+        ],
+        tags: ["Side dish", "Vegetarian", "Quick"],
+      },
+      3: {
+        id: 3, name: "Classic Negroni", type: "cocktail", emoji: "🍸",
+        author: "Wendy", rating: 4.5, ratings: 20,
+        description: "The timeless Italian aperitivo. Equal parts gin, Campari, and sweet vermouth stirred over ice.",
+        heroColor: "#EEEDFE",
+        ingredients: [
+          { name: "Gin",            amount: "30ml"       },
+          { name: "Campari",        amount: "30ml"       },
+          { name: "Sweet vermouth", amount: "30ml"       },
+          { name: "Orange peel",    amount: "1"          },
+          { name: "Ice",            amount: "large cube" },
+        ],
+        steps: [
+          "Add gin, Campari, and vermouth to a mixing glass filled with ice.",
+          "Stir for 30 seconds until well chilled.",
+          "Strain into a rocks glass over a large ice cube.",
+          "Express an orange peel over the glass and use as garnish.",
+        ],
+        tags: ["Classic", "Italian", "Stirred"],
+      },
+      4: {
+        id: 4, name: "Summer Salad", type: "food", emoji: "🥗",
+        author: "Asad Maza", rating: 4.0, ratings: 7,
+        description: "A bright, crunchy salad packed with seasonal veg and a zingy lemon dressing.",
+        heroColor: "#FAEEDA",
+        ingredients: [
+          { name: "Mixed leaves",    amount: "80g"      },
+          { name: "Cherry tomatoes", amount: "100g"     },
+          { name: "Cucumber",        amount: "½"        },
+          { name: "Red onion",       amount: "¼"        },
+          { name: "Olive oil",       amount: "2 tbsp"   },
+          { name: "Lemon juice",     amount: "1 tbsp"   },
+          { name: "Salt & pepper",   amount: "to taste" },
+        ],
+        steps: [
+          "Wash and dry salad leaves, place in a large bowl.",
+          "Halve tomatoes, slice cucumber and red onion thinly, add to bowl.",
+          "Whisk olive oil and lemon juice together, season well.",
+          "Drizzle dressing over salad just before serving and toss lightly.",
+        ],
+        tags: ["Healthy", "Vegetarian", "Quick"],
+      },
+      5: {
+        id: 5, name: "Mango Daiquiri", type: "cocktail", emoji: "🥭",
+        author: "Wenmin", rating: 4.5, ratings: 15,
+        description: "Tropical, fruity, and dangerously easy to drink. Blend it frozen or shake it up.",
+        heroColor: "#EEEDFE",
+        ingredients: [
+          { name: "White rum",   amount: "60ml"    },
+          { name: "Mango purée", amount: "60ml"    },
+          { name: "Lime juice",  amount: "30ml"    },
+          { name: "Sugar syrup", amount: "15ml"    },
+          { name: "Ice",         amount: "handful" },
+        ],
+        steps: [
+          "Add all ingredients to a cocktail shaker with ice.",
+          "Shake vigorously for 15 seconds.",
+          "Double-strain into a chilled coupe glass.",
+          "Garnish with a thin mango slice on the rim.",
+        ],
+        tags: ["Tropical", "Fruity", "Shaken"],
+      },
+    };
+ 
+    const badgeClass = { cocktail: "badge-cocktail", food: "badge-food" };
+
+    let userRating = 0;
+
+function starHTML() {
+  let html = "";
+  for (let i = 1; i <= 5; i++) {
+    html += `<button type="button" class="star-btn ${i <= userRating ? "active" : ""}"
+               onmouseover="highlightStars(${i})"
+               onmouseout="resetStars()"
+               onclick="chooseRating(${i})">★</button>`;
+  }
+  return html;
+}
+
+function chooseRating(n) {
+  userRating = n;
+  resetStars();
+  document.getElementById("ratingFeedback").textContent =
+    `You selected ${n}/5. Click Submit rating to confirm.`;
+}
+
+function highlightStars(n) {
+  document.querySelectorAll(".star-btn").forEach((b, i) => {
+    b.classList.toggle("active", i < n);
+  });
+}
+
+function resetStars() {
+  document.querySelectorAll(".star-btn").forEach((b, i) => {
+    b.classList.toggle("active", i < userRating);
+  });
+}
+
+function setRating() {
+  if (userRating === 0) {
+    document.getElementById("ratingFeedback").textContent =
+      "Please choose a star rating first.";
+    return;
+  }
+
+  document.getElementById("ratingFeedback").textContent =
+    userRating === 5
+      ? "Thanks! You gave 5 stars ⭐"
+      : `Thanks! You rated this ${userRating}/5.`;
+}
+
+    function starsDisplay(rating) {
+      const full = Math.round(rating);
+      let s = "";
+      for (let i = 1; i <= 5; i++) s += i <= full ? "★" : "☆";
+      return `<span style="color:#f2c37c">${s}</span>`;
+    }
+ 
+    function render(r) {
+      const ingredientsHTML = r.ingredients.map(ing => `
+        <tr class="ingredient-row">
+          <td>${ing.name}</td>
+          <td class="text-end text-muted">${ing.amount}</td>
+        </tr>`).join("");
+ 
+      const stepsHTML = r.steps.map((step, i) => `
+        <div class="step-card">
+          <div class="step-num bg-light text-secondary">${i + 1}</div>
+          <p class="mb-0" style="line-height:1.6">${step}</p>
+        </div>`).join("");
+ 
+      const tagsHTML = (r.tags || []).map(t =>
+        `<span class="tag-pill">${t}</span>`
+      ).join("");
+ 
+      document.title = `${r.name} - Mix It Up`;
+ 
+      document.getElementById("mainContent").innerHTML = `
+        <a href="recipes.html" class="text-muted text-decoration-none small d-inline-flex align-items-center gap-1 mb-3">
+          ← Back to recipes
+        </a>
+ 
+        <div class="hero-banner d-flex align-items-center gap-4 flex-wrap" style="background:${r.heroColor}">
+          <div class="hero-emoji">${r.emoji}</div>
+          <div class="flex-grow-1">
+            <h1 class="recipe-title">${r.name}</h1>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+              <span class="badge rounded-pill ${badgeClass[r.type]}">${r.type}</span>
+              <span class="small">${starsDisplay(r.rating)} ${r.rating.toFixed(1)} (${r.ratings} ratings)</span>
+              <span class="small text-muted">by @${r.author}</span>
+            </div>
+            <p class="recipe-description mb-0">${r.description}</p>
+          </div>
+          <div class="hero-actions d-flex flex-column gap-2">
+            <button class="btn btn-sm btn-outline-secondary" onclick="shareRecipe()">Share</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="saveRecipe()">Save</button>
+          </div>
+        </div>
+ 
+        ${tagsHTML ? `<div class="mb-4">${tagsHTML}</div>` : ""}
+ 
+        <div class="row gx-5 gy-4 mb-4">
+          <div class="col-md-4">
+           <div class="info-card">
+             <div class="section-label">Ingredients</div>
+              <table class="w-100">
+                <tbody>${ingredientsHTML}</tbody>
+              </table>
+           </div>
+         </div>
+
+  <div class="col-md-8">
+    <div class="info-card">
+      <div class="section-label">Method</div>
+      ${stepsHTML}
+    </div>
+  </div>
+</div>
+ 
+        <div class="rating-box">
+          <p class="section-label mb-2">Rate this recipe</p>
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div id="starWidget">${starHTML()}</div>
+            <button type="button" class="btn btn-sm btn-dark" onclick="setRating()">Submit rating</button>
+            <span id="ratingFeedback" class="small text-muted"></span>
+          </div>
+        </div>`;
+    }
+ 
+    function shareRecipe() {
+      if (navigator.share) {
+        navigator.share({ title: recipe.name, url: location.href });
+      } else {
+        navigator.clipboard.writeText(location.href);
+        alert("Link copied to clipboard!");
+      }
+    }
+ 
+    function saveRecipe() {
+      // TODO: POST to your backend save endpoint
+      alert("Recipe saved!");
+    }
+ 
+    const params = new URLSearchParams(location.search);
+    const id     = parseInt(params.get("id")) || 1;
+    const recipe = recipeDB[id];
+ 
+    if (recipe) {
+      render(recipe);
+    } else {
+      document.getElementById("mainContent").innerHTML = `
+        <div class="text-center py-5">
+          <p class="text-muted">Recipe not found.</p>
+          <a href="recipes.html" class="btn btn-outline-secondary btn-sm">Back to recipes</a>
+        </div>`;
+    }
+  </script>
 </body>
 </html>
