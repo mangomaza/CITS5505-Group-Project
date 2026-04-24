@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recipes - Mix It Up</title>
+  <title>Recipes &mdash; Mix It Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../static/css/style.css">
-
+  <link rel="stylesheet" href="../static/css/recipes.css">
 </head>
+<body>
 
-<body class="d-flex flex-column min-vh-100">
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
         <a class="navbar-brand" href="index.html">Mix It Up</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -34,118 +37,173 @@
     </nav>
   </header>
 
-  <main class="container my-4 flex-grow-1">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h1 class="h4 mb-0">Recipes</h1>
-    </div>
+  <main class="container my-4">
 
-    <div class="random-suggestion-card mb-4 p-3 rounded-4 shadow-sm bg-white border">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-          <p class="text-uppercase small text-muted mb-1">Random Recipe Suggestion</p>
-          <h2 class="h5 mb-1" id="randomRecipeName">Loading suggestion...</h2>
-          <p class="mb-0 text-muted" id="randomRecipeMeta"></p>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="btn btn-outline-dark btn-sm" onclick="showRandomRecipe()">Try another</button>
-          <a id="randomRecipeLink" class="btn btn-dark btn-sm" href="#">View recipe</a>
-        </div>
+    <h1 class="mb-4">Recipes</h1>
+
+    <!-- Search & Filter -->
+    <div class="search-bar d-flex flex-wrap align-items-center gap-3">
+      <div class="input-group" style="max-width:320px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search recipes...">
       </div>
-    </div>
-
-    <div class="row g-2 mb-4">
-      <div class="col-md-6">
-        <input type="text" class="form-control" id="searchInput" placeholder="Search recipes...">
+      <div class="filter-pills">
+        <button class="filter-pill active" data-filter="all">All</button>
+        <button class="filter-pill" data-filter="cocktail">Cocktails</button>
+        <button class="filter-pill" data-filter="food">Food</button>
+        <button class="filter-pill" data-filter="mocktail">Mocktails</button>
       </div>
-      <div class="col-md-3">
-        <select class="form-select" id="typeFilter">
-          <option value="">All types</option>
-          <option value="cocktail">Cocktail</option>
-          <option value="food">Food</option>
-        </select>
+      <button class="btn-mix-it-up ms-auto" id="mixItUpBtn" title="Pick a random recipe">
+        <i class="bi bi-shuffle me-1"></i> Mix it up
+      </button>
+    </div>
+
+    <!-- Recipe Grid -->
+    <div class="recipe-grid">
+
+      <div class="recipe-grid-item">
+        <a href="recipe_detail.html" class="text-decoration-none">
+          <div class="recipe-card">
+            <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
+            <div class="card-body">
+              <span class="badge-cocktail">Cocktail</span>
+              <h3 class="card-title mt-2">Margarita</h3>
+              <p class="card-meta">by mixmaster &middot; 2 days ago</p>
+              <div class="star-rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <span class="ms-1 font-mono">4.3</span>
+              </div>
+            </div>
+          </div>
+        </a>
       </div>
+
+      <div class="recipe-grid-item">
+        <a href="recipe_detail.html" class="text-decoration-none">
+          <div class="recipe-card">
+            <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
+            <div class="card-body">
+              <span class="badge-cocktail">Cocktail</span>
+              <h3 class="card-title mt-2">Mojito</h3>
+              <p class="card-meta">by limelife &middot; 5 days ago</p>
+              <div class="star-rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star"></i>
+                <span class="ms-1 font-mono">4.0</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="recipe-grid-item">
+        <a href="recipe_detail.html" class="text-decoration-none">
+          <div class="recipe-card">
+            <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
+            <div class="card-body">
+              <span class="badge-food">Food</span>
+              <h3 class="card-title mt-2">Spicy Arrabiata Penne</h3>
+              <p class="card-meta">by pastaqueen &middot; 1 week ago</p>
+              <div class="star-rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <span class="ms-1 font-mono">4.8</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="recipe-grid-item">
+        <a href="recipe_detail.html" class="text-decoration-none">
+          <div class="recipe-card">
+            <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
+            <div class="card-body">
+              <span class="badge-cocktail">Cocktail</span>
+              <h3 class="card-title mt-2">Old Fashioned</h3>
+              <p class="card-meta">by bourbonboy &middot; 3 days ago</p>
+              <div class="star-rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star"></i>
+                <span class="ms-1 font-mono">4.1</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="recipe-grid-item">
+        <a href="recipe_detail.html" class="text-decoration-none">
+          <div class="recipe-card">
+            <img src="https://www.thecocktaildb.com/images/media/drink/qyxjpe1680103024.jpg" class="card-img-top" alt="Negroni">
+            <div class="card-body">
+              <span class="badge-cocktail">Cocktail</span>
+              <h3 class="card-title mt-2">Negroni</h3>
+              <p class="card-meta">by ginlover &middot; 4 days ago</p>
+              <div class="star-rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-half"></i>
+                <span class="ms-1 font-mono">4.5</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="recipe-grid-item">
+        <a href="recipe_detail.html" class="text-decoration-none">
+          <div class="recipe-card">
+            <img src="https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg" class="card-img-top" alt="Pad Thai">
+            <div class="card-body">
+              <span class="badge-food">Food</span>
+              <h3 class="card-title mt-2">Pad Thai</h3>
+              <p class="card-meta">by noodleking &middot; 6 days ago</p>
+              <div class="star-rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star"></i>
+                <span class="ms-1 font-mono">3.9</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
     </div>
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4" id="recipeGrid">
+    <!-- Load More -->
+    <div class="load-more">
+      <button class="btn btn-ghost">Load more</button>
     </div>
 
-    <p class="text-muted text-center mt-4 d-none" id="emptyMsg">No recipes match your search.</p>
   </main>
 
-  <footer class="bg-dark text-light py-3 mt-auto">
+  <footer class="py-3 mt-auto">
     <div class="container text-center">
-      <p class="mb-0">© 2026 Mix It Up</p>
+      <p class="mb-0">&copy; 2026 Mix It Up</p>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const recipes = [
-      { id: 1, name: "Sunset Spritz", type: "cocktail", emoji: "🍹", rating: 4.2, ratings: 8, author: "Ricky" },
-      { id: 2, name: "Garlic Flatbread", type: "food", emoji: "🍞", rating: 3.9, ratings: 12, author: "Wendy" },
-      { id: 3, name: "Classic Negroni", type: "cocktail", emoji: "🍸", rating: 4.5, ratings: 20, author: "Wendy" },
-      { id: 4, name: "Summer Salad", type: "food", emoji: "🥗", rating: 4.0, ratings: 7, author: "Asad Maza" },
-      { id: 5, name: "Mango Daiquiri", type: "cocktail", emoji: "🥭", rating: 4.5, ratings: 15, author: "Wenmin" },
-    ];
-
-    const badgeClass = { cocktail: "badge-cocktail", food: "badge-food" };
-    const bgColor = { cocktail: "#EEEDFE", food: "#FAEEDA" };
-
-    function starsHTML(rating) {
-      const full = Math.round(rating);
-      let s = "";
-      for (let i = 1; i <= 5; i++) {
-        s += i <= full ? "★" : "☆";
-      }
-      return `<span class="stars">${s}</span> <small class="text-muted">${rating.toFixed(1)}</small>`;
-    }
-
-    function cardHTML(r) {
-      return `
-        <div class="col recipe-item" data-type="${r.type}" data-name="${r.name.toLowerCase()}" data-rating="${r.rating}">
-          <div class="card recipe-card h-100" data-type="${r.type}" onclick="location.href='recipe_detail.html?id=${r.id}'">
-            <div class="card-emoji" style="background:${bgColor[r.type]}">${r.emoji}</div>
-            <div class="card-body py-2 px-3">
-              <p class="card-title mb-1">${r.name}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge rounded-pill ${badgeClass[r.type]} small">${r.type}</span>
-                <span>${starsHTML(r.rating)}</span>
-              </div>
-              <p class="text-muted small mt-1 mb-0">by @${r.author} · ${r.ratings} ratings</p>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    function showRandomRecipe() {
-      const random = recipes[Math.floor(Math.random() * recipes.length)];
-
-      document.getElementById("randomRecipeName").textContent = `${random.emoji} ${random.name}`;
-      document.getElementById("randomRecipeMeta").textContent =
-        `${random.type} · ${random.rating.toFixed(1)} stars · by @${random.author}`;
-      document.getElementById("randomRecipeLink").href = `recipe_detail.html?id=${random.id}`;
-    }
-
-    function render() {
-      const q = document.getElementById("searchInput").value.toLowerCase();
-      const type = document.getElementById("typeFilter").value;
-
-      let filtered = recipes.filter(r =>
-        r.name.toLowerCase().includes(q) &&
-        (type === "" || r.type === type)
-      );
-
-      const grid = document.getElementById("recipeGrid");
-      grid.innerHTML = filtered.map(cardHTML).join("");
-      document.getElementById("emptyMsg").classList.toggle("d-none", filtered.length > 0);
-    }
-
-    document.getElementById("searchInput").addEventListener("input", render);
-    document.getElementById("typeFilter").addEventListener("change", render);
-
-    render();
-    showRandomRecipe();
-  </script>
+  <script src="../static/js/main.js"></script>
+  <script src="../static/js/recipes.js"></script>
 </body>
-
 </html>
