@@ -1,0 +1,190 @@
+/* ============================================================
+   Mix It Up — Option A: Recipe Detail Page Styles
+   ============================================================ */
+
+/* ---- Detail Hero ---- */
+.detail-hero {
+  position: relative;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: 0 0 var(--mix-radius) var(--mix-radius);
+}
+
+.detail-hero img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.detail-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(to top, var(--mix-bg) 0%, transparent 100%);
+}
+
+/* ---- Metadata Bar ---- */
+.recipe-meta {
+  margin-top: -40px;
+  position: relative;
+  z-index: 2;
+}
+
+.recipe-meta .recipe-title {
+  font-family: var(--mix-font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-meta .meta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--mix-text-muted);
+  font-family: var(--mix-font-mono);
+}
+
+/* ---- Side A / Side B Section Labels ---- */
+.side-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--mix-accent);
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(212, 148, 76, 0.3);
+  margin-bottom: 20px;
+  margin-top: 2rem;
+}
+
+/* ---- Ingredients List ---- */
+.ingredients-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredients-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(155, 142, 130, 0.1);
+  font-size: 0.9rem;
+}
+
+.ingredients-list li:last-child {
+  border-bottom: none;
+}
+
+.ingredient-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 6px;
+  background-color: var(--mix-card-elevated);
+  padding: 2px;
+}
+
+.ingredient-qty {
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  color: var(--mix-accent);
+  min-width: 60px;
+}
+
+/* ---- Instructions ---- */
+.instructions-block {
+  background-color: var(--mix-card);
+  border-radius: var(--mix-radius);
+  padding: 24px;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  position: relative;
+}
+
+.instructions-block::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, rgba(232,221,211,0.015) 0px, rgba(232,221,211,0.015) 1px, transparent 1px, transparent 4px);
+  opacity: 1;
+  pointer-events: none;
+  border-radius: var(--mix-radius);
+}
+
+/* ---- Ratings Section ---- */
+.rating-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.rating-summary .rating-number {
+  font-family: var(--mix-font-display);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--mix-accent);
+  line-height: 1;
+}
+
+.rating-card {
+  background-color: var(--mix-card);
+  border-radius: var(--mix-radius);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.rating-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, rgba(232,221,211,0.015) 0px, rgba(232,221,211,0.015) 1px, transparent 1px, transparent 4px);
+  opacity: 1;
+  pointer-events: none;
+  border-radius: var(--mix-radius);
+}
+
+.rating-card .rating-author {
+  font-family: var(--mix-font-mono);
+  font-size: 0.78rem;
+  color: var(--mix-text-muted);
+}
+
+.rating-card .rating-comment {
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+/* ---- Action Buttons Row ---- */
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 575.98px) {
+  .detail-hero img {
+    height: 260px;
+  }
+
+  .recipe-meta .recipe-title {
+    font-size: 1.6rem;
+  }
+
+  .rating-summary .rating-number {
+    font-size: 2rem;
+  }
+}
