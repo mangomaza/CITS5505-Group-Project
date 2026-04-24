@@ -10,7 +10,7 @@
 
 ## Project Description
 
-Mix It Up is a web app for creating, logging, and sharing cocktail, mocktail, and food recipes with friends. Users can browse community recipes, rate what others have made, and use a random recipe generator when they're not sure what to try next. The idea is to keep it simple and social, so you can share your creations with specific people and see what they think.
+Mix It Up is a web app for creating, logging, and sharing cocktail and food recipes with friends. Users can browse community recipes, rate what others have made, and use a random recipe generator when they're not sure what to try next. The idea is to keep it simple and social, so you can share your creations with specific people and see what they think.
 
 ## Contributing
 
