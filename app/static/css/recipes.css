@@ -1,0 +1,145 @@
+/* ============================================================
+   Mix It Up — Option A: Browse Recipes Page Styles
+   ============================================================ */
+
+/* ---- Search & Filter Bar ---- */
+.search-bar {
+  background-color: var(--mix-card);
+  border-radius: var(--mix-radius);
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  box-shadow: var(--mix-shadow);
+}
+
+.search-bar .form-control {
+  max-width: 300px;
+}
+
+.search-bar .input-group-text {
+  background-color: var(--mix-card-elevated);
+  border: 1px solid rgba(155, 142, 130, 0.25);
+  border-right: none;
+  color: var(--mix-text-muted);
+}
+
+.search-bar .input-group .form-control {
+  border-left: none;
+}
+
+/* ---- Filter Pills ---- */
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  background: transparent;
+  border: 1px solid var(--mix-text-muted);
+  color: var(--mix-text-muted);
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.filter-pill:hover {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+}
+
+.filter-pill.active {
+  background-color: var(--mix-accent);
+  border-color: var(--mix-accent);
+  color: var(--mix-bg);
+}
+
+/* ---- Recipe Grid ---- */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+/* ---- Mix It Up Button (in search bar) ---- */
+.btn-mix-it-up {
+  background-color: var(--mix-accent);
+  border: none;
+  color: var(--mix-bg);
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-mix-it-up:hover {
+  background-color: var(--mix-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--mix-shadow-hover);
+}
+
+.btn-mix-it-up:active {
+  transform: translateY(0);
+}
+
+.btn-mix-it-up.spinning .bi-shuffle {
+  animation: spin 600ms ease-in-out;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Load More ---- */
+.load-more {
+  text-align: center;
+  padding: 32px 0;
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--mix-accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state p {
+  color: var(--mix-text-muted);
+  font-size: 1rem;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 767.98px) {
+  .recipe-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .search-bar .form-control {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .btn-mix-it-up {
+    width: 100%;
+    margin-left: 0 !important;
+    justify-content: center;
+  }
+}
