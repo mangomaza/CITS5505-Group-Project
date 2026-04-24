@@ -198,16 +198,6 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-block;
 }
 
-.badge-mocktail {
-  background-color: #C4868E;
-  color: var(--mix-text);
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 20px;
-  display: inline-block;
-}
-
 .badge-food {
   background-color: var(--mix-tertiary);
   color: var(--mix-text);
