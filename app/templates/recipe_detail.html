@@ -6,6 +6,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/recipe_detail.css') }}">
 {% endblock %}
 
+{% block extra_js %}
+  <script src="{{ url_for('static', filename='js/recipe_detail.js') }}"></script>
+{% endblock %}
+
 {% block content %}
   <main>
 
