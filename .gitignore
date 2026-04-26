@@ -1,1 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Editor / IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local-only working notes
 temporary/
