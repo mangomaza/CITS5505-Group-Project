@@ -5,6 +5,12 @@ __pycache__/
 # Virtual environment
 .venv/
 
+# Database / instance
+instance/
+*.db
+*.sqlite3
+.env
+
 # Editor / IDE
 .vscode/
 
