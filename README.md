@@ -28,6 +28,49 @@ The frontend uses Bootstrap 5 for layout and responsiveness, with custom CSS on 
 
 ## Technology Stack
 
+**Backend:** Python, Flask
+
 **Frontend:** HTML5, CSS3, Bootstrap 5, JavaScript, jQuery
 
 **Database:** SQLite
+
+## Setup
+
+1. Clone the repo and change into the project folder.
+
+   ```
+   git clone https://github.com/mangomaza/CITS5505-Group-Project.git
+   cd CITS5505-Group-Project
+   ```
+
+2. Create and activate a virtual environment.
+
+   Windows:
+   ```
+   python -m venv .venv
+   .venv\Scripts\activate
+   ```
+
+   macOS/Linux:
+   ```
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. Install dependencies.
+
+   ```
+   pip install -r requirements.txt
+   ```
+
+## Running the App
+
+With your virtual environment activated, run:
+
+```
+python manage.py
+```
+
+Then open http://127.0.0.1:5000 in your browser.
+
+By default the app uses the development config. To change it, set `FLASK_CONFIG` before running (`development`, `testing`, or `production`).

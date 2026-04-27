@@ -1,41 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home &mdash; Mix It Up</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="../static/css/style.css">
-  <link rel="stylesheet" href="../static/css/index.css">
-</head>
-<body>
-  <header>
-    <nav class="navbar navbar-expand-lg sticky-top">
-      <div class="container">
-        <a class="navbar-brand" href="index.html">Mix It Up</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="recipes.html">Recipes</a></li>
-            <li class="nav-item"><a class="nav-link" href="create_recipe.html">Create</a></li>
-            <li class="nav-item"><a class="nav-link" href="share.html">Share</a></li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-            <li class="nav-item"><a class="nav-link" href="signup.html">Sign Up</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
+{% extends 'base.html' %}
 
+{% block title %}Home &mdash; Mix It Up{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block content %}
   <main>
 
     <!-- Hero -->
@@ -50,7 +21,7 @@
           </button>
           <p class="hero-shuffle-label">Surprise me</p>
         </div>
-        <a href="recipes.html" class="btn btn-outline-mix mt-3">Browse Recipes</a>
+        <a href="{{ url_for('main.recipes') }}" class="btn btn-outline-mix mt-3">Browse Recipes</a>
       </div>
     </section>
 
@@ -61,7 +32,7 @@
       </div>
       <div class="row justify-content-center">
         <div class="col-md-6">
-          <a href="recipe_detail.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
             <div class="recipe-card">
               <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
               <div class="card-body">
@@ -82,7 +53,7 @@
       <div class="row g-4">
 
         <div class="col-md-6">
-          <a href="recipe_detail.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
             <div class="recipe-card">
               <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
               <div class="card-body">
@@ -103,7 +74,7 @@
         </div>
 
         <div class="col-md-6">
-          <a href="recipe_detail.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
             <div class="recipe-card">
               <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
               <div class="card-body">
@@ -124,7 +95,7 @@
         </div>
 
         <div class="col-md-6">
-          <a href="recipe_detail.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
             <div class="recipe-card">
               <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
               <div class="card-body">
@@ -145,7 +116,7 @@
         </div>
 
         <div class="col-md-6">
-          <a href="recipe_detail.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
             <div class="recipe-card">
               <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
               <div class="card-body">
@@ -173,7 +144,7 @@
       <h2 class="mb-4">Browse by category</h2>
       <div class="row g-4">
         <div class="col-md-6">
-          <a href="recipes.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipes') }}" class="text-decoration-none">
             <div class="category-card category-cocktail">
               <i class="bi bi-cup-straw"></i>
               <h3>Cocktails</h3>
@@ -181,7 +152,7 @@
           </a>
         </div>
         <div class="col-md-6">
-          <a href="recipes.html" class="text-decoration-none">
+          <a href="{{ url_for('main.recipes') }}" class="text-decoration-none">
             <div class="category-card category-food">
               <i class="bi bi-egg-fried"></i>
               <h3>Food</h3>
@@ -202,15 +173,8 @@
     </section>
 
   </main>
+{% endblock %}
 
-  <footer class="py-3 mt-auto">
-    <div class="container text-center">
-      <p class="mb-0">&copy; 2026 Mix It Up</p>
-    </div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../static/js/main.js"></script>
-  <script src="../static/js/index.js"></script>
-</body>
-</html>
+{% block extra_js %}
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}
