@@ -63,6 +63,24 @@ The frontend uses Bootstrap 5 for layout and responsiveness, with custom CSS on 
    pip install -r requirements.txt
    ```
 
+## Database Setup
+
+After installing dependencies, create the database:
+
+```
+flask --app manage.py db upgrade
+```
+
+This creates `instance/mixitup.db` with the latest schema.
+
+To load some sample users to play with, run:
+
+```
+python seed_db.py
+```
+
+This wipes the database and inserts four test users (one per team member). Skip this step if you want to start with an empty database.
+
 ## Running the App
 
 With your virtual environment activated, run:
