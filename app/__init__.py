@@ -16,6 +16,8 @@ def create_app(config_name='default'):
     db.init_app(app)
     migrate.init_app(app, db)
 
+    from app import models  # noqa: F401
+
     from app.routes.main_routes import main_bp
     from app.routes.auth_routes import auth_bp
     app.register_blueprint(main_bp)
