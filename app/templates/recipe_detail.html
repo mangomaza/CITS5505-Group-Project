@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}Margarita &mdash; Mix It Up{% endblock %}
+  {% if source == 'db' %}
+    {{recipe.name}}&mdash; Mix It Up
+  {% endif %}
+    Margarita &mdash; Mix It Up
+  {% endif %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/recipe_detail.css') }}">
@@ -13,147 +18,267 @@
 {% block content %}
   <main>
 
-    <!-- Hero Image -->
-    <div class="detail-hero">
-      <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" alt="Margarita">
-    </div>
+    {% if source == 'db' %}
 
-    <div class="container">
-
-      <!-- Recipe Meta -->
-      <div class="recipe-meta">
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge-cocktail">Cocktail</span>
-          <span class="badge-alcoholic">Alcoholic</span>
-        </div>
-        <h1 class="recipe-title">Margarita</h1>
-        <div class="meta-row">
-          <span>by mixmaster</span>
-          <span>&middot;</span>
-          <span>2 days ago</span>
-          <span>&middot;</span>
-          <span>Ordinary Drink</span>
-        </div>
+      <!-- Database Recipe Hero Image -->
+      <div class="detail-hero">
+        {% if recipe.image_data %}
+          <img src="{{ url_for('main.database_recipe_image', recipe_id=recipe.id) }}" alt="{{ recipe.name }}">
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light" style="height: 320px;">
+            <span class="text-muted">No image available</span>
+          </div>
+        {% endif %}
       </div>
 
-      <div class="row mt-4">
+      <div class="container">
 
-        <!-- Left Column - Ingredients & Instructions -->
-        <div class="col-lg-8">
+        <!-- Recipe Meta -->
+        <div class="recipe-meta">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            {% if recipe.category == 'cocktail' %}
+              <span class="badge-cocktail">Cocktail</span>
+            {% else %}
+              <span class="badge-food">{{ recipe.category|title }}</span>
+            {% endif %}
 
-          <!-- SIDE A: Ingredients -->
-          <div class="side-label">Side A &mdash; Ingredients</div>
-          <ul class="ingredients-list">
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/tequila-Small.png" alt="Tequila" class="ingredient-thumb">
-              <span class="ingredient-qty">1 1/2 oz</span>
-              <span>Tequila</span>
-            </li>
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/triple%20sec-Small.png" alt="Triple sec" class="ingredient-thumb">
-              <span class="ingredient-qty">1/2 oz</span>
-              <span>Triple sec</span>
-            </li>
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/lime%20juice-Small.png" alt="Lime juice" class="ingredient-thumb">
-              <span class="ingredient-qty">1 oz</span>
-              <span>Lime juice</span>
-            </li>
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/salt-Small.png" alt="Salt" class="ingredient-thumb">
-              <span class="ingredient-qty">Pinch</span>
-              <span>Salt</span>
-            </li>
-          </ul>
-
-          <!-- SIDE B: Instructions -->
-          <div class="side-label">Side B &mdash; Instructions</div>
-          <div class="instructions-block">
-            <p>Rub the rim of the glass with the lime slice to make the salt stick to it. Take care to moisten only the outer rim and sprinkle the salt on it. The salt should present to the lips of the imbiber and never mix into the cocktail. Shake the other ingredients with ice, then carefully pour into the glass.</p>
+            {% if recipe.is_alcoholic %}
+              <span class="badge-alcoholic">Alcoholic</span>
+            {% endif %}
           </div>
 
-          <!-- Actions -->
-          <div class="detail-actions">
-            <button class="btn btn-mix" id="favBtn"><i class="bi bi-heart me-1"></i> Favourite</button>
-            <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
+          <h1 class="recipe-title">{{ recipe.name }}</h1>
+
+          <div class="meta-row">
+            <span>by {{ recipe.creator.email }}</span>
+            <span>&middot;</span>
+            <span>{{ recipe.created_at.strftime('%d %b %Y') }}</span>
+
+            {% if recipe.subcategory %}
+              <span>&middot;</span>
+              <span>{{ recipe.subcategory }}</span>
+            {% endif %}
           </div>
 
+          {% if recipe.description %}
+            <p class="mt-3">{{ recipe.description }}</p>
+          {% endif %}
         </div>
 
-        <!-- Right Column - Ratings -->
-        <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="row mt-4">
 
-          <div class="side-label">Ratings</div>
+          <!-- Left Column - Ingredients & Instructions -->
+          <div class="col-lg-8">
 
-          <div class="rating-summary">
-            <span class="rating-number">4.3</span>
-            <div>
-              <div class="star-rating star-rating-lg">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-              </div>
-              <p class="mb-0" style="font-size:0.8rem; color:var(--mix-text-muted);">12 ratings</p>
+            <!-- SIDE A: Ingredients -->
+            <div class="side-label">Side A &mdash; Ingredients</div>
+            <ul class="ingredients-list">
+              {% for ingredient in recipe.ingredients %}
+                <li>
+                  <span class="ingredient-qty">
+                    {% if ingredient.quantity %}
+                      {{ ingredient.quantity }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </span>
+                  <span>{{ ingredient.name }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+
+            <!-- SIDE B: Instructions -->
+            <div class="side-label">Side B &mdash; Instructions</div>
+            <div class="instructions-block">
+              <p>{{ recipe.instructions }}</p>
             </div>
+
+            <!-- Actions -->
+            <div class="detail-actions">
+              <button class="btn btn-mix" id="favBtn">
+                <i class="bi bi-heart me-1"></i> Favourite
+              </button>
+              <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix">
+                <i class="bi bi-share me-1"></i> Share
+              </a>
+            </div>
+
           </div>
 
-          <!-- Existing ratings -->
-          <div class="rating-card">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-              </div>
-              <span class="rating-author">limelife &middot; 1 day ago</span>
-            </div>
-            <p class="rating-comment">Classic done right. The salt rim makes all the difference.</p>
-          </div>
+          <!-- Right Column - Ratings Placeholder -->
+          <div class="col-lg-4 mt-4 mt-lg-0">
 
-          <div class="rating-card">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star"></i>
-              </div>
-              <span class="rating-author">bourbonboy &middot; 3 days ago</span>
-            </div>
-            <p class="rating-comment">Solid recipe, though I prefer mine a little less sweet.</p>
-          </div>
+            <div class="side-label">Ratings</div>
 
-          <!-- Rating Form -->
-          <div class="form-card mt-3">
-            <h4 style="font-size:1rem;" class="mb-3">Leave a rating</h4>
-            <form>
-              <div class="mb-3">
-                <div class="star-input">
+            <div class="rating-summary">
+              <span class="rating-number">--</span>
+              <div>
+                <div class="star-rating star-rating-lg">
                   <i class="bi bi-star"></i>
                   <i class="bi bi-star"></i>
                   <i class="bi bi-star"></i>
                   <i class="bi bi-star"></i>
                   <i class="bi bi-star"></i>
                 </div>
-                <input type="hidden" id="ratingValue" name="rating" value="">
+                <p class="mb-0" style="font-size:0.8rem; color:var(--mix-text-muted);">
+                  Ratings will be added later.
+                </p>
               </div>
-              <div class="mb-3">
-                <textarea class="form-control" rows="3" placeholder="Add a comment (optional)"></textarea>
-              </div>
-              <button type="submit" class="btn btn-mix btn-sm">Submit</button>
-            </form>
+            </div>
+
           </div>
 
         </div>
 
       </div>
 
-    </div>
+    {% else %}
+
+      <!-- Existing external API / placeholder recipe detail page -->
+
+      <!-- Hero Image -->
+      <div class="detail-hero">
+        <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" alt="Margarita">
+      </div>
+
+      <div class="container">
+
+        <!-- Recipe Meta -->
+        <div class="recipe-meta">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge-cocktail">Cocktail</span>
+            <span class="badge-alcoholic">Alcoholic</span>
+          </div>
+          <h1 class="recipe-title">Margarita</h1>
+          <div class="meta-row">
+            <span>by mixmaster</span>
+            <span>&middot;</span>
+            <span>2 days ago</span>
+            <span>&middot;</span>
+            <span>Ordinary Drink</span>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+
+          <!-- Left Column - Ingredients & Instructions -->
+          <div class="col-lg-8">
+
+            <!-- SIDE A: Ingredients -->
+            <div class="side-label">Side A &mdash; Ingredients</div>
+            <ul class="ingredients-list">
+              <li>
+                <img src="https://www.thecocktaildb.com/images/ingredients/tequila-Small.png" alt="Tequila" class="ingredient-thumb">
+                <span class="ingredient-qty">1 1/2 oz</span>
+                <span>Tequila</span>
+              </li>
+              <li>
+                <img src="https://www.thecocktaildb.com/images/ingredients/triple%20sec-Small.png" alt="Triple sec" class="ingredient-thumb">
+                <span class="ingredient-qty">1/2 oz</span>
+                <span>Triple sec</span>
+              </li>
+              <li>
+                <img src="https://www.thecocktaildb.com/images/ingredients/lime%20juice-Small.png" alt="Lime juice" class="ingredient-thumb">
+                <span class="ingredient-qty">1 oz</span>
+                <span>Lime juice</span>
+              </li>
+              <li>
+                <img src="https://www.thecocktaildb.com/images/ingredients/salt-Small.png" alt="Salt" class="ingredient-thumb">
+                <span class="ingredient-qty">Pinch</span>
+                <span>Salt</span>
+              </li>
+            </ul>
+
+            <!-- SIDE B: Instructions -->
+            <div class="side-label">Side B &mdash; Instructions</div>
+            <div class="instructions-block">
+              <p>Rub the rim of the glass with the lime slice to make the salt stick to it. Take care to moisten only the outer rim and sprinkle the salt on it. The salt should present to the lips of the imbiber and never mix into the cocktail. Shake the other ingredients with ice, then carefully pour into the glass.</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="detail-actions">
+              <button class="btn btn-mix" id="favBtn"><i class="bi bi-heart me-1"></i> Favourite</button>
+              <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
+            </div>
+
+          </div>
+
+          <!-- Right Column - Ratings -->
+          <div class="col-lg-4 mt-4 mt-lg-0">
+
+            <div class="side-label">Ratings</div>
+
+            <div class="rating-summary">
+              <span class="rating-number">4.3</span>
+              <div>
+                <div class="star-rating star-rating-lg">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-half"></i>
+                </div>
+                <p class="mb-0" style="font-size:0.8rem; color:var(--mix-text-muted);">12 ratings</p>
+              </div>
+            </div>
+
+            <!-- Existing ratings -->
+            <div class="rating-card">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="star-rating">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <span class="rating-author">limelife &middot; 1 day ago</span>
+              </div>
+              <p class="rating-comment">Classic done right. The salt rim makes all the difference.</p>
+            </div>
+
+            <div class="rating-card">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <div class="star-rating">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                </div>
+                <span class="rating-author">bourbonboy &middot; 3 days ago</span>
+              </div>
+              <p class="rating-comment">Solid recipe, though I prefer mine a little less sweet.</p>
+            </div>
+
+            <!-- Rating Form -->
+            <div class="form-card mt-3">
+              <h4 style="font-size:1rem;" class="mb-3">Leave a rating</h4>
+              <form>
+                <div class="mb-3">
+                  <div class="star-input">
+                    <i class="bi bi-star"></i>
+                    <i class="bi bi-star"></i>
+                    <i class="bi bi-star"></i>
+                    <i class="bi bi-star"></i>
+                    <i class="bi bi-star"></i>
+                  </div>
+                  <input type="hidden" id="ratingValue" name="rating" value="">
+                </div>
+                <div class="mb-3">
+                  <textarea class="form-control" rows="3" placeholder="Add a comment (optional)"></textarea>
+                </div>
+                <button type="submit" class="btn btn-mix btn-sm">Submit</button>
+              </form>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    {% endif %}
 
   </main>
 {% endblock %}
