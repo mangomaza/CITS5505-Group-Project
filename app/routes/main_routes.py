@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort
+from flask import Blueprint, render_template, abort, Response
 from flask_login import current_user
 from app.models.recipe import Recipe, can_view_recipe
 
@@ -36,6 +36,17 @@ def database_recipe_detail(recipe_id):
 
     return render_template('recipe_detail.html', recipe=recipe, source='db')
 
+@main_bp.route('/recipes/db/<int:recipe_id>/image')
+def database_recipe_image(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    if not can_view_recipe(recipe, current_user):
+        abort(403)
+
+    if not recipe.image_data:
+        abort(404)
+
+    return Response(recipe.image_data, mimetype=recipe.image_mime)
 
 @main_bp.route('/recipe/create')
 def create_recipe():
