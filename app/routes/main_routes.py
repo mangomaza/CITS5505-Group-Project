@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, abort, Response
+from flask_login import current_user
+from app.models.recipe import Recipe, can_view_recipe
 
 main_bp = Blueprint('main', __name__)
 
@@ -10,6 +12,14 @@ def index():
 
 @main_bp.route('/recipes')
 def recipes():
+    my_recipes():
+    if current_user.authenticated:
+        my_recipes = (
+            Recipe.query
+            .filter_by(creator_id=current_user.id)
+            .order_by(Recipe.created_at.desc())
+            .all()
+        )
     return render_template('recipes.html')
 
 
