@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, Response
+from flask import Blueprint, render_template, abort
 from flask_login import current_user
 from app.models.recipe import Recipe, can_view_recipe
 
@@ -12,20 +12,29 @@ def index():
 
 @main_bp.route('/recipes')
 def recipes():
-    my_recipes():
-    if current_user.authenticated:
+    my_recipes=[]
+    if current_user.is_authenticated:
         my_recipes = (
             Recipe.query
             .filter_by(creator_id=current_user.id)
             .order_by(Recipe.created_at.desc())
             .all()
         )
-    return render_template('recipes.html')
-
+    return render_template('recipes.html', my_recipes=my_recipes)
 
 @main_bp.route('/recipes/<int:recipe_id>')
 def recipe_detail(recipe_id):
-    return render_template('recipe_detail.html', recipe_id=recipe_id)
+    return render_template('recipe_detail.html', recipe_id=recipe_id, source='api')
+
+
+@main_bp.route('/recipes/db/<int:recipe_id>')
+def database_recipe_detail(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    if not can_view_recipe(recipe, current_user):
+        abort(403)
+
+    return render_template('recipe_detail.html', recipe=recipe, source='db')
 
 
 @main_bp.route('/recipe/create')
