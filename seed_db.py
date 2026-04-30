@@ -2,7 +2,7 @@ import requests
 
 from app import create_app
 from app.extensions import db
-from app.models import User, Recipe, Ingredient, Rating
+from app.models import User, Recipe, Ingredient, Rating, SharedAccess
 
 app = create_app()
 
@@ -122,6 +122,11 @@ def seed():
                 user_id=users[1].id,
                 stars=4,
                 comment='Solid classic. A bit strong but tasty.',
+            ))
+            db.session.add(SharedAccess(
+                recipe_id=recipes[0].id,
+                shared_with_user_id=users[2].id,
+                granted_by_user_id=creator.id,
             ))
             db.session.commit()
 

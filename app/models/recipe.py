@@ -36,3 +36,28 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return f'<Recipe {self.id} {self.name!r}>'
+
+
+def can_view_recipe(recipe, user):
+    """Return True if user is allowed to view recipe.
+
+    Public recipes are visible to anyone. Private recipes are visible to the
+    creator and to anyone the recipe has been shared with.
+    """
+    if recipe is None:
+        return False
+    if recipe.is_public:
+        return True
+    if user is None or getattr(user, 'is_authenticated', True) is False:
+        return False
+    if getattr(user, 'id', None) is None:
+        return False
+    if user.id == recipe.creator_id:
+        return True
+
+    from app.models.shared_access import SharedAccess
+    grant = SharedAccess.query.filter_by(
+        recipe_id=recipe.id,
+        shared_with_user_id=user.id,
+    ).first()
+    return grant is not None
