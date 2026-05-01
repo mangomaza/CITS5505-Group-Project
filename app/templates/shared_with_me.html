@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Shared with Me &mdash; Mix It Up{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
+{% endblock %}
+
+{% block content %}
+  <main class="container my-4">
+    <div class="row">
+      <div class="col-lg-9">
+        <h1 class="mb-4">Shared with me</h1>
+
+        <div class="share-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Recipe</th>
+                <th>From</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grant in shared_grants %}
+                <tr>
+                  <td>{{ grant.recipe.name }}</td>
+                  <td>{{ grant.granted_by.username }}</td>
+                  <td class="font-mono" style="font-size:0.8rem;">
+                    {{ grant.created_at.strftime('%Y-%m-%d %H:%M') if grant.created_at else '' }}
+                  </td>
+                  <td>
+                    <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}" class="btn btn-outline-mix btn-sm">
+                      View
+                    </a>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="4" class="text-muted">No recipes have been shared with you yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

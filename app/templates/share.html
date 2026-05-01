@@ -13,32 +13,49 @@
 
         <h1 class="mb-4">Share a recipe</h1>
 
-        <!-- Share Form -->
         <div class="form-card share-form">
-          <form>
+          <form method="post" action="{{ url_for('main.share') }}">
+            {% if form %}
+              {{ form.hidden_tag() }}
+            {% endif %}
+
             <div class="mb-3">
               <label for="shareRecipe" class="form-label">Recipe</label>
-              <select class="form-select" id="shareRecipe">
-                <option value="">Select a recipe to share</option>
-                <option value="1">Margarita</option>
-                <option value="2">Mojito</option>
-                <option value="3">Spicy Arrabiata Penne</option>
-                <option value="4">Old Fashioned</option>
-              </select>
+              {% if form %}
+                {{ form.recipe_id(class="form-select", id="shareRecipe") }}
+                {% for error in form.recipe_id.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% else %}
+                <select class="form-select" id="shareRecipe" disabled>
+                  <option selected>Your private recipes will load here</option>
+                </select>
+                <div class="form-text">Draft placeholder until auth and form wiring are merged.</div>
+              {% endif %}
             </div>
+
             <div class="mb-3">
               <label for="shareWith" class="form-label">Share with</label>
-              <input type="text" class="form-control" id="shareWith" placeholder="Username or email">
+              {% if form %}
+                {{ form.username(class="form-control", id="shareWith", placeholder="Enter a username") }}
+                {% for error in form.username.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              {% else %}
+                <input type="text" class="form-control" id="shareWith" placeholder="Enter a username" disabled>
+              {% endif %}
             </div>
-            <div class="mb-3">
-              <label for="shareNote" class="form-label">Note (optional)</label>
-              <textarea class="form-control" id="shareNote" rows="3" placeholder="Add a message..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-mix"><i class="bi bi-share me-1"></i> Share</button>
+
+            {% if form %}
+              {{ form.submit(class="btn btn-mix") }}
+            {% else %}
+              <button type="submit" class="btn btn-mix" disabled>
+                <i class="bi bi-share me-1"></i> Share recipe
+              </button>
+            {% endif %}
           </form>
         </div>
 
-        <!-- Share History -->
         <div class="share-history">
           <h3>Shared by you</h3>
           <div class="share-table">
@@ -52,55 +69,24 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Margarita</td>
-                  <td>limelife</td>
-                  <td class="font-mono" style="font-size:0.8rem;">2 days ago</td>
-                  <td><button class="btn-unshare">Unshare</button></td>
-                </tr>
-                <tr>
-                  <td>Spicy Arrabiata Penne</td>
-                  <td>pastaqueen</td>
-                  <td class="font-mono" style="font-size:0.8rem;">5 days ago</td>
-                  <td><button class="btn-unshare">Unshare</button></td>
-                </tr>
-                <tr>
-                  <td>Old Fashioned</td>
-                  <td>bourbonboy</td>
-                  <td class="font-mono" style="font-size:0.8rem;">1 week ago</td>
-                  <td><button class="btn-unshare">Unshare</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Shared With You -->
-        <div class="share-history">
-          <h3>Shared with you</h3>
-          <div class="share-table">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Recipe</th>
-                  <th>From</th>
-                  <th>Date</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=2) }}">Mojito</a></td>
-                  <td>limelife</td>
-                  <td class="font-mono" style="font-size:0.8rem;">1 day ago</td>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=2) }}" class="btn btn-outline-mix btn-sm">View</a></td>
-                </tr>
-                <tr>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=5) }}">Negroni</a></td>
-                  <td>ginlover</td>
-                  <td class="font-mono" style="font-size:0.8rem;">3 days ago</td>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=5) }}" class="btn btn-outline-mix btn-sm">View</a></td>
-                </tr>
+                {% for grant in existing_grants %}
+                  <tr>
+                    <td>{{ grant.recipe.name }}</td>
+                    <td>{{ grant.shared_with.username }}</td>
+                    <td class="font-mono" style="font-size:0.8rem;">
+                      {{ grant.created_at.strftime('%Y-%m-%d %H:%M') if grant.created_at else '' }}
+                    </td>
+                    <td>
+                      <form method="post" action="{{ url_for('main.remove_share', grant_id=grant.id) }}">
+                        <button type="submit" class="btn-unshare">Remove</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="text-muted">You have not shared any private recipes yet.</td>
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
