@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Server Error &mdash; Mix It Up{% endblock %}
+
+{% block content %}
+<main class="container my-5 text-center">
+    <div class="form-card mx-auto" style="max-width: 560px;">
+        <h1 class="mb-3" style="font-size: 3rem;">500</h1>
+        <h2 class="mb-3">Something went wrong</h2>
+        <p style="color: var(--mix-text-muted);">
+            Sorry, something went wrong on our side. Please try again later.
+        </p>
+        <a href="{{ url_for('main.index') }}" class="btn btn-mix mt-3">Back to home</a>
+    </div>
+</main>
+{% endblock %}
