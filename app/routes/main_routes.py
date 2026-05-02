@@ -19,7 +19,7 @@ def recipes():
     return render_template('recipes.html')
 
 
-@main_bp.route('/recipes/<int:recipe_id>')
+@main_bp.route('/recipe/<int:recipe_id>')
 def recipe_detail(recipe_id):
     recipe = db.get_or_404(Recipe, recipe_id)
     if not can_view_recipe(recipe, current_user):

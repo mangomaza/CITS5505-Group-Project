@@ -3,39 +3,70 @@
 {% block title %}Sign Up &mdash; Mix It Up{% endblock %}
 
 {% block content %}
-  <main class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-5 col-lg-4">
+<main class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
 
-        <div class="form-card">
-          <h2 class="text-center mb-4" style="font-size:1.6rem;">Create an account</h2>
+      <div class="form-card">
+        <h2 class="text-center mb-4" style="font-size:1.6rem;">Create an account</h2>
 
-          <form>
-            <div class="mb-3">
-              <label for="signupName" class="form-label">Username</label>
-              <input type="text" class="form-control" id="signupName" placeholder="Your username" required>
-            </div>
-            <div class="mb-3">
-              <label for="signupEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="signupEmail" placeholder="you@example.com" required>
-            </div>
-            <div class="mb-3">
-              <label for="signupPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="signupPassword" placeholder="At least 8 characters" required>
-            </div>
-            <div class="mb-3">
-              <label for="signupConfirm" class="form-label">Confirm password</label>
-              <input type="password" class="form-control" id="signupConfirm" placeholder="Re-enter password" required>
-            </div>
-            <button type="submit" class="btn btn-mix w-100">Sign Up</button>
-          </form>
+        <form method="POST" action="{{ url_for('auth.signup') }}" novalidate>
+          {{ form.hidden_tag() }}
 
-          <p class="text-center mt-4" style="font-size:0.85rem; color:var(--mix-text-muted);">
-            Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
-          </p>
-        </div>
+          <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""),
+                             id="signupName", placeholder="Your username",
+                             autocomplete="username", required=True,
+                             minlength=3, maxlength=80, pattern="[A-Za-z0-9_]+") }}
+            {% for error in form.username.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                          id="signupEmail", placeholder="you@example.com",
+                          autocomplete="email", required=True, maxlength=120) }}
+            {% for error in form.email.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                             id="signupPassword", placeholder="At least 8 characters",
+                             autocomplete="new-password", required=True,
+                             minlength=8, maxlength=128) }}
+            {% for error in form.password.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.confirm_password.label(class="form-label") }}
+            {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+                                     id="signupConfirm", placeholder="Re-enter password",
+                                     autocomplete="new-password", required=True) }}
+            {% for error in form.confirm_password.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <button type="submit" class="btn btn-mix w-100">Sign Up</button>
+        </form>
+
+        <!-- Login link -->
+        <p class="text-center mt-4" style="font-size:0.85rem; color:var(--mix-text-muted);">
+          Already have an account?
+          <a href="{{ url_for('auth.login') }}">Log in</a>
+        </p>
 
       </div>
+
     </div>
-  </main>
+  </div>
+</main>
 {% endblock %}
