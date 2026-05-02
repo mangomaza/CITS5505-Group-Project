@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Margarita &mdash; Mix It Up{% endblock %}
+{% block title %}{{ recipe.name }} &mdash; Mix It Up{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/recipe_detail.css') }}">
@@ -15,7 +15,7 @@
 
     <!-- Hero Image -->
     <div class="detail-hero">
-      <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" alt="Margarita">
+      <img src="https://placehold.co/1200x480/f4efe7/6b513d?text={{ recipe.name|replace(' ', '+') }}" alt="{{ recipe.name }}">
     </div>
 
     <div class="container">
@@ -23,16 +23,22 @@
       <!-- Recipe Meta -->
       <div class="recipe-meta">
         <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge-cocktail">Cocktail</span>
-          <span class="badge-alcoholic">Alcoholic</span>
+          <span class="{{ 'badge-cocktail' if recipe.category == 'cocktail' else 'badge-food' }}">
+            {{ recipe.category|title }}
+          </span>
+          {% if recipe.category == 'cocktail' %}
+            <span class="badge-alcoholic">{{ 'Alcoholic' if recipe.is_alcoholic else 'Non-alcoholic' }}</span>
+          {% endif %}
         </div>
-        <h1 class="recipe-title">Margarita</h1>
+        <h1 class="recipe-title">{{ recipe.name }}</h1>
         <div class="meta-row">
-          <span>by mixmaster</span>
+          <span>by {{ recipe.creator.username }}</span>
           <span>&middot;</span>
-          <span>2 days ago</span>
-          <span>&middot;</span>
-          <span>Ordinary Drink</span>
+          <span>{{ recipe.created_at.strftime('%Y-%m-%d') }}</span>
+          {% if recipe.subcategory %}
+            <span>&middot;</span>
+            <span>{{ recipe.subcategory }}</span>
+          {% endif %}
         </div>
       </div>
 
@@ -44,38 +50,34 @@
           <!-- SIDE A: Ingredients -->
           <div class="side-label">Side A &mdash; Ingredients</div>
           <ul class="ingredients-list">
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/tequila-Small.png" alt="Tequila" class="ingredient-thumb">
-              <span class="ingredient-qty">1 1/2 oz</span>
-              <span>Tequila</span>
-            </li>
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/triple%20sec-Small.png" alt="Triple sec" class="ingredient-thumb">
-              <span class="ingredient-qty">1/2 oz</span>
-              <span>Triple sec</span>
-            </li>
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/lime%20juice-Small.png" alt="Lime juice" class="ingredient-thumb">
-              <span class="ingredient-qty">1 oz</span>
-              <span>Lime juice</span>
-            </li>
-            <li>
-              <img src="https://www.thecocktaildb.com/images/ingredients/salt-Small.png" alt="Salt" class="ingredient-thumb">
-              <span class="ingredient-qty">Pinch</span>
-              <span>Salt</span>
-            </li>
+            {% for ingredient in recipe.ingredients %}
+              <li>
+                <img src="https://placehold.co/48x48/f2dfc4/6b513d?text={{ ingredient.name[:1]|upper }}" alt="{{ ingredient.name }}" class="ingredient-thumb">
+                <span class="ingredient-qty">
+                  {{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}
+                </span>
+                <span>{{ ingredient.name }}</span>
+              </li>
+            {% else %}
+              <li>
+                <span class="ingredient-qty">-</span>
+                <span>No ingredients listed.</span>
+              </li>
+            {% endfor %}
           </ul>
 
           <!-- SIDE B: Instructions -->
           <div class="side-label">Side B &mdash; Instructions</div>
           <div class="instructions-block">
-            <p>Rub the rim of the glass with the lime slice to make the salt stick to it. Take care to moisten only the outer rim and sprinkle the salt on it. The salt should present to the lips of the imbiber and never mix into the cocktail. Shake the other ingredients with ice, then carefully pour into the glass.</p>
+            <p>{{ recipe.instructions }}</p>
           </div>
 
           <!-- Actions -->
           <div class="detail-actions">
             <button class="btn btn-mix" id="favBtn"><i class="bi bi-heart me-1"></i> Favourite</button>
-            <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
+            {% if current_user.is_authenticated %}
+              <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
+            {% endif %}
           </div>
 
         </div>

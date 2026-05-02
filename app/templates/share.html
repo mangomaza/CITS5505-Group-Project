@@ -14,45 +14,36 @@
         <h1 class="mb-4">Share a recipe</h1>
 
         <div class="form-card share-form">
-          <form method="post" action="{{ url_for('main.share') }}">
-            {% if form %}
-              {{ form.hidden_tag() }}
-            {% endif %}
-
+          <form method="post" action="{{ url_for('main.share') }}" novalidate>
+            {{ form.hidden_tag() }}
             <div class="mb-3">
-              <label for="shareRecipe" class="form-label">Recipe</label>
-              {% if form %}
-                {{ form.recipe_id(class="form-select", id="shareRecipe") }}
-                {% for error in form.recipe_id.errors %}
-                  <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-              {% else %}
-                <select class="form-select" id="shareRecipe" disabled>
-                  <option selected>Your private recipes will load here</option>
-                </select>
-                <div class="form-text">Draft placeholder until auth and form wiring are merged.</div>
+              {{ form.recipe_id.label(class="form-label") }}
+              {{ form.recipe_id(
+                class="form-select" + (" is-invalid" if form.recipe_id.errors else ""),
+                id="shareRecipe",
+                disabled=not has_private_recipes
+              ) }}
+              {% for error in form.recipe_id.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
+              {% if not has_private_recipes %}
+                <div class="form-text">You need at least one private recipe before you can share it.</div>
               {% endif %}
             </div>
-
             <div class="mb-3">
-              <label for="shareWith" class="form-label">Share with</label>
-              {% if form %}
-                {{ form.username(class="form-control", id="shareWith", placeholder="Enter a username") }}
-                {% for error in form.username.errors %}
-                  <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-              {% else %}
-                <input type="text" class="form-control" id="shareWith" placeholder="Enter a username" disabled>
-              {% endif %}
+              {{ form.username.label(class="form-label") }}
+              {{ form.username(
+                class="form-control" + (" is-invalid" if form.username.errors else ""),
+                id="shareWith",
+                placeholder="Enter a username",
+                autocomplete="username",
+                disabled=not has_private_recipes
+              ) }}
+              {% for error in form.username.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
             </div>
-
-            {% if form %}
-              {{ form.submit(class="btn btn-mix") }}
-            {% else %}
-              <button type="submit" class="btn btn-mix" disabled>
-                <i class="bi bi-share me-1"></i> Share recipe
-              </button>
-            {% endif %}
+            {{ form.submit(class="btn btn-mix", disabled=not has_private_recipes) }}
           </form>
         </div>
 
@@ -74,10 +65,11 @@
                     <td>{{ grant.recipe.name }}</td>
                     <td>{{ grant.shared_with.username }}</td>
                     <td class="font-mono" style="font-size:0.8rem;">
-                      {{ grant.created_at.strftime('%Y-%m-%d %H:%M') if grant.created_at else '' }}
+                      {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
                     </td>
                     <td>
                       <form method="post" action="{{ url_for('main.remove_share', grant_id=grant.id) }}">
+                        {{ revoke_form.hidden_tag() }}
                         <button type="submit" class="btn-unshare">Remove</button>
                       </form>
                     </td>
@@ -85,6 +77,46 @@
                 {% else %}
                   <tr>
                     <td colspan="4" class="text-muted">You have not shared any private recipes yet.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="share-history">
+          <h3>Shared with you</h3>
+          <div class="share-table">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Recipe</th>
+                  <th>From</th>
+                  <th>Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for grant in shared_with_you %}
+                  <tr>
+                    <td>
+                      <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}">
+                        {{ grant.recipe.name }}
+                      </a>
+                    </td>
+                    <td>{{ grant.granted_by.username }}</td>
+                    <td class="font-mono" style="font-size:0.8rem;">
+                      {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </td>
+                    <td>
+                      <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}" class="btn btn-outline-mix btn-sm">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="text-muted">Nothing has been shared with you yet.</td>
                   </tr>
                 {% endfor %}
               </tbody>
