@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, abort, Response
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.models.recipe import Recipe, can_view_recipe
 
 main_bp = Blueprint('main', __name__)
@@ -22,7 +22,7 @@ def recipes():
         )
     return render_template('recipes.html', my_recipes=my_recipes)
 
-@main_bp.route('/recipes/<int:recipe_id>')
+@main_bp.route('/recipe/<int:recipe_id>')
 def recipe_detail(recipe_id):
     return render_template('recipe_detail.html', recipe_id=recipe_id, source='api')
 
@@ -49,10 +49,12 @@ def database_recipe_image(recipe_id):
     return Response(recipe.image_data, mimetype=recipe.image_mime)
 
 @main_bp.route('/recipe/create')
+@login_required
 def create_recipe():
     return render_template('create_recipe.html')
 
 
 @main_bp.route('/share')
+@login_required
 def share():
     return render_template('share.html')

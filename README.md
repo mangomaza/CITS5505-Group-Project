@@ -63,6 +63,28 @@ The frontend uses Bootstrap 5 for layout and responsiveness, with custom CSS on 
    pip install -r requirements.txt
    ```
 
+4. Set the secret key.
+
+   The app requires a `SECRET_KEY` environment variable for session signing and CSRF protection. Create a `.env` file in the project root (it's already in `.gitignore` so it won't be committed):
+
+   ```
+   SECRET_KEY=some-long-random-string
+   ```
+
+   Then load it before running the app. On macOS/Linux you can export it directly:
+
+   ```
+   export SECRET_KEY=some-long-random-string
+   ```
+
+   On Windows (PowerShell):
+
+   ```
+   $env:SECRET_KEY = "some-long-random-string"
+   ```
+
+   Pick any random string — it just needs to be kept off the repo.
+
 ## Database Setup
 
 After installing dependencies, create the database:
