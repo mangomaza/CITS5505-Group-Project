@@ -1,24 +1,35 @@
 import os
 from flask import Flask, render_template
 from config import config
-from app.extensions import db, migrate
+from app.extensions import db, migrate, login_manager
 
 
 def create_app(config_name='default'):
     app = Flask(
         __name__,
         template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'),
-        static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+        static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static'),
     )
 
     app.config.from_object(config[config_name])
 
-    os.makedirs(app.instance_path, exist_ok=True)
-
     db.init_app(app)
     migrate.init_app(app, db)
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'warning'
 
-    from app import models  # noqa: F401
+    from app.models import User
+    from app.forms.auth_forms import LogoutForm
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
+
+    @app.context_processor
+    def inject_logout_form():
+        return {'logout_form': LogoutForm()}
 
     from app.routes.main_routes import main_bp
     from app.routes.auth_routes import auth_bp

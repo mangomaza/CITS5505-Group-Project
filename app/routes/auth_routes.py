@@ -1,88 +1,70 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask_login import login_user, logout_user, login_required, current_user
+from urllib.parse import urlparse
 from app.extensions import db
 from app.models.user import User
+from app.forms.auth_forms import SignupForm, LoginForm
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
+def _is_safe_next_url(target):
+    if not target:
+        return False
+    parsed = urlparse(target)
+    return not parsed.netloc and not parsed.scheme and target.startswith('/')
+
+
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-    field_errors = {}
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
 
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
-        confirm_password = request.form.get('confirm_password', '')
-
-        if not username:
-            field_errors['username'] = 'Username is required.'
-
-        if not email:
-            field_errors['email'] = 'Email is required.'
-
-        if len(password) < 8:
-            field_errors['password'] = 'Password must be at least 8 characters.'
-
-        if password != confirm_password:
-            field_errors['confirm_password'] = 'Passwords do not match.'
-
-        if username and User.query.filter_by(username=username).first():
-            field_errors['username'] = 'This username is already taken.'
-
-        if email and User.query.filter_by(email=email).first():
-            field_errors['email'] = 'This email is already registered.'
-
-        if field_errors:
-            return render_template(
-                'signup.html',
-                field_errors=field_errors,
-                username=username,
-                email=email
-            )
-
-        user = User(username=username, email=email)
-        user.set_password(password)
-
+    form = SignupForm()
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data.strip(),
+            email=form.email.data.strip().lower(),
+        )
+        user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
 
-        session['user_id'] = user.id
-        session['username'] = user.username
-
+        login_user(user)
         flash(f'Welcome, {user.username}!', 'success')
-        return redirect('/')
+        return redirect(url_for('main.index'))
 
-    return render_template('signup.html', field_errors={})
+    return render_template('signup.html', form=form)
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
 
-        user = User.query.filter_by(email=email).first()
+    form = LoginForm()
+    if form.validate_on_submit():
+        email = form.email.data.strip().lower()
+        user = db.session.execute(
+            db.select(User).where(User.email == email)
+        ).scalar_one_or_none()
 
-        if user and user.check_password(password):
-            session['user_id'] = user.id
-            session['username'] = user.username
-
+        if user and user.check_password(form.password.data):
+            login_user(user)
             flash(f'Welcome back, {user.username}!', 'success')
-            return redirect('/')
+            next_url = request.args.get('next')
+            if _is_safe_next_url(next_url):
+                return redirect(next_url)
+            return redirect(url_for('main.index'))
 
         flash('Invalid email or password.', 'danger')
-        return render_template('login.html', email=email)
 
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=['POST'])
+@login_required
 def logout():
-    if 'user_id' not in session:
-        flash('Please log in first.', 'warning')
-        return redirect(url_for('auth.login'))
-
-    session.clear()
+    logout_user()
     flash('You have been logged out.', 'success')
-    return redirect('/')
+    return redirect(url_for('main.index'))

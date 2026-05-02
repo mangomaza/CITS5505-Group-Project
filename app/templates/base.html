@@ -65,17 +65,20 @@
           </ul>
 
           <!-- RIGHT MENU -->
-          <ul class="navbar-nav">
-            {% if session.get('user_id') %}
+          <ul class="navbar-nav align-items-lg-center">
+            {% if current_user.is_authenticated %}
             <li class="nav-item">
               <span class="navbar-text me-3">
-                {{ session.get('username') }}
+                {{ current_user.username }}
               </span>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                Logout
-              </a>
+              <form method="POST" action="{{ url_for('auth.logout') }}" class="d-inline">
+                {{ logout_form.hidden_tag() }}
+                <button type="submit" class="nav-link btn btn-link p-0 align-baseline">
+                  Logout
+                </button>
+              </form>
             </li>
             {% else %}
             <li class="nav-item">
@@ -105,7 +108,7 @@
     {% for category, message in messages %}
     <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
       {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
     {% endif %}

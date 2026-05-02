@@ -10,64 +10,52 @@
       <div class="form-card">
         <h2 class="text-center mb-4" style="font-size:1.6rem;">Create an account</h2>
 
-        <form method="POST" action="{{ url_for('auth.signup') }}">
+        <form method="POST" action="{{ url_for('auth.signup') }}" novalidate>
+          {{ form.hidden_tag() }}
 
-          <!-- Username -->
           <div class="mb-3">
-            <label for="signupName" class="form-label">Username</label>
-            <input type="text" class="form-control" id="signupName" name="username" placeholder="Your username"
-              value="{{ username or '' }}" required>
-
-            {% if field_errors and field_errors.username %}
-            <div class="text-danger small mt-1">
-              {{ field_errors.username }}
-            </div>
-            {% endif %}
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""),
+                             id="signupName", placeholder="Your username",
+                             autocomplete="username", required=True,
+                             minlength=3, maxlength=80, pattern="[A-Za-z0-9_]+") }}
+            {% for error in form.username.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
           </div>
 
-          <!-- Email -->
           <div class="mb-3">
-            <label for="signupEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="signupEmail" name="email" placeholder="you@example.com"
-              value="{{ email or '' }}" required>
-
-            {% if field_errors and field_errors.email %}
-            <div class="text-danger small mt-1">
-              {{ field_errors.email }}
-            </div>
-            {% endif %}
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
+                          id="signupEmail", placeholder="you@example.com",
+                          autocomplete="email", required=True, maxlength=120) }}
+            {% for error in form.email.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
           </div>
 
-          <!-- Password -->
           <div class="mb-3">
-            <label for="signupPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="signupPassword" name="password"
-              placeholder="At least 8 characters" required>
-
-            {% if field_errors and field_errors.password %}
-            <div class="text-danger small mt-1">
-              {{ field_errors.password }}
-            </div>
-            {% endif %}
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""),
+                             id="signupPassword", placeholder="At least 8 characters",
+                             autocomplete="new-password", required=True,
+                             minlength=8, maxlength=128) }}
+            {% for error in form.password.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
           </div>
 
-          <!-- Confirm Password -->
           <div class="mb-3">
-            <label for="signupConfirm" class="form-label">Confirm password</label>
-            <input type="password" class="form-control" id="signupConfirm" name="confirm_password"
-              placeholder="Re-enter password" required>
-
-            {% if field_errors and field_errors.confirm_password %}
-            <div class="text-danger small mt-1">
-              {{ field_errors.confirm_password }}
-            </div>
-            {% endif %}
+            {{ form.confirm_password.label(class="form-label") }}
+            {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""),
+                                     id="signupConfirm", placeholder="Re-enter password",
+                                     autocomplete="new-password", required=True) }}
+            {% for error in form.confirm_password.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
           </div>
 
-          <!-- Submit -->
-          <button type="submit" class="btn btn-mix w-100">
-            Sign Up
-          </button>
+          <button type="submit" class="btn btn-mix w-100">Sign Up</button>
         </form>
 
         <!-- Login link -->
