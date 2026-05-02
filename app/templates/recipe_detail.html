@@ -15,7 +15,10 @@
 
     <!-- Hero Image -->
     <div class="detail-hero">
-      <img src="https://placehold.co/1200x480/f4efe7/6b513d?text={{ recipe.name|replace(' ', '+') }}" alt="{{ recipe.name }}">
+      <img
+        src="{% if recipe.image_data %}{{ url_for('main.recipe_image', recipe_id=recipe.id) }}{% else %}https://placehold.co/1200x480/f4efe7/6b513d?text={{ recipe.name|replace(' ', '+') }}{% endif %}"
+        alt="{{ recipe.name }}"
+      >
     </div>
 
     <div class="container">
