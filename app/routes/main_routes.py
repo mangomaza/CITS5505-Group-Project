@@ -85,6 +85,7 @@ def create_recipe():
                 description=(form.description.data or '').strip() or None,
                 category=form.category.data,
                 glass=(form.glass.data or '').strip() or None,
+                is_alcoholic=(form.is_alcoholic.data == 'true'),
                 instructions=form.instructions.data.strip(),
                 is_public=(form.visibility.data == 'public'),
                 creator_id=current_user.id,

@@ -1,5 +1,3 @@
-import imghdr
-
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import RadioField, SelectField, StringField, SubmitField, TextAreaField
@@ -7,6 +5,18 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {'jpeg', 'png', 'gif', 'webp'}
+
+
+def _detect_image_type(header):
+    if header.startswith(b'\xff\xd8\xff'):
+        return 'jpeg'
+    if header.startswith(b'\x89PNG\r\n\x1a\n'):
+        return 'png'
+    if header.startswith((b'GIF87a', b'GIF89a')):
+        return 'gif'
+    if header.startswith(b'RIFF') and header[8:12] == b'WEBP':
+        return 'webp'
+    return None
 
 
 class CreateRecipeForm(FlaskForm):
@@ -41,6 +51,15 @@ class CreateRecipeForm(FlaskForm):
             Length(max=10000, message='Instructions must be 10000 characters or fewer.'),
         ],
     )
+    is_alcoholic = RadioField(
+        'Alcohol content',
+        choices=[
+            ('true', 'Alcoholic'),
+            ('false', 'Non-alcoholic'),
+        ],
+        default='true',
+        validators=[DataRequired(message='Please choose whether this recipe contains alcohol.')],
+    )
     visibility = RadioField(
         'Visibility',
         choices=[
@@ -70,9 +89,7 @@ class CreateRecipeForm(FlaskForm):
 
         header = stream.read(512)
         stream.seek(0)
-        image_type = imghdr.what(None, header)
-        if image_type == 'jpg':
-            image_type = 'jpeg'
+        image_type = _detect_image_type(header)
 
         mimetype = (upload.mimetype or '').lower()
         if image_type not in ALLOWED_IMAGE_TYPES or not mimetype.startswith('image/'):

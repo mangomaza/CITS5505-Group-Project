@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var uploadPlaceholder = uploadArea ? uploadArea.querySelector('.upload-placeholder') : null;
   var ingredientList = document.getElementById('ingredientList');
   var addIngredientBtn = document.getElementById('addIngredient');
+  var categorySelect = document.getElementById('recipeCategory');
+  var alcoholChoices = document.getElementById('alcoholChoices');
+  var alcoholTrue = document.getElementById('is_alcoholic-0');
+  var alcoholFalse = document.getElementById('is_alcoholic-1');
 
   function updateImagePreview(file) {
     if (!file || !imagePreview || !uploadPlaceholder) {
@@ -64,5 +68,26 @@ document.addEventListener('DOMContentLoaded', function () {
         ingredientList.appendChild(buildIngredientRow());
       }
     });
+  }
+
+  function syncAlcoholChoices() {
+    if (!categorySelect || !alcoholChoices || !alcoholTrue || !alcoholFalse) {
+      return;
+    }
+
+    var isCocktail = categorySelect.value === 'cocktail';
+    var isFood = categorySelect.value === 'food';
+    alcoholChoices.style.opacity = '1';
+
+    if (isCocktail) {
+      alcoholTrue.checked = true;
+    } else if (isFood) {
+      alcoholFalse.checked = true;
+    }
+  }
+
+  if (categorySelect) {
+    categorySelect.addEventListener('change', syncAlcoholChoices);
+    syncAlcoholChoices();
   }
 });

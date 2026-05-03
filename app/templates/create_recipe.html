@@ -72,6 +72,21 @@
                 </div>
               </div>
               <div class="mt-3">
+                <label class="form-label d-block">{{ form.is_alcoholic.label.text }}</label>
+                <div class="d-flex gap-4" id="alcoholChoices">
+                  {% for subfield in form.is_alcoholic %}
+                    <div class="form-check">
+                      {{ subfield(class="form-check-input", id=subfield.id) }}
+                      <label class="form-check-label" for="{{ subfield.id }}">{{ subfield.label.text }}</label>
+                    </div>
+                  {% endfor %}
+                </div>
+                <div class="form-text">For food recipes, choose non-alcoholic unless alcohol is actually part of the dish.</div>
+                {% for error in form.is_alcoholic.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="mt-3">
                 <label class="form-label d-block">{{ form.visibility.label.text }}</label>
                 <div class="d-flex gap-4">
                   {% for subfield in form.visibility %}
