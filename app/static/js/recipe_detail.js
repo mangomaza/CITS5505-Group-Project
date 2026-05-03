@@ -3,8 +3,103 @@
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', function () {
+  // DB recipe star rating widget
+  var ratingWidget = document.getElementById('ratingWidget');
 
-  // interactive star rating input
+  if (ratingWidget) {
+    var recipeId = ratingWidget.dataset.recipeId;
+    var starButtons = document.querySelectorAll('.rating-star-button');
+    var averageRating = document.getElementById('averageRating');
+    var ratingCount = document.getElementById('ratingCount');
+    var ratingMessage = document.getElementById('ratingMessage');
+    var averageStars = document.getElementById('averageStars');
+
+    function updateUserStars(userRating) {
+      starButtons.forEach(function (button) {
+        var value = parseInt(button.dataset.stars, 10);
+        var icon = button.querySelector('i');
+
+        if (value <= userRating) {
+          icon.className = 'bi bi-star-fill';
+        } else {
+          icon.className = 'bi bi-star';
+        }
+      });
+    }
+
+    function updateAverageStars(average) {
+      if (!averageStars) {
+        return;
+      }
+
+      averageStars.innerHTML = '';
+
+      for (var i = 1; i <= 5; i++) {
+        var icon = document.createElement('i');
+
+        if (i <= Math.round(average)) {
+          icon.className = 'bi bi-star-fill';
+        } else {
+          icon.className = 'bi bi-star';
+        }
+
+        averageStars.appendChild(icon);
+      }
+    }
+
+    starButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        var stars = this.dataset.stars;
+
+        if (ratingMessage) {
+          ratingMessage.textContent = 'Saving your rating...';
+        }
+
+        fetch('/recipes/db/' + recipeId + '/rate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            stars: stars
+          })
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            if (!data.success) {
+              if (ratingMessage) {
+                ratingMessage.textContent = data.error || 'Rating could not be saved.';
+              }
+              return;
+            }
+
+            if (averageRating) {
+              averageRating.textContent = data.average;
+            }
+
+            if (ratingCount) {
+              ratingCount.textContent = data.count;
+            }
+
+            if (ratingMessage) {
+              ratingMessage.textContent = 'Your rating has been saved.';
+            }
+
+            updateUserStars(data.user_rating);
+            updateAverageStars(data.average);
+          })
+          .catch(function () {
+            if (ratingMessage) {
+              ratingMessage.textContent = 'Something went wrong. Please try again.';
+            }
+          });
+      });
+    });
+  }
+
+  // Existing external/static rating input fallback
   var starInput = document.querySelector('.star-input');
   var ratingField = document.getElementById('ratingValue');
 
@@ -68,5 +163,4 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
-
 });
