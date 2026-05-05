@@ -30,6 +30,7 @@
                   class="form-control" + (" is-invalid" if form.name.errors else ""),
                   id="recipeName",
                   placeholder="e.g. Spicy Mango Margarita",
+                  maxlength="150",
                   required=True
                 ) }}
                 {% for error in form.name.errors %}
@@ -42,6 +43,7 @@
                   class="form-control" + (" is-invalid" if form.description.errors else ""),
                   id="recipeDesc",
                   rows="2",
+                  maxlength="1000",
                   placeholder="A short description of your recipe"
                 ) }}
                 {% for error in form.description.errors %}
@@ -64,6 +66,7 @@
                   {{ form.glass(
                     class="form-control" + (" is-invalid" if form.glass.errors else ""),
                     id="recipeGlass",
+                    maxlength="50",
                     placeholder="e.g. Cocktail glass"
                   ) }}
                   {% for error in form.glass.errors %}
@@ -146,6 +149,8 @@
                 {{ form.instructions(
                   class="form-control" + (" is-invalid" if form.instructions.errors else ""),
                   rows="6",
+                  maxlength="10000",
+                  required=True,
                   placeholder="Describe how to make this recipe..."
                 ) }}
                 {% for error in form.instructions.errors %}

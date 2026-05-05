@@ -21,6 +21,7 @@
               {{ form.recipe_id(
                 class="form-select" + (" is-invalid" if form.recipe_id.errors else ""),
                 id="shareRecipe",
+                required=has_private_recipes,
                 disabled=not has_private_recipes
               ) }}
               {% for error in form.recipe_id.errors %}
@@ -37,6 +38,8 @@
                 id="shareWith",
                 placeholder="Enter a username",
                 autocomplete="username",
+                maxlength="80",
+                required=has_private_recipes,
                 disabled=not has_private_recipes
               ) }}
               {% for error in form.username.errors %}

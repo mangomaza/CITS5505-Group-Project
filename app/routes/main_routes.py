@@ -67,6 +67,9 @@ def _normalise_ingredient_rows(form_data):
 @main_bp.route('/recipe/create', methods=['GET', 'POST'])
 @login_required
 def create_recipe():
+    # TODO: when Mix It Up's Edit-and-save flow is wired up, accept a
+    # ?prefill=external_source:external_id query and pre-populate the form
+    # from the cached external recipe.
     form = CreateRecipeForm()
     ingredient_rows = _normalise_ingredient_rows(request.form if request.method == 'POST' else None)
     ingredient_error = None
