@@ -13,32 +13,43 @@
 
         <h1 class="mb-4">Share a recipe</h1>
 
-        <!-- Share Form -->
         <div class="form-card share-form">
-          <form>
+          <form method="post" action="{{ url_for('main.share') }}" novalidate>
+            {{ form.hidden_tag() }}
             <div class="mb-3">
-              <label for="shareRecipe" class="form-label">Recipe</label>
-              <select class="form-select" id="shareRecipe">
-                <option value="">Select a recipe to share</option>
-                <option value="1">Margarita</option>
-                <option value="2">Mojito</option>
-                <option value="3">Spicy Arrabiata Penne</option>
-                <option value="4">Old Fashioned</option>
-              </select>
+              {{ form.recipe_id.label(class="form-label") }}
+              {{ form.recipe_id(
+                class="form-select" + (" is-invalid" if form.recipe_id.errors else ""),
+                id="shareRecipe",
+                required=has_private_recipes,
+                disabled=not has_private_recipes
+              ) }}
+              {% for error in form.recipe_id.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
+              {% if not has_private_recipes %}
+                <div class="form-text">You need at least one private recipe before you can share it.</div>
+              {% endif %}
             </div>
             <div class="mb-3">
-              <label for="shareWith" class="form-label">Share with</label>
-              <input type="text" class="form-control" id="shareWith" placeholder="Username or email">
+              {{ form.username.label(class="form-label") }}
+              {{ form.username(
+                class="form-control" + (" is-invalid" if form.username.errors else ""),
+                id="shareWith",
+                placeholder="Enter a username",
+                autocomplete="username",
+                maxlength="80",
+                required=has_private_recipes,
+                disabled=not has_private_recipes
+              ) }}
+              {% for error in form.username.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
             </div>
-            <div class="mb-3">
-              <label for="shareNote" class="form-label">Note (optional)</label>
-              <textarea class="form-control" id="shareNote" rows="3" placeholder="Add a message..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-mix"><i class="bi bi-share me-1"></i> Share</button>
+            {{ form.submit(class="btn btn-mix", disabled=not has_private_recipes) }}
           </form>
         </div>
 
-        <!-- Share History -->
         <div class="share-history">
           <h3>Shared by you</h3>
           <div class="share-table">
@@ -52,30 +63,30 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Margarita</td>
-                  <td>limelife</td>
-                  <td class="font-mono" style="font-size:0.8rem;">2 days ago</td>
-                  <td><button class="btn-unshare">Unshare</button></td>
-                </tr>
-                <tr>
-                  <td>Spicy Arrabiata Penne</td>
-                  <td>pastaqueen</td>
-                  <td class="font-mono" style="font-size:0.8rem;">5 days ago</td>
-                  <td><button class="btn-unshare">Unshare</button></td>
-                </tr>
-                <tr>
-                  <td>Old Fashioned</td>
-                  <td>bourbonboy</td>
-                  <td class="font-mono" style="font-size:0.8rem;">1 week ago</td>
-                  <td><button class="btn-unshare">Unshare</button></td>
-                </tr>
+                {% for grant in existing_grants %}
+                  <tr>
+                    <td>{{ grant.recipe.name }}</td>
+                    <td>{{ grant.shared_with.username }}</td>
+                    <td class="font-mono" style="font-size:0.8rem;">
+                      {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </td>
+                    <td>
+                      <form method="post" action="{{ url_for('main.remove_share', grant_id=grant.id) }}">
+                        {{ revoke_form.hidden_tag() }}
+                        <button type="submit" class="btn-unshare">Remove</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="text-muted">You have not shared any private recipes yet.</td>
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- Shared With You -->
         <div class="share-history">
           <h3>Shared with you</h3>
           <div class="share-table">
@@ -89,18 +100,28 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=2) }}">Mojito</a></td>
-                  <td>limelife</td>
-                  <td class="font-mono" style="font-size:0.8rem;">1 day ago</td>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=2) }}" class="btn btn-outline-mix btn-sm">View</a></td>
-                </tr>
-                <tr>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=5) }}">Negroni</a></td>
-                  <td>ginlover</td>
-                  <td class="font-mono" style="font-size:0.8rem;">3 days ago</td>
-                  <td><a href="{{ url_for('main.recipe_detail', recipe_id=5) }}" class="btn btn-outline-mix btn-sm">View</a></td>
-                </tr>
+                {% for grant in shared_with_you %}
+                  <tr>
+                    <td>
+                      <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}">
+                        {{ grant.recipe.name }}
+                      </a>
+                    </td>
+                    <td>{{ grant.granted_by.username }}</td>
+                    <td class="font-mono" style="font-size:0.8rem;">
+                      {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </td>
+                    <td>
+                      <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}" class="btn btn-outline-mix btn-sm">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="text-muted">Nothing has been shared with you yet.</td>
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
