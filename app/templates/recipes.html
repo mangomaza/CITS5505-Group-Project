@@ -21,6 +21,7 @@
         <button class="filter-pill active" data-filter="all">All</button>
         <button class="filter-pill" data-filter="cocktail">Cocktails</button>
         <button class="filter-pill" data-filter="food">Food</button>
+        <button class="filter-pill" data-filter="my-recipes">My recipes</button>
       </div>
       <button class="btn-mix-it-up ms-auto" id="mixItUpBtn" title="Pick a random recipe">
         <i class="bi bi-shuffle me-1"></i> Mix it up
@@ -157,6 +158,79 @@
       </div>
 
     </div>
+
+    <section class="my-recipes-section mt-5" data-recipe-section="my-recipes">
+      <h2 class="mb-3">My recipes</h2>
+
+      {% if not current_user.is_authenticated %}
+        <div class="empty-state p-4 text-center">
+          <h3>Log in to see your recipes</h3>
+          <p>Please log in to view the recipes you have created.</p>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Log in</a>
+        </div>
+
+      {% elif my_recipes|length == 0 %}
+        <div class="empty-state p-4 text-center">
+          <h3>No recipes yet</h3>
+          <p>You have not created any recipes yet.</p>
+          <a href="{{ url_for('main.create_recipe') }}" class="btn btn-primary">
+            Create your first recipe
+          </a>
+        </div>
+
+      {% else %}
+        <div class="recipe-grid">
+          {% for recipe in my_recipes %}
+            <div class="recipe-grid-item">
+              <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
+                <div class="recipe-card">
+
+                  {% if recipe.image_data %}
+                    <img src="{{ url_for('main.recipe_image', recipe_id=recipe.id) }}"
+                         class="card-img-top"
+                         alt="{{ recipe.name }}">
+                  {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                      <span class="text-muted">No image</span>
+                    </div>
+                  {% endif %}
+
+                  <div class="card-body">
+                    {% if recipe.category == 'cocktail' %}
+                      <span class="badge-cocktail">Cocktail</span>
+                    {% else %}
+                      <span class="badge-food">{{ recipe.category|title }}</span>
+                    {% endif %}
+
+                    <h3 class="card-title mt-2">{{ recipe.name }}</h3>
+
+                    <p class="card-meta">
+                      by {{ recipe.creator.username }}
+                      &middot;
+                      {{ recipe.created_at.strftime('%d %b %Y') }}
+                    </p>
+
+                    {% if recipe.description %}
+                      <p class="card-text">{{ recipe.description }}</p>
+                    {% endif %}
+
+                    <div class="star-rating">
+                      <i class="bi bi-star"></i>
+                      <i class="bi bi-star"></i>
+                      <i class="bi bi-star"></i>
+                      <i class="bi bi-star"></i>
+                      <i class="bi bi-star"></i>
+                      <span class="ms-1 font-mono">Not rated yet</span>
+                    </div>
+                  </div>
+
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </section>
 
     <!-- Load More -->
     <div class="load-more">

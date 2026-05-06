@@ -19,7 +19,15 @@ def index():
 
 @main_bp.route('/recipes')
 def recipes():
-    return render_template('recipes.html')
+    my_recipes = []
+    if current_user.is_authenticated:
+        my_recipes = (
+            Recipe.query
+            .filter_by(creator_id=current_user.id)
+            .order_by(Recipe.created_at.desc())
+            .all()
+        )
+    return render_template('recipes.html', my_recipes=my_recipes)
 
 
 @main_bp.route('/recipes/<int:recipe_id>')
