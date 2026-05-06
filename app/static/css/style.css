@@ -232,6 +232,9 @@ h1, h2, h3, h4, h5, h6 {
 .star-rating .bi-star      { color: var(--mix-text-muted); }
 
 /* star input (interactive) */
+/* TODO: restyle .rating-star-button so the interactive star widget (leave-a-rating) matches
+   the central Mix It Up theme — hover/active colours, sizing, and button reset should use
+   --mix-accent, --mix-accent-dark, and --mix-radius to align with btn-mix. */
 .star-input {
   display: inline-flex;
   gap: 4px;

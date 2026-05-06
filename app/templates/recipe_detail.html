@@ -91,67 +91,46 @@
           <div class="side-label">Ratings</div>
 
           <div class="rating-summary">
-            <span class="rating-number">4.3</span>
+            <span class="rating-number" id="averageRating">{{ average_rating }}</span>
             <div>
-              <div class="star-rating star-rating-lg">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
+              <div class="star-rating star-rating-lg" id="averageStars">
+                {% for star in range(1, 6) %}
+                  {% if star <= average_rating %}
+                    <i class="bi bi-star-fill"></i>
+                  {% else %}
+                    <i class="bi bi-star"></i>
+                  {% endif %}
+                {% endfor %}
               </div>
-              <p class="mb-0" style="font-size:0.8rem; color:var(--mix-text-muted);">12 ratings</p>
+              <p class="mb-0" style="font-size:0.8rem; color:var(--mix-text-muted);">
+                <span id="ratingCount">{{ rating_count }}</span> ratings
+              </p>
             </div>
-          </div>
-
-          <!-- Existing ratings -->
-          <div class="rating-card">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-              </div>
-              <span class="rating-author">limelife &middot; 1 day ago</span>
-            </div>
-            <p class="rating-comment">Classic done right. The salt rim makes all the difference.</p>
-          </div>
-
-          <div class="rating-card">
-            <div class="d-flex align-items-center gap-2 mb-1">
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star"></i>
-              </div>
-              <span class="rating-author">bourbonboy &middot; 3 days ago</span>
-            </div>
-            <p class="rating-comment">Solid recipe, though I prefer mine a little less sweet.</p>
           </div>
 
           <!-- Rating Form -->
           <div class="form-card mt-3">
             <h4 style="font-size:1rem;" class="mb-3">Leave a rating</h4>
-            <form>
-              <div class="mb-3">
-                <div class="star-input">
-                  <i class="bi bi-star"></i>
-                  <i class="bi bi-star"></i>
-                  <i class="bi bi-star"></i>
-                  <i class="bi bi-star"></i>
-                  <i class="bi bi-star"></i>
-                </div>
-                <input type="hidden" id="ratingValue" name="rating" value="">
+            {% if not current_user.is_authenticated %}
+              <p class="mb-0">
+                <a href="{{ url_for('auth.login') }}">Log in</a> to rate this recipe.
+              </p>
+            {% elif recipe.creator_id == current_user.id %}
+              <p class="mb-0">You cannot rate your own recipe.</p>
+            {% else %}
+              <div class="star-input" id="ratingWidget" data-recipe-id="{{ recipe.id }}">
+                {% for star in range(1, 6) %}
+                  <button type="button" class="rating-star-button" data-stars="{{ star }}" aria-label="Rate {{ star }} stars">
+                    {% if user_rating and star <= user_rating %}
+                      <i class="bi bi-star-fill"></i>
+                    {% else %}
+                      <i class="bi bi-star"></i>
+                    {% endif %}
+                  </button>
+                {% endfor %}
               </div>
-              <div class="mb-3">
-                <textarea class="form-control" rows="3" placeholder="Add a comment (optional)"></textarea>
-              </div>
-              <button type="submit" class="btn btn-mix btn-sm">Submit</button>
-            </form>
+              <p class="mb-0 mt-2" id="ratingMessage" style="font-size:0.85rem; color:var(--mix-text-muted);"></p>
+            {% endif %}
           </div>
 
         </div>

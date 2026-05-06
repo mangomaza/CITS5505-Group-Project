@@ -1,15 +1,27 @@
 from io import BytesIO
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
+from sqlalchemy import func
 
 from app.extensions import db
 from app.forms.recipe_forms import CreateRecipeForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
-from app.models import Ingredient, Recipe, SharedAccess
+from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
 
 main_bp = Blueprint('main', __name__)
+
+
+def get_rating_summary(recipe_id):
+    summary = (
+        db.session.query(func.avg(Rating.stars), func.count(Rating.id))
+        .filter(Rating.recipe_id == recipe_id)
+        .first()
+    )
+    average = summary[0] or 0
+    count = summary[1] or 0
+    return round(float(average), 1), count
 
 
 @main_bp.route('/')
@@ -35,7 +47,25 @@ def recipe_detail(recipe_id):
     recipe = db.get_or_404(Recipe, recipe_id)
     if not can_view_recipe(recipe, current_user):
         abort(403)
-    return render_template('recipe_detail.html', recipe=recipe)
+
+    average_rating, rating_count = get_rating_summary(recipe.id)
+
+    user_rating = None
+    if current_user.is_authenticated:
+        existing = Rating.query.filter_by(
+            recipe_id=recipe.id,
+            user_id=current_user.id,
+        ).first()
+        if existing:
+            user_rating = existing.stars
+
+    return render_template(
+        'recipe_detail.html',
+        recipe=recipe,
+        average_rating=average_rating,
+        rating_count=rating_count,
+        user_rating=user_rating,
+    )
 
 
 @main_bp.route('/recipes/<int:recipe_id>/image')
@@ -207,3 +237,49 @@ def remove_share(grant_id):
 
     flash(f'Removed access to "{recipe_name}" for {target_username}.', 'success')
     return redirect(url_for('main.share'))
+
+
+@main_bp.route('/recipes/<int:recipe_id>/rate', methods=['POST'])
+def rate_recipe(recipe_id):
+    if not current_user.is_authenticated:
+        return jsonify({'error': 'Please log in to rate recipes.'}), 401
+
+    recipe = db.get_or_404(Recipe, recipe_id)
+
+    if recipe.creator_id == current_user.id:
+        return jsonify({'error': 'You cannot rate your own recipe.'}), 403
+
+    if not can_view_recipe(recipe, current_user):
+        return jsonify({'error': 'You are not allowed to rate this recipe.'}), 403
+
+    payload = request.get_json(silent=True) or {}
+    stars = payload.get('stars')
+
+    try:
+        stars = int(stars)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Rating must be a number from 1 to 5.'}), 400
+
+    if stars < 1 or stars > 5:
+        return jsonify({'error': 'Rating must be between 1 and 5.'}), 400
+
+    rating = Rating.query.filter_by(
+        recipe_id=recipe.id,
+        user_id=current_user.id,
+    ).first()
+
+    if rating:
+        rating.stars = stars
+    else:
+        rating = Rating(recipe_id=recipe.id, user_id=current_user.id, stars=stars)
+        db.session.add(rating)
+
+    db.session.commit()
+
+    average, count = get_rating_summary(recipe.id)
+    return jsonify({
+        'success': True,
+        'average': average,
+        'count': count,
+        'user_rating': stars,
+    })
