@@ -1,18 +1,21 @@
-from flask import Blueprint, render_template, abort, Response, request, jsonify
+from io import BytesIO
+
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
-from app.models.recipe import Recipe, can_view_recipe
 from sqlalchemy import func
+
 from app.extensions import db
-from app.models.rating import Rating
+from app.forms.recipe_forms import CreateRecipeForm
+from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
+from app.models import Ingredient, Rating, Recipe, SharedAccess
+from app.models.recipe import can_view_recipe
 
 main_bp = Blueprint('main', __name__)
 
+
 def get_rating_summary(recipe_id):
     summary = (
-        db.session.query(
-            func.avg(Rating.stars),
-            func.count(Rating.id)
-        )
+        db.session.query(func.avg(Rating.stars), func.count(Rating.id))
         .filter(Rating.recipe_id == recipe_id)
         .first()
     )
@@ -28,7 +31,7 @@ def index():
 
 @main_bp.route('/recipes')
 def recipes():
-    my_recipes=[]
+    my_recipes = []
     if current_user.is_authenticated:
         my_recipes = (
             Recipe.query
@@ -38,126 +41,245 @@ def recipes():
         )
     return render_template('recipes.html', my_recipes=my_recipes)
 
-@main_bp.route('/recipe/<int:recipe_id>')
+
+@main_bp.route('/recipes/<int:recipe_id>')
 def recipe_detail(recipe_id):
-    return render_template('recipe_detail.html', recipe_id=recipe_id, source='api')
-
-
-@main_bp.route('/recipes/db/<int:recipe_id>')
-def database_recipe_detail(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
-
+    recipe = db.get_or_404(Recipe, recipe_id)
     if not can_view_recipe(recipe, current_user):
         abort(403)
+
     average_rating, rating_count = get_rating_summary(recipe.id)
-    
+
     user_rating = None
     if current_user.is_authenticated:
-        rating = Rating.query.filter_by(
+        existing = Rating.query.filter_by(
             recipe_id=recipe.id,
-            user_id=current_user.id
+            user_id=current_user.id,
         ).first()
+        if existing:
+            user_rating = existing.stars
 
-        if rating:
-            user_rating = rating.stars
     return render_template(
         'recipe_detail.html',
         recipe=recipe,
-        source='db',
         average_rating=average_rating,
         rating_count=rating_count,
-        user_rating=user_rating
+        user_rating=user_rating,
     )
 
-@main_bp.route('/recipes/db/<int:recipe_id>/image')
-def database_recipe_image(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
 
+@main_bp.route('/recipes/<int:recipe_id>/image')
+def recipe_image(recipe_id):
+    recipe = db.get_or_404(Recipe, recipe_id)
     if not can_view_recipe(recipe, current_user):
         abort(403)
-
-    if not recipe.image_data:
+    if not recipe.image_data or not recipe.image_mime:
         abort(404)
 
-    return Response(recipe.image_data, mimetype=recipe.image_mime)
+    return send_file(
+        BytesIO(recipe.image_data),
+        mimetype=recipe.image_mime,
+        max_age=3600,
+    )
 
-@main_bp.route('/recipe/create')
+
+def _normalise_ingredient_rows(form_data):
+    if form_data is None:
+        return [{'name': '', 'quantity': '', 'unit': ''} for _ in range(3)]
+
+    names = form_data.getlist('ingredient_name')
+    quantities = form_data.getlist('ingredient_quantity')
+    units = form_data.getlist('ingredient_unit')
+
+    max_len = max(len(names), len(quantities), len(units), 3)
+    rows = []
+    for index in range(max_len):
+        rows.append({
+            'name': (names[index] if index < len(names) else '').strip(),
+            'quantity': (quantities[index] if index < len(quantities) else '').strip(),
+            'unit': (units[index] if index < len(units) else '').strip(),
+        })
+    return rows
+
+
+@main_bp.route('/recipe/create', methods=['GET', 'POST'])
 @login_required
 def create_recipe():
-    return render_template('create_recipe.html')
+    # TODO: when Mix It Up's Edit-and-save flow is wired up, accept a
+    # ?prefill=external_source:external_id query and pre-populate the form
+    # from the cached external recipe.
+    form = CreateRecipeForm()
+    ingredient_rows = _normalise_ingredient_rows(request.form if request.method == 'POST' else None)
+    ingredient_error = None
+
+    if form.validate_on_submit():
+        non_empty_rows = [
+            row for row in ingredient_rows
+            if row['name'] or row['quantity'] or row['unit']
+        ]
+
+        if not non_empty_rows:
+            ingredient_error = 'Please add at least one ingredient.'
+        else:
+            recipe = Recipe(
+                name=form.name.data.strip(),
+                description=(form.description.data or '').strip() or None,
+                category=form.category.data,
+                glass=(form.glass.data or '').strip() or None,
+                is_alcoholic=(form.is_alcoholic.data == 'true'),
+                instructions=form.instructions.data.strip(),
+                is_public=(form.visibility.data == 'public'),
+                creator_id=current_user.id,
+            )
+
+            upload = form.image.data
+            if upload is not None and getattr(upload, 'filename', ''):
+                upload.stream.seek(0)
+                recipe.image_data = upload.read()
+                recipe.image_mime = upload.mimetype
+
+            db.session.add(recipe)
+            db.session.flush()
+
+            position = 1
+            for row in non_empty_rows:
+                if not row['name']:
+                    ingredient_error = 'Each saved ingredient needs a name.'
+                    db.session.rollback()
+                    break
+
+                db.session.add(Ingredient(
+                    recipe_id=recipe.id,
+                    name=row['name'],
+                    quantity=row['quantity'] or None,
+                    unit=row['unit'] or None,
+                    position=position,
+                ))
+                position += 1
+
+            if ingredient_error is None:
+                db.session.commit()
+                flash('Recipe created successfully.', 'success')
+                return redirect(url_for('main.recipe_detail', recipe_id=recipe.id))
+
+    return render_template(
+        'create_recipe.html',
+        form=form,
+        ingredient_rows=ingredient_rows,
+        ingredient_error=ingredient_error,
+    )
 
 
-@main_bp.route('/share')
+@main_bp.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
-    return render_template('share.html')
+    owned_private_recipes = db.session.execute(
+        db.select(Recipe)
+        .where(
+            Recipe.creator_id == current_user.id,
+            Recipe.is_public.is_(False),
+        )
+        .order_by(Recipe.name.asc())
+    ).scalars().all()
 
-@main_bp.route('/recipes/db/<int:recipe_id>/rate', methods=['POST'])
-def rate_database_recipe(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    form = ShareRecipeForm(owner=current_user)
+    form.set_recipe_choices(owned_private_recipes)
+    revoke_form = RevokeShareForm()
 
-    if not can_view_recipe(recipe, current_user):
-        return jsonify({
-            'success': False,
-            'error': 'You are not allowed to rate this recipe.'
-        }), 403
+    if form.validate_on_submit():
+        db.session.add(SharedAccess(
+            recipe_id=form.recipe.id,
+            shared_with_user_id=form.target_user.id,
+            granted_by_user_id=current_user.id,
+        ))
+        db.session.commit()
+        flash(f'Shared "{form.recipe.name}" with {form.target_user.username}.', 'success')
+        return redirect(url_for('main.share'))
 
+    existing_grants = db.session.execute(
+        db.select(SharedAccess)
+        .join(Recipe, SharedAccess.recipe_id == Recipe.id)
+        .where(Recipe.creator_id == current_user.id)
+        .order_by(SharedAccess.created_at.desc())
+    ).scalars().all()
+
+    shared_with_you = db.session.execute(
+        db.select(SharedAccess)
+        .where(SharedAccess.shared_with_user_id == current_user.id)
+        .order_by(SharedAccess.created_at.desc())
+    ).scalars().all()
+
+    return render_template(
+        'share.html',
+        form=form,
+        revoke_form=revoke_form,
+        existing_grants=existing_grants,
+        shared_with_you=shared_with_you,
+        has_private_recipes=bool(owned_private_recipes),
+    )
+
+
+@main_bp.route('/share/remove/<int:grant_id>', methods=['POST'])
+@login_required
+def remove_share(grant_id):
+    form = RevokeShareForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    grant = db.get_or_404(SharedAccess, grant_id)
+    if grant.recipe.creator_id != current_user.id:
+        abort(403)
+
+    recipe_name = grant.recipe.name
+    target_username = grant.shared_with.username
+    db.session.delete(grant)
+    db.session.commit()
+
+    flash(f'Removed access to "{recipe_name}" for {target_username}.', 'success')
+    return redirect(url_for('main.share'))
+
+
+@main_bp.route('/recipes/<int:recipe_id>/rate', methods=['POST'])
+def rate_recipe(recipe_id):
     if not current_user.is_authenticated:
-        return jsonify({
-            'success': False,
-            'error': 'Please log in to rate this recipe.'
-        }), 401
+        return jsonify({'error': 'Please log in to rate recipes.'}), 401
+
+    recipe = db.get_or_404(Recipe, recipe_id)
 
     if recipe.creator_id == current_user.id:
-        return jsonify({
-            'success': False,
-            'error': 'You cannot rate your own recipe.'
-        }), 403
+        return jsonify({'error': 'You cannot rate your own recipe.'}), 403
 
-    data = request.get_json(silent=True)
+    if not can_view_recipe(recipe, current_user):
+        return jsonify({'error': 'You are not allowed to rate this recipe.'}), 403
 
-    if not data or 'stars' not in data:
-        return jsonify({
-            'success': False,
-            'error': 'Missing rating value.'
-        }), 400
+    payload = request.get_json(silent=True) or {}
+    stars = payload.get('stars')
 
     try:
-        stars = int(data['stars'])
+        stars = int(stars)
     except (TypeError, ValueError):
-        return jsonify({
-            'success': False,
-            'error': 'Invalid rating value.'
-        }), 400
+        return jsonify({'error': 'Rating must be a number from 1 to 5.'}), 400
 
     if stars < 1 or stars > 5:
-        return jsonify({
-            'success': False,
-            'error': 'Rating must be between 1 and 5.'
-        }), 400
+        return jsonify({'error': 'Rating must be between 1 and 5.'}), 400
 
     rating = Rating.query.filter_by(
         recipe_id=recipe.id,
-        user_id=current_user.id
+        user_id=current_user.id,
     ).first()
 
     if rating:
         rating.stars = stars
     else:
-        rating = Rating(
-            recipe_id=recipe.id,
-            user_id=current_user.id,
-            stars=stars
-        )
+        rating = Rating(recipe_id=recipe.id, user_id=current_user.id, stars=stars)
         db.session.add(rating)
 
     db.session.commit()
 
-    average_rating, rating_count = get_rating_summary(recipe.id)
-
+    average, count = get_rating_summary(recipe.id)
     return jsonify({
         'success': True,
-        'average': average_rating,
-        'count': rating_count,
-        'user_rating': stars
+        'average': average,
+        'count': count,
+        'user_rating': stars,
     })

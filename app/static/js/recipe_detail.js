@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
           ratingMessage.textContent = 'Saving your rating...';
         }
 
-        fetch('/recipes/db/' + recipeId + '/rate', {
+        fetch('/recipes/' + recipeId + '/rate', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
