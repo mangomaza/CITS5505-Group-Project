@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import HiddenField, RadioField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import AnyOf, DataRequired, Length, Regexp, ValidationError
+from wtforms.validators import AnyOf, DataRequired, Length, Optional, Regexp, ValidationError
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {'jpeg', 'png', 'gif', 'webp'}
@@ -70,6 +70,19 @@ class CreateRecipeForm(FlaskForm):
         validators=[DataRequired(message='Please choose whether the recipe is public or private.')],
     )
     image = FileField('Photo')
+    external_source = HiddenField(
+        validators=[
+            Optional(),
+            AnyOf(['thecocktaildb', 'themealdb'], message='Invalid recipe source.'),
+        ],
+    )
+    external_id = HiddenField(
+        validators=[
+            Optional(),
+            Length(max=20),
+            Regexp(r'^[A-Za-z0-9_-]+$', message='Invalid recipe id.'),
+        ],
+    )
     submit = SubmitField('Create Recipe')
 
     def validate_image(self, field):

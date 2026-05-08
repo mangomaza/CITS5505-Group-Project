@@ -266,7 +266,7 @@
     return active && active.dataset.visibility === 'public' ? 'public' : 'private';
   }
 
-  // --- edit and save (handoff to /recipe/create) ----------------------
+  // --- edit and save (handoff to /recipe/create via prefill) ---------
   function editAndSave(card) {
     const side = card.dataset.side;
     const item = drawData[side];
@@ -275,12 +275,10 @@
       window.location.href = LOGIN_URL + '?next=' + encodeURIComponent('/recipe/create');
       return;
     }
-    // Prefill payload handoff is wired in a later commit. For now, drop
-    // the user on the create page so the flow is reachable.
     const params = new URLSearchParams();
-    params.set('mix_source', item.source || '');
-    params.set('mix_id', item.external_id || '');
-    window.location.href = '/recipe/create?' + params.toString();
+    params.set('source', item.source || '');
+    params.set('external_id', item.external_id || '');
+    window.location.href = '/recipes/external-prefill?' + params.toString();
   }
 
   // --- modal open/close -----------------------------------------------

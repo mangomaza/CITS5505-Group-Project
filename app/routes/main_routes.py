@@ -1,8 +1,10 @@
 import random
+import re
+import secrets
 from io import BytesIO
 
 import requests
-from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, session, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func
 
@@ -376,14 +378,64 @@ def _normalise_ingredient_rows(form_data):
     return rows
 
 
+@main_bp.route('/recipes/external-prefill', methods=['GET'])
+@login_required
+def external_prefill():
+    source = (request.args.get('source') or '').strip()
+    external_id = (request.args.get('external_id') or '').strip()
+
+    if source not in {'thecocktaildb', 'themealdb'}:
+        flash('Could not start that recipe. Please try again.', 'warning')
+        return redirect(url_for('main.create_recipe'))
+    if not re.match(r'^[A-Za-z0-9_-]{1,20}$', external_id):
+        flash('Could not start that recipe. Please try again.', 'warning')
+        return redirect(url_for('main.create_recipe'))
+
+    payload = _lookup_external(source, external_id)
+    if payload is None:
+        flash('Could not look up that recipe. It may have been removed.', 'warning')
+        return redirect(url_for('main.create_recipe'))
+
+    token = secrets.token_urlsafe(16)
+    session[f'external_prefill_{token}'] = payload
+    return redirect(url_for('main.create_recipe', prefill=token))
+
+
 @main_bp.route('/recipe/create', methods=['GET', 'POST'])
 @login_required
 def create_recipe():
-    # TODO: when Mix It Up's Edit-and-save flow is wired up, accept a
-    # ?prefill=external_source:external_id query and pre-populate the form
-    # from the cached external recipe.
-    form = CreateRecipeForm()
-    ingredient_rows = _normalise_ingredient_rows(request.form if request.method == 'POST' else None)
+    prefill_payload = None
+    prefill_token = request.args.get('prefill') if request.method == 'GET' else None
+    if prefill_token:
+        prefill_payload = session.pop(f'external_prefill_{prefill_token}', None)
+
+    if prefill_payload:
+        is_alc = 'true' if prefill_payload.get('is_alcoholic') else 'false'
+        form = CreateRecipeForm(data={
+            'name': prefill_payload.get('name', ''),
+            'description': prefill_payload.get('description') or '',
+            'category': prefill_payload.get('category', ''),
+            'glass': prefill_payload.get('glass') or '',
+            'instructions': prefill_payload.get('instructions') or '',
+            'is_alcoholic': is_alc,
+            'visibility': 'private',
+            'external_source': prefill_payload.get('source', ''),
+            'external_id': prefill_payload.get('external_id', ''),
+        })
+        ingredient_rows = [
+            {
+                'name': (i.get('name') or '').strip(),
+                'quantity': (i.get('quantity') or '').strip(),
+                'unit': (i.get('unit') or '').strip(),
+            }
+            for i in (prefill_payload.get('ingredients') or [])
+        ]
+        if not ingredient_rows:
+            ingredient_rows = [{'name': '', 'quantity': '', 'unit': ''} for _ in range(3)]
+    else:
+        form = CreateRecipeForm()
+        ingredient_rows = _normalise_ingredient_rows(request.form if request.method == 'POST' else None)
+
     ingredient_error = None
 
     if form.validate_on_submit():
@@ -391,6 +443,19 @@ def create_recipe():
             row for row in ingredient_rows
             if row['name'] or row['quantity'] or row['unit']
         ]
+
+        ext_source = (form.external_source.data or '').strip() or None
+        ext_id = (form.external_id.data or '').strip() or None
+        is_external = bool(ext_source and ext_id)
+
+        if is_external:
+            state, existing = _check_external_dedupe(
+                current_user.id, ext_source, ext_id,
+                form.name.data.strip(), form.category.data,
+            )
+            if state == 'exact':
+                flash(f'You already have "{existing.name}" in your cookbook.', 'warning')
+                return redirect(url_for('main.recipe_detail', recipe_id=existing.id))
 
         if not non_empty_rows:
             ingredient_error = 'Please add at least one ingredient.'
@@ -404,6 +469,9 @@ def create_recipe():
                 instructions=form.instructions.data.strip(),
                 is_public=(form.visibility.data == 'public'),
                 creator_id=current_user.id,
+                source='external' if is_external else 'user',
+                external_source=ext_source,
+                external_id=ext_id,
             )
 
             upload = form.image.data
