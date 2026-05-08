@@ -15,7 +15,12 @@
     <div class="row justify-content-center">
       <div class="col-lg-8">
 
-        <h1 class="mb-4">Create a recipe</h1>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+          <h1 class="mb-0">Create a recipe</h1>
+          <button type="button" class="btn btn-mix-outline" data-mix-trigger>
+            <i class="bi bi-shuffle me-1"></i> Mix It Up
+          </button>
+        </div>
 
         <div class="form-card create-form">
           <form method="post" action="{{ url_for('main.create_recipe') }}" enctype="multipart/form-data" novalidate>
