@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
-from wtforms import RadioField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms import HiddenField, RadioField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms.validators import AnyOf, DataRequired, Length, Regexp, ValidationError
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {'jpeg', 'png', 'gif', 'webp'}
@@ -97,3 +97,28 @@ class CreateRecipeForm(FlaskForm):
             raise ValidationError('Please upload a valid image file.')
 
         stream.seek(current_pos)
+
+
+class SaveExternalRecipeForm(FlaskForm):
+    """Save a recipe drawn from an external API into the user's cookbook."""
+
+    external_source = HiddenField(
+        validators=[
+            DataRequired(message='Missing recipe source.'),
+            AnyOf(['thecocktaildb', 'themealdb'], message='Unknown recipe source.'),
+        ],
+    )
+    external_id = HiddenField(
+        validators=[
+            DataRequired(message='Missing recipe id.'),
+            Length(max=20, message='Recipe id is too long.'),
+            Regexp(r'^[A-Za-z0-9_-]+$', message='Recipe id contains invalid characters.'),
+        ],
+    )
+    visibility = HiddenField(
+        validators=[
+            DataRequired(message='Missing visibility.'),
+            AnyOf(['public', 'private'], message='Visibility must be public or private.'),
+        ],
+    )
+    confirm_duplicate = HiddenField()

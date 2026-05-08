@@ -7,13 +7,15 @@ from flask_login import current_user, login_required
 from sqlalchemy import func
 
 from app.extensions import db
-from app.forms.recipe_forms import CreateRecipeForm
+from app.forms.recipe_forms import CreateRecipeForm, SaveExternalRecipeForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
 from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
 
 COCKTAIL_API_URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
 MEAL_API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php'
+COCKTAIL_LOOKUP_URL = 'https://www.thecocktaildb.com/api/json/v1/1/lookup.php'
+MEAL_LOOKUP_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php'
 EXTERNAL_API_TIMEOUT = 3
 
 main_bp = Blueprint('main', __name__)
@@ -44,7 +46,7 @@ def _extract_external_ingredients(payload, max_slots=20):
 def _shape_cocktail(payload):
     return {
         'name': (payload.get('strDrink') or '').strip(),
-        'category': 'Cocktail',
+        'category': 'cocktail',
         'subcategory': (payload.get('strCategory') or '').strip() or None,
         'cuisine': None,
         'glass': (payload.get('strGlass') or '').strip() or None,
@@ -62,7 +64,7 @@ def _shape_cocktail(payload):
 def _shape_meal(payload):
     return {
         'name': (payload.get('strMeal') or '').strip(),
-        'category': 'Meal',
+        'category': 'food',
         'subcategory': (payload.get('strCategory') or '').strip() or None,
         'cuisine': (payload.get('strArea') or '').strip() or None,
         'glass': None,
@@ -144,8 +146,8 @@ def _fallback_from_db(category):
 
 @main_bp.route('/recipes/random.json')
 def random_recipe_pair():
-    side_a = _fetch_random_cocktail() or _fallback_from_db('Cocktail')
-    side_b = _fetch_random_meal() or _fallback_from_db('Meal')
+    side_a = _fetch_random_cocktail() or _fallback_from_db('cocktail')
+    side_b = _fetch_random_meal() or _fallback_from_db('food')
 
     if side_a is None and side_b is None:
         return jsonify({
@@ -154,6 +156,146 @@ def random_recipe_pair():
         }), 503
 
     return jsonify({'side_a': side_a, 'side_b': side_b})
+
+
+def _lookup_external(source, external_id):
+    if source == 'thecocktaildb':
+        url = COCKTAIL_LOOKUP_URL
+        list_key = 'drinks'
+        shaper = _shape_cocktail
+    elif source == 'themealdb':
+        url = MEAL_LOOKUP_URL
+        list_key = 'meals'
+        shaper = _shape_meal
+    else:
+        return None
+
+    try:
+        response = requests.get(url, params={'i': external_id}, timeout=EXTERNAL_API_TIMEOUT)
+        response.raise_for_status()
+        items = (response.json() or {}).get(list_key) or []
+        if not items:
+            return None
+        shaped = shaper(items[0])
+        if not shaped['name'] or not shaped['external_id']:
+            return None
+        return shaped
+    except (requests.RequestException, ValueError):
+        return None
+
+
+def _check_external_dedupe(user_id, source, external_id, name, category):
+    exact = (
+        Recipe.query
+        .filter_by(
+            creator_id=user_id,
+            external_source=source,
+            external_id=external_id,
+        )
+        .first()
+    )
+    if exact is not None:
+        return 'exact', exact
+
+    fuzzy = (
+        Recipe.query
+        .filter(
+            Recipe.creator_id == user_id,
+            Recipe.category == category,
+            func.lower(Recipe.name) == name.strip().lower(),
+        )
+        .first()
+    )
+    if fuzzy is not None:
+        return 'fuzzy', fuzzy
+
+    return 'none', None
+
+
+def _save_external_recipe(user_id, payload, visibility):
+    recipe = Recipe(
+        name=payload['name'],
+        description=None,
+        category=payload['category'],
+        subcategory=payload.get('subcategory'),
+        cuisine=payload.get('cuisine'),
+        glass=payload.get('glass'),
+        is_alcoholic=bool(payload.get('is_alcoholic')),
+        instructions=payload['instructions'],
+        is_public=(visibility == 'public'),
+        source='external',
+        external_source=payload['external_source'],
+        external_id=payload['external_id'],
+        creator_id=user_id,
+    )
+    db.session.add(recipe)
+    db.session.flush()
+
+    for index, row in enumerate(payload.get('ingredients') or [], start=1):
+        if not row.get('name'):
+            continue
+        db.session.add(Ingredient(
+            recipe_id=recipe.id,
+            name=row['name'],
+            quantity=(row.get('quantity') or '').strip() or None,
+            unit=(row.get('unit') or '').strip() or None,
+            position=index,
+        ))
+
+    db.session.commit()
+    return recipe
+
+
+@main_bp.route('/recipes/save-external', methods=['POST'])
+@login_required
+def save_external_recipe():
+    form = SaveExternalRecipeForm()
+    if not form.validate_on_submit():
+        return jsonify({
+            'error': 'invalid_request',
+            'message': 'Could not save this recipe. Please try again.',
+            'details': form.errors,
+        }), 400
+
+    source = form.external_source.data
+    external_id = form.external_id.data.strip()
+    visibility = form.visibility.data
+    confirm = (form.confirm_duplicate.data or '').strip() == '1'
+
+    payload = _lookup_external(source, external_id)
+    if payload is None:
+        return jsonify({
+            'error': 'lookup_failed',
+            'message': 'Could not look up that recipe. It may have been removed.',
+        }), 502
+
+    state, existing = _check_external_dedupe(
+        current_user.id, source, external_id, payload['name'], payload['category'],
+    )
+
+    if state == 'exact':
+        return jsonify({
+            'error': 'already_saved',
+            'message': f'You already have "{existing.name}" in your cookbook.',
+            'existing_recipe_id': existing.id,
+            'existing_recipe_url': url_for('main.recipe_detail', recipe_id=existing.id),
+        }), 409
+
+    if state == 'fuzzy' and not confirm:
+        return jsonify({
+            'error': 'similar_recipe',
+            'message': f'You already have a recipe called "{existing.name}" in this category. Save anyway?',
+            'confirm_required': True,
+            'existing_recipe_id': existing.id,
+            'existing_recipe_url': url_for('main.recipe_detail', recipe_id=existing.id),
+        }), 409
+
+    recipe = _save_external_recipe(current_user.id, payload, visibility)
+    return jsonify({
+        'ok': True,
+        'recipe_id': recipe.id,
+        'recipe_url': url_for('main.recipe_detail', recipe_id=recipe.id),
+    }), 201
 
 
 @main_bp.route('/')
