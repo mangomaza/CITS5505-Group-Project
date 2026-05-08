@@ -1,5 +1,7 @@
+import random
 from io import BytesIO
 
+import requests
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func
@@ -9,6 +11,10 @@ from app.forms.recipe_forms import CreateRecipeForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
 from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
+
+COCKTAIL_API_URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
+MEAL_API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php'
+EXTERNAL_API_TIMEOUT = 3
 
 main_bp = Blueprint('main', __name__)
 
@@ -22,6 +28,132 @@ def get_rating_summary(recipe_id):
     average = summary[0] or 0
     count = summary[1] or 0
     return round(float(average), 1), count
+
+
+def _extract_external_ingredients(payload, max_slots=20):
+    rows = []
+    for index in range(1, max_slots + 1):
+        name = (payload.get(f'strIngredient{index}') or '').strip()
+        measure = (payload.get(f'strMeasure{index}') or '').strip()
+        if not name:
+            continue
+        rows.append({'name': name, 'quantity': measure, 'unit': ''})
+    return rows
+
+
+def _shape_cocktail(payload):
+    return {
+        'name': (payload.get('strDrink') or '').strip(),
+        'category': 'Cocktail',
+        'subcategory': (payload.get('strCategory') or '').strip() or None,
+        'cuisine': None,
+        'glass': (payload.get('strGlass') or '').strip() or None,
+        'is_alcoholic': (payload.get('strAlcoholic') or '').strip().lower() == 'alcoholic',
+        'instructions': (payload.get('strInstructions') or '').strip(),
+        'image_url': (payload.get('strDrinkThumb') or '').strip() or None,
+        'ingredients': _extract_external_ingredients(payload),
+        'external_source': 'thecocktaildb',
+        'external_id': str(payload.get('idDrink') or '').strip(),
+        'source_origin': 'api',
+        'internal_recipe_id': None,
+    }
+
+
+def _shape_meal(payload):
+    return {
+        'name': (payload.get('strMeal') or '').strip(),
+        'category': 'Meal',
+        'subcategory': (payload.get('strCategory') or '').strip() or None,
+        'cuisine': (payload.get('strArea') or '').strip() or None,
+        'glass': None,
+        'is_alcoholic': False,
+        'instructions': (payload.get('strInstructions') or '').strip(),
+        'image_url': (payload.get('strMealThumb') or '').strip() or None,
+        'ingredients': _extract_external_ingredients(payload),
+        'external_source': 'themealdb',
+        'external_id': str(payload.get('idMeal') or '').strip(),
+        'source_origin': 'api',
+        'internal_recipe_id': None,
+    }
+
+
+def _fetch_random_cocktail():
+    try:
+        response = requests.get(COCKTAIL_API_URL, timeout=EXTERNAL_API_TIMEOUT)
+        response.raise_for_status()
+        drinks = (response.json() or {}).get('drinks') or []
+        if not drinks:
+            return None
+        shaped = _shape_cocktail(drinks[0])
+        if not shaped['name'] or not shaped['external_id']:
+            return None
+        return shaped
+    except (requests.RequestException, ValueError):
+        return None
+
+
+def _fetch_random_meal():
+    try:
+        response = requests.get(MEAL_API_URL, timeout=EXTERNAL_API_TIMEOUT)
+        response.raise_for_status()
+        meals = (response.json() or {}).get('meals') or []
+        if not meals:
+            return None
+        shaped = _shape_meal(meals[0])
+        if not shaped['name'] or not shaped['external_id']:
+            return None
+        return shaped
+    except (requests.RequestException, ValueError):
+        return None
+
+
+def _shape_internal_recipe(recipe):
+    image_url = None
+    if recipe.image_data:
+        image_url = url_for('main.recipe_image', recipe_id=recipe.id)
+    return {
+        'name': recipe.name,
+        'category': recipe.category,
+        'subcategory': recipe.subcategory,
+        'cuisine': recipe.cuisine,
+        'glass': recipe.glass,
+        'is_alcoholic': recipe.is_alcoholic,
+        'instructions': recipe.instructions,
+        'image_url': image_url,
+        'ingredients': [
+            {'name': ing.name, 'quantity': ing.quantity or '', 'unit': ing.unit or ''}
+            for ing in recipe.ingredients
+        ],
+        'external_source': None,
+        'external_id': None,
+        'source_origin': 'db',
+        'internal_recipe_id': recipe.id,
+    }
+
+
+def _fallback_from_db(category):
+    candidates = (
+        Recipe.query
+        .filter(Recipe.is_public.is_(True), Recipe.category == category)
+        .all()
+    )
+    if not candidates:
+        return None
+    return _shape_internal_recipe(random.choice(candidates))
+
+
+@main_bp.route('/recipes/random.json')
+def random_recipe_pair():
+    side_a = _fetch_random_cocktail() or _fallback_from_db('Cocktail')
+    side_b = _fetch_random_meal() or _fallback_from_db('Meal')
+
+    if side_a is None and side_b is None:
+        return jsonify({
+            'error': 'no_recipes_available',
+            'message': 'Recipe sources are unavailable right now. Please try again in a moment.',
+        }), 503
+
+    return jsonify({'side_a': side_a, 'side_b': side_b})
 
 
 @main_bp.route('/')
