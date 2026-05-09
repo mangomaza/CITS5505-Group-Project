@@ -93,7 +93,7 @@ class CreateRecipeForm(FlaskForm):
             ),
         ],
     )
-    submit = SubmitField('Create Recipe')
+    submit = SubmitField('Save to mixtape')
 
     def validate(self, extra_validators=None):
         # For food recipes the alcohol radio is hidden, so default it to

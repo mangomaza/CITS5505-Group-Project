@@ -405,6 +405,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ---- Forms ---- */
+.cassette-insert-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--mix-accent);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px dotted rgba(212, 148, 76, 0.4);
+}
+
 .form-card {
   background-color: var(--mix-card);
   border-radius: var(--mix-radius);

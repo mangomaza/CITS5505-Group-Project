@@ -3,8 +3,8 @@
 {% block title %}Create Recipe &mdash; Mix It Up{% endblock %}
 
 {#
-  TODO: Replace the placeholder asset paths static/images/placeholders/cocktail-default.png
-  and static/images/placeholders/food-default.png with the AI-generated default images
+  TODO: Replace the placeholder asset paths static/images/placeholders/cocktail-default.jpg
+  and static/images/placeholders/food-default.jpg with the AI-generated default images
   (one for cocktails, one for food). They are referenced from the photo upload area below
   and from create_recipe.js to seed the preview when no real photo is set yet.
 #}
@@ -29,6 +29,7 @@
           </button>
         </div>
 
+        <div class="cassette-insert-label">// SIDE A &middot; NEW MIX</div>
         <div class="form-card create-form">
           <form method="post" action="{{ url_for('main.create_recipe') }}" enctype="multipart/form-data" novalidate>
             {{ form.hidden_tag() }}
@@ -121,8 +122,8 @@
             <div class="form-section">
               <div class="section-title">Photo</div>
               <div class="upload-area" id="uploadArea"
-                   data-default-cocktail="{{ url_for('static', filename='images/placeholders/cocktail-default.png') }}"
-                   data-default-food="{{ url_for('static', filename='images/placeholders/food-default.png') }}">
+                   data-default-cocktail="{{ url_for('static', filename='images/placeholders/cocktail-default.jpg') }}"
+                   data-default-food="{{ url_for('static', filename='images/placeholders/food-default.jpg') }}">
                 <img class="upload-preview" id="imagePreview" alt=""
                      {% if form.external_image_url.data %}src="{{ form.external_image_url.data }}"{% endif %}>
                 <div class="upload-placeholder" id="uploadPlaceholder">
