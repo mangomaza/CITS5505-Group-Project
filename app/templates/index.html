@@ -28,93 +28,64 @@
     <!-- Featured Recipes -->
     <section class="container my-5">
       <h2 class="mb-4">What people are making</h2>
-      <div class="row g-4">
 
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Margarita</h3>
-                <p class="card-meta">by mixmaster &middot; 2 days ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-half"></i>
-                  <span class="ms-1 font-mono">4.3</span>
+      {% if featured and featured|length > 0 %}
+        <div class="row g-4">
+          {% for entry in featured %}
+            {% set recipe = entry.recipe %}
+            <div class="col-md-6">
+              <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
+                <div class="recipe-card">
+
+                  {% if recipe.image_data %}
+                    <img src="{{ url_for('main.recipe_image', recipe_id=recipe.id) }}"
+                         class="card-img-top"
+                         alt="{{ recipe.name }}">
+                  {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                      <span class="text-muted">No image</span>
+                    </div>
+                  {% endif %}
+
+                  <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      {% if recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ recipe.category|title }}</span>
+                      {% endif %}
+                      <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                        {{ entry.origin }}
+                      </span>
+                    </div>
+
+                    <h3 class="card-title mt-2">{{ recipe.name }}</h3>
+                    <p class="card-meta">
+                      by {{ recipe.creator.username }}
+                      &middot;
+                      {{ recipe.created_at.strftime('%d %b %Y') }}
+                    </p>
+
+                    {% if recipe.description %}
+                      <p class="card-text">{{ recipe.description }}</p>
+                    {% endif %}
+                  </div>
+
                 </div>
-              </div>
+              </a>
             </div>
-          </a>
+          {% endfor %}
         </div>
-
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Mojito</h3>
-                <p class="card-meta">by limelife &middot; 5 days ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star"></i>
-                  <span class="ms-1 font-mono">4.0</span>
-                </div>
-              </div>
-            </div>
-          </a>
+      {% else %}
+        <div class="empty-state p-4 text-center">
+          <p class="mb-2">No public recipes yet.</p>
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.create_recipe') }}" class="btn btn-mix-primary">Create the first one</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-mix-primary">Log in to create one</a>
+          {% endif %}
         </div>
-
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
-              <div class="card-body">
-                <span class="badge-food">Food</span>
-                <h3 class="card-title mt-2">Spicy Arrabiata Penne</h3>
-                <p class="card-meta">by pastaqueen &middot; 1 week ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <span class="ms-1 font-mono">4.8</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Old Fashioned</h3>
-                <p class="card-meta">by bourbonboy &middot; 3 days ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star"></i>
-                  <span class="ms-1 font-mono">4.1</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-
-      </div>
+      {% endif %}
     </section>
 
     <!-- Browse by Category -->

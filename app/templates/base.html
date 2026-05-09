@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% if csrf_token is defined %}<meta name="csrf-token" content="{{ csrf_token() }}">{% endif %}
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{% block title %}Mix It Up{% endblock %}</title>
 
   <!-- Fonts -->
@@ -131,9 +131,11 @@
   {% include '_random_draw.html' %}
 
   <!-- JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Local scripts first so [data-mix-trigger] click handlers attach before the
+       Bootstrap CDN bundle finishes downloading. -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script src="{{ url_for('static', filename='js/random_draw.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
 
 </body>

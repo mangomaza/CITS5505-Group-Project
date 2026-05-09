@@ -52,6 +52,18 @@
   font-family: var(--mix-font-mono);
 }
 
+/* ---- Recipe Description blurb ---- */
+.recipe-description {
+  background-color: var(--mix-card-elevated);
+  border-left: 3px solid var(--mix-accent);
+  border-radius: var(--mix-radius);
+  padding: 14px 18px;
+  font-style: italic;
+  color: var(--mix-text);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
 /* ---- Side A / Side B Section Labels ---- */
 .side-label {
   font-family: var(--mix-font-mono);

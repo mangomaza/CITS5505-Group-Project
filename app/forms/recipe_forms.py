@@ -83,6 +83,16 @@ class CreateRecipeForm(FlaskForm):
             Regexp(r'^[A-Za-z0-9_-]+$', message='Invalid recipe id.'),
         ],
     )
+    external_image_url = HiddenField(
+        validators=[
+            Optional(),
+            Length(max=300),
+            Regexp(
+                r'^https://(?:www\.)?(?:thecocktaildb|themealdb)\.com/images/[A-Za-z0-9/_.-]+$',
+                message='Invalid recipe image source.',
+            ),
+        ],
+    )
     submit = SubmitField('Create Recipe')
 
     def validate_image(self, field):

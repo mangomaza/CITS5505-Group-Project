@@ -10,7 +10,7 @@
 
   const RANDOM_URL = '/recipes/random.json';
   const SAVE_URL = '/recipes/save-external';
-  const LOGIN_URL = '/login';
+  const LOGIN_URL = '/auth/login';
 
   const cards = modal.querySelectorAll('.draw-card');
   const stage = modal.querySelector('.random-draw-stage');
@@ -66,6 +66,8 @@
       if (pickWrap) pickWrap.hidden = false;
       const actions = card.querySelector('.draw-card-actions');
       if (actions) actions.hidden = true;
+      const deselect = card.querySelector('[data-mix-deselect]');
+      if (deselect) deselect.hidden = true;
     });
   }
 
@@ -93,10 +95,10 @@
     badge.className = 'draw-card-badge ' + (cat === 'cocktail' ? 'badge-cocktail' : 'badge-food');
 
     name.textContent = item.name || 'Untitled';
-    const sourceLabel = item.source === 'thecocktaildb' || item.source === 'themealdb'
-      ? 'from the wider web'
-      : 'from your community';
-    meta.textContent = sourceLabel;
+    const isExternal = item.source_origin === 'api'
+      || item.external_source === 'thecocktaildb'
+      || item.external_source === 'themealdb';
+    meta.textContent = isExternal ? 'from the wider web' : 'from your community';
 
     face.hidden = false;
   }
@@ -147,7 +149,12 @@
 
     drawData.a = data.side_a || null;
     drawData.b = data.side_b || null;
-    setStatus('', false);
+
+    if (data.fallback_used) {
+      setStatus("Couldn't reach the wider web. Showing recipes from the community instead.", true);
+    } else {
+      setStatus('', false);
+    }
 
     cards.forEach((card) => {
       const side = card.dataset.side;
@@ -171,6 +178,8 @@
         card.classList.add('is-chosen');
         const pickWrap = card.querySelector('.draw-card-pick');
         if (pickWrap) pickWrap.hidden = true;
+        const deselect = card.querySelector('[data-mix-deselect]');
+        if (deselect) deselect.hidden = false;
         const actions = card.querySelector('.draw-card-actions');
         if (actions) {
           actions.hidden = false;
@@ -185,7 +194,20 @@
               anonBlock.hidden = false;
               const link = anonBlock.querySelector('.draw-card-login-link');
               if (link) {
-                link.href = LOGIN_URL + '?next=' + encodeURIComponent(window.location.pathname);
+                // Stash chosen item so after login we can reopen the modal
+                // already on this card.
+                link.onclick = (ev) => {
+                  ev.preventDefault();
+                  try {
+                    sessionStorage.setItem('mixResume', JSON.stringify({
+                      side: side,
+                      item: item,
+                      path: window.location.pathname,
+                    }));
+                  } catch (_) { /* ignore */ }
+                  const nextUrl = window.location.pathname + '?resume_mix=1';
+                  window.location.href = LOGIN_URL + '?next=' + encodeURIComponent(nextUrl);
+                };
               }
             }
           }
@@ -198,6 +220,20 @@
     });
   }
 
+  // Reverse the pick: drop chosen/faded states and bring the pick buttons
+  // back so the user can choose the other card.
+  function deselectCard() {
+    cards.forEach((card) => {
+      card.classList.remove('is-chosen', 'is-faded');
+      const pickWrap = card.querySelector('.draw-card-pick');
+      if (pickWrap) pickWrap.hidden = false;
+      const actions = card.querySelector('.draw-card-actions');
+      if (actions) actions.hidden = true;
+      const deselect = card.querySelector('[data-mix-deselect]');
+      if (deselect) deselect.hidden = true;
+    });
+  }
+
   // --- save -----------------------------------------------------------
   async function postSave(card, confirmDuplicate) {
     const side = card.dataset.side;
@@ -207,7 +243,7 @@
 
     const body = new URLSearchParams();
     body.set('csrf_token', getCsrfToken());
-    body.set('external_source', item.source || '');
+    body.set('external_source', item.external_source || '');
     body.set('external_id', item.external_id || '');
     body.set('visibility', visibility);
     if (confirmDuplicate) body.set('confirm_duplicate', '1');
@@ -276,7 +312,7 @@
       return;
     }
     const params = new URLSearchParams();
-    params.set('source', item.source || '');
+    params.set('source', item.external_source || '');
     params.set('external_id', item.external_id || '');
     window.location.href = '/recipes/external-prefill?' + params.toString();
   }
@@ -326,6 +362,9 @@
     const pickBtn = card.querySelector('.draw-card-pick-btn');
     if (pickBtn) pickBtn.addEventListener('click', () => pickCard(card));
 
+    const deselectBtn = card.querySelector('[data-mix-deselect]');
+    if (deselectBtn) deselectBtn.addEventListener('click', deselectCard);
+
     card.querySelectorAll('.visibility-pill').forEach((pill) => {
       pill.addEventListener('click', () => {
         card.querySelectorAll('.visibility-pill').forEach((p) => p.classList.remove('is-active'));
@@ -339,4 +378,43 @@
     const editBtn = card.querySelector('.draw-card-edit-btn');
     if (editBtn) editBtn.addEventListener('click', () => editAndSave(card));
   });
+
+  // --- resume after login ---------------------------------------------
+  // If we just bounced an anon user to login and they came back, replay
+  // the modal already on their picked card so they don't have to re-roll.
+  function maybeResume() {
+    if (!isAuthed) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('resume_mix') !== '1') return;
+    let stash = null;
+    try {
+      const raw = sessionStorage.getItem('mixResume');
+      if (raw) stash = JSON.parse(raw);
+    } catch (_) { /* ignore */ }
+    if (!stash || !stash.item || stash.path !== window.location.pathname) return;
+    sessionStorage.removeItem('mixResume');
+
+    // Strip the query param so a refresh is clean.
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, '', cleanUrl);
+
+    modal.hidden = false;
+    document.body.classList.add('mix-modal-open');
+    if (dialog) dialog.focus();
+
+    drawData[stash.side] = stash.item;
+    cards.forEach((card) => {
+      if (card.dataset.side === stash.side) {
+        renderCard(card, stash.item);
+        card.classList.add('is-flipped');
+        card.setAttribute('aria-busy', 'false');
+        pickCard(card);
+      } else {
+        const back = card.querySelector('.draw-card-back-label');
+        if (back) back.textContent = 'B SIDE';
+      }
+    });
+    setStatus("You're back. Save it now or pick something else.", false);
+  }
+  maybeResume();
 })();

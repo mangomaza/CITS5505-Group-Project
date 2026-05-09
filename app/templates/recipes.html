@@ -26,135 +26,69 @@
     </div>
 
     <!-- Recipe Grid -->
-    <div class="recipe-grid">
-
-      <div class="recipe-grid-item">
-        <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-          <div class="recipe-card">
-            <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
-            <div class="card-body">
-              <span class="badge-cocktail">Cocktail</span>
-              <h3 class="card-title mt-2">Margarita</h3>
-              <p class="card-meta">by mixmaster &middot; 2 days ago</p>
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <span class="ms-1 font-mono">4.3</span>
-              </div>
-            </div>
-          </div>
-        </a>
+    {% if visible_recipes|length == 0 %}
+      <div class="empty-state p-4 text-center">
+        <h3>No recipes yet</h3>
+        {% if current_user.is_authenticated %}
+          <p>No public recipes are available yet. Be the first to create one.</p>
+          <a href="{{ url_for('main.create_recipe') }}" class="btn btn-mix-primary">
+            Create a recipe
+          </a>
+        {% else %}
+          <p>No public recipes are available yet. Log in to create your own.</p>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-mix-primary">Log in</a>
+        {% endif %}
       </div>
+    {% else %}
+      <div class="recipe-grid">
+        {% for entry in visible_recipes %}
+          {% set recipe = entry.recipe %}
+          <div class="recipe-grid-item" data-category="{{ recipe.category }}"
+               data-mine="{{ '1' if current_user.is_authenticated and recipe.creator_id == current_user.id else '0' }}">
+            <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
+              <div class="recipe-card">
 
-      <div class="recipe-grid-item">
-        <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-          <div class="recipe-card">
-            <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
-            <div class="card-body">
-              <span class="badge-cocktail">Cocktail</span>
-              <h3 class="card-title mt-2">Mojito</h3>
-              <p class="card-meta">by limelife &middot; 5 days ago</p>
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star"></i>
-                <span class="ms-1 font-mono">4.0</span>
+                {% if recipe.image_data %}
+                  <img src="{{ url_for('main.recipe_image', recipe_id=recipe.id) }}"
+                       class="card-img-top"
+                       alt="{{ recipe.name }}">
+                {% else %}
+                  <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                    <span class="text-muted">No image</span>
+                  </div>
+                {% endif %}
+
+                <div class="card-body">
+                  <div class="d-flex flex-wrap align-items-center gap-2">
+                    {% if recipe.category == 'cocktail' %}
+                      <span class="badge-cocktail">Cocktail</span>
+                    {% else %}
+                      <span class="badge-food">{{ recipe.category|title }}</span>
+                    {% endif %}
+                    <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                      {{ entry.origin }}
+                    </span>
+                  </div>
+
+                  <h3 class="card-title mt-2">{{ recipe.name }}</h3>
+
+                  <p class="card-meta">
+                    by {{ recipe.creator.username }}
+                    &middot;
+                    {{ recipe.created_at.strftime('%d %b %Y') }}
+                  </p>
+
+                  {% if recipe.description %}
+                    <p class="card-text">{{ recipe.description }}</p>
+                  {% endif %}
+                </div>
+
               </div>
-            </div>
+            </a>
           </div>
-        </a>
+        {% endfor %}
       </div>
-
-      <div class="recipe-grid-item">
-        <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-          <div class="recipe-card">
-            <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
-            <div class="card-body">
-              <span class="badge-food">Food</span>
-              <h3 class="card-title mt-2">Spicy Arrabiata Penne</h3>
-              <p class="card-meta">by pastaqueen &middot; 1 week ago</p>
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <span class="ms-1 font-mono">4.8</span>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="recipe-grid-item">
-        <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-          <div class="recipe-card">
-            <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
-            <div class="card-body">
-              <span class="badge-cocktail">Cocktail</span>
-              <h3 class="card-title mt-2">Old Fashioned</h3>
-              <p class="card-meta">by bourbonboy &middot; 3 days ago</p>
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star"></i>
-                <span class="ms-1 font-mono">4.1</span>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="recipe-grid-item">
-        <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-          <div class="recipe-card">
-            <img src="https://www.thecocktaildb.com/images/media/drink/qyxjpe1680103024.jpg" class="card-img-top" alt="Negroni">
-            <div class="card-body">
-              <span class="badge-cocktail">Cocktail</span>
-              <h3 class="card-title mt-2">Negroni</h3>
-              <p class="card-meta">by ginlover &middot; 4 days ago</p>
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-half"></i>
-                <span class="ms-1 font-mono">4.5</span>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="recipe-grid-item">
-        <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-          <div class="recipe-card">
-            <img src="https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg" class="card-img-top" alt="Pad Thai">
-            <div class="card-body">
-              <span class="badge-food">Food</span>
-              <h3 class="card-title mt-2">Pad Thai</h3>
-              <p class="card-meta">by noodleking &middot; 6 days ago</p>
-              <div class="star-rating">
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star-fill"></i>
-                <i class="bi bi-star"></i>
-                <span class="ms-1 font-mono">3.9</span>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-
-    </div>
+    {% endif %}
 
     <section class="my-recipes-section mt-5" data-recipe-section="my-recipes">
       <h2 class="mb-3">My recipes</h2>
@@ -163,14 +97,14 @@
         <div class="empty-state p-4 text-center">
           <h3>Log in to see your recipes</h3>
           <p>Please log in to view the recipes you have created.</p>
-          <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Log in</a>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-mix-primary">Log in</a>
         </div>
 
       {% elif my_recipes|length == 0 %}
         <div class="empty-state p-4 text-center">
           <h3>No recipes yet</h3>
           <p>You have not created any recipes yet.</p>
-          <a href="{{ url_for('main.create_recipe') }}" class="btn btn-primary">
+          <a href="{{ url_for('main.create_recipe') }}" class="btn btn-mix-primary">
             Create your first recipe
           </a>
         </div>

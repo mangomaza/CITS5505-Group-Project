@@ -176,6 +176,12 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
   color: var(--mix-text-muted);
   margin-bottom: 0.75rem;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .recipe-card .card-footer {
@@ -212,6 +218,34 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.65rem;
   color: var(--mix-text-muted);
   margin-left: 6px;
+}
+
+/* ---- Visibility / Origin Pills ---- */
+.badge-visibility {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.badge-visibility-public {
+  background-color: #4f8a63;
+}
+
+.badge-visibility-private {
+  background-color: #6b513d;
+}
+
+.badge-visibility-shared {
+  background-color: #c9803a;
+}
+
+.badge-visibility-community {
+  background-color: #6e5d9c;
 }
 
 /* ---- Star Ratings ---- */
@@ -696,9 +730,9 @@ body.mix-modal-open {
   min-height: 420px;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 600ms cubic-bezier(0.25, 0.8, 0.3, 1),
-              opacity 300ms ease,
-              flex-grow 400ms ease;
+  transition: transform 2s cubic-bezier(0.25, 0.8, 0.3, 1),
+              opacity 500ms ease,
+              flex-grow 800ms ease;
 }
 
 .draw-card.is-flipped {
@@ -924,6 +958,43 @@ body.mix-modal-open {
   border-color: var(--mix-accent);
   color: var(--mix-accent);
   outline: none;
+}
+
+/* Trigger buttons in page headers should have a comfortable hit area. */
+.btn-mix-outline,
+.btn-mix-primary {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Deselect (back) button sits over the chosen card's image. */
+.draw-card-deselect {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--mix-accent);
+  background-color: rgba(26, 22, 20, 0.78);
+  color: var(--mix-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.draw-card-deselect:hover,
+.draw-card-deselect:focus-visible {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  outline: none;
+  transform: rotate(-30deg);
 }
 
 .random-draw-footer {

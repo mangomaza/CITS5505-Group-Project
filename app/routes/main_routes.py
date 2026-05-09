@@ -1,12 +1,13 @@
 import random
 import re
 import secrets
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 
 import requests
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, session, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from app.extensions import db
 from app.forms.recipe_forms import CreateRecipeForm, SaveExternalRecipeForm
@@ -18,7 +19,12 @@ COCKTAIL_API_URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
 MEAL_API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php'
 COCKTAIL_LOOKUP_URL = 'https://www.thecocktaildb.com/api/json/v1/1/lookup.php'
 MEAL_LOOKUP_URL = 'https://www.themealdb.com/api/json/v1/1/lookup.php'
-EXTERNAL_API_TIMEOUT = 3
+EXTERNAL_API_TIMEOUT = 1.5
+EXTERNAL_IMAGE_TIMEOUT = 3
+EXTERNAL_IMAGE_HOSTS = ('thecocktaildb.com', 'themealdb.com')
+EXTERNAL_IMAGE_URL_RE = re.compile(
+    r'^https://(?:www\.)?(?:thecocktaildb|themealdb)\.com/images/[A-Za-z0-9/_.-]+$'
+)
 
 main_bp = Blueprint('main', __name__)
 
@@ -148,8 +154,25 @@ def _fallback_from_db(category):
 
 @main_bp.route('/recipes/random.json')
 def random_recipe_pair():
-    side_a = _fetch_random_cocktail() or _fallback_from_db('cocktail')
-    side_b = _fetch_random_meal() or _fallback_from_db('food')
+    fallback_used = False
+
+    # Fetch both external sources in parallel so an offline source does not
+    # block the other one (and cuts worst-case wait roughly in half).
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        cocktail_future = pool.submit(_fetch_random_cocktail)
+        meal_future = pool.submit(_fetch_random_meal)
+        side_a = cocktail_future.result()
+        side_b = meal_future.result()
+
+    if side_a is None:
+        side_a = _fallback_from_db('cocktail')
+        if side_a is not None:
+            fallback_used = True
+
+    if side_b is None:
+        side_b = _fallback_from_db('food')
+        if side_b is not None:
+            fallback_used = True
 
     if side_a is None and side_b is None:
         return jsonify({
@@ -157,7 +180,11 @@ def random_recipe_pair():
             'message': 'Recipe sources are unavailable right now. Please try again in a moment.',
         }), 503
 
-    return jsonify({'side_a': side_a, 'side_b': side_b})
+    return jsonify({
+        'side_a': side_a,
+        'side_b': side_b,
+        'fallback_used': fallback_used,
+    })
 
 
 def _lookup_external(source, external_id):
@@ -214,10 +241,57 @@ def _check_external_dedupe(user_id, source, external_id, name, category):
     return 'none', None
 
 
+def _synthesise_external_description(payload):
+    """Build a short blurb for an external recipe so listing cards show one.
+
+    The cocktail/meal APIs don't expose a description field, so we synthesise
+    one from the structured fields we do have.
+    """
+    bits = []
+    if payload.get('category') == 'cocktail':
+        bits.append('Alcoholic cocktail' if payload.get('is_alcoholic') else 'Non-alcoholic cocktail')
+        if payload.get('glass'):
+            bits.append(f"served in a {payload['glass'].lower()}")
+    else:
+        if payload.get('cuisine'):
+            bits.append(f"{payload['cuisine']} dish")
+        else:
+            bits.append('Recipe')
+        if payload.get('subcategory'):
+            bits.append(f"({payload['subcategory'].lower()})")
+    src = payload.get('external_source') or payload.get('source')
+    src_label = 'TheCocktailDB' if src == 'thecocktaildb' else 'TheMealDB'
+    return ', '.join(bits) + f'. Saved from {src_label}.'
+
+
+def _download_external_image(url):
+    """Fetch an external recipe photo and return (bytes, mime) or (None, None).
+
+    Only allows images served from TheCocktailDB / TheMealDB to avoid SSRF
+    against arbitrary hosts.
+    """
+    if not url or not isinstance(url, str):
+        return None, None
+    if not EXTERNAL_IMAGE_URL_RE.match(url):
+        return None, None
+    try:
+        response = requests.get(url, timeout=EXTERNAL_IMAGE_TIMEOUT)
+        response.raise_for_status()
+    except requests.RequestException:
+        return None, None
+
+    content_type = (response.headers.get('Content-Type') or '').split(';')[0].strip().lower()
+    if not content_type.startswith('image/'):
+        return None, None
+    if len(response.content) > 5 * 1024 * 1024:
+        return None, None
+    return response.content, content_type
+
+
 def _save_external_recipe(user_id, payload, visibility):
     recipe = Recipe(
         name=payload['name'],
-        description=None,
+        description=_synthesise_external_description(payload),
         category=payload['category'],
         subcategory=payload.get('subcategory'),
         cuisine=payload.get('cuisine'),
@@ -230,6 +304,12 @@ def _save_external_recipe(user_id, payload, visibility):
         external_id=payload['external_id'],
         creator_id=user_id,
     )
+
+    image_bytes, image_mime = _download_external_image(payload.get('image_url'))
+    if image_bytes:
+        recipe.image_data = image_bytes
+        recipe.image_mime = image_mime
+
     db.session.add(recipe)
     db.session.flush()
 
@@ -302,20 +382,80 @@ def save_external_recipe():
 
 @main_bp.route('/')
 def index():
-    return render_template('index.html')
+    if current_user.is_authenticated:
+        shared_ids = [
+            row[0] for row in db.session.execute(
+                db.select(SharedAccess.recipe_id)
+                .where(SharedAccess.shared_with_user_id == current_user.id)
+            ).all()
+        ]
+        clauses = [
+            Recipe.is_public.is_(True),
+            Recipe.creator_id == current_user.id,
+        ]
+        if shared_ids:
+            clauses.append(Recipe.id.in_(shared_ids))
+        query = Recipe.query.filter(or_(*clauses))
+    else:
+        query = Recipe.query.filter(Recipe.is_public.is_(True))
+
+    featured_recipes = (
+        query.order_by(Recipe.created_at.desc()).limit(4).all()
+    )
+    featured = [
+        {'recipe': r, 'origin': _origin_label(r, current_user)}
+        for r in featured_recipes
+    ]
+    return render_template('index.html', featured=featured)
+
+
+def _origin_label(recipe, user):
+    """Return the visibility/origin label for a recipe relative to user."""
+    is_anon = user is None or not getattr(user, 'is_authenticated', False)
+    if is_anon:
+        return 'Community'
+    if recipe.creator_id == user.id:
+        return 'Public' if recipe.is_public else 'Private'
+    if recipe.is_public:
+        return 'Community'
+    return 'Shared'
 
 
 @main_bp.route('/recipes')
 def recipes():
+    if current_user.is_authenticated:
+        shared_ids_rows = db.session.execute(
+            db.select(SharedAccess.recipe_id)
+            .where(SharedAccess.shared_with_user_id == current_user.id)
+        ).all()
+        shared_ids = [row[0] for row in shared_ids_rows]
+
+        query = Recipe.query.filter(
+            or_(
+                Recipe.is_public.is_(True),
+                Recipe.creator_id == current_user.id,
+                Recipe.id.in_(shared_ids) if shared_ids else False,
+            )
+        )
+    else:
+        query = Recipe.query.filter(Recipe.is_public.is_(True))
+
+    all_recipes = query.order_by(Recipe.created_at.desc()).all()
+
+    visible_recipes = [
+        {'recipe': r, 'origin': _origin_label(r, current_user)}
+        for r in all_recipes
+    ]
+
     my_recipes = []
     if current_user.is_authenticated:
-        my_recipes = (
-            Recipe.query
-            .filter_by(creator_id=current_user.id)
-            .order_by(Recipe.created_at.desc())
-            .all()
-        )
-    return render_template('recipes.html', my_recipes=my_recipes)
+        my_recipes = [r for r in all_recipes if r.creator_id == current_user.id]
+
+    return render_template(
+        'recipes.html',
+        visible_recipes=visible_recipes,
+        my_recipes=my_recipes,
+    )
 
 
 @main_bp.route('/recipes/<int:recipe_id>')
@@ -413,7 +553,7 @@ def create_recipe():
         is_alc = 'true' if prefill_payload.get('is_alcoholic') else 'false'
         form = CreateRecipeForm(data={
             'name': prefill_payload.get('name', ''),
-            'description': prefill_payload.get('description') or '',
+            'description': prefill_payload.get('description') or _synthesise_external_description(prefill_payload),
             'category': prefill_payload.get('category', ''),
             'glass': prefill_payload.get('glass') or '',
             'instructions': prefill_payload.get('instructions') or '',
@@ -421,6 +561,7 @@ def create_recipe():
             'visibility': 'private',
             'external_source': prefill_payload.get('source', ''),
             'external_id': prefill_payload.get('external_id', ''),
+            'external_image_url': prefill_payload.get('image_url') or '',
         })
         ingredient_rows = [
             {
@@ -479,6 +620,13 @@ def create_recipe():
                 upload.stream.seek(0)
                 recipe.image_data = upload.read()
                 recipe.image_mime = upload.mimetype
+            elif (form.external_image_url.data or '').strip():
+                ext_image_bytes, ext_image_mime = _download_external_image(
+                    form.external_image_url.data.strip()
+                )
+                if ext_image_bytes:
+                    recipe.image_data = ext_image_bytes
+                    recipe.image_mime = ext_image_mime
 
             db.session.add(recipe)
             db.session.flush()
