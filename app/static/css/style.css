@@ -565,41 +565,67 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 2rem;
 }
 
-/* ---- Flash Alerts ---- */
+/* ---- Flash Alerts (cassette stickers) ---- */
 .alert {
-  border: none;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  padding: 14px 20px;
+  border: 1px solid;
+  border-left-width: 6px;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  padding: 12px 44px 12px 18px;
+  position: relative;
+  background-color: var(--mix-card);
+  box-shadow: 2px 2px 0 rgba(60, 41, 28, 0.18);
+}
+
+.alert::before {
+  font-family: var(--mix-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-right: 10px;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
 }
 
 .alert-success {
-  background-color: rgba(125, 140, 110, 0.2);
-  color: var(--mix-tertiary);
-  border-left: 3px solid var(--mix-tertiary);
+  color: var(--mix-accent);
+  border-color: var(--mix-accent);
+  background-color: rgba(212, 148, 76, 0.10);
 }
-
-.alert-danger {
-  background-color: rgba(196, 91, 74, 0.15);
-  color: var(--mix-danger);
-  border-left: 3px solid var(--mix-danger);
-}
-
-.alert-warning {
-  background-color: rgba(176, 107, 93, 0.15);
-  color: var(--mix-secondary);
-  border-left: 3px solid var(--mix-secondary);
-}
+.alert-success::before { content: "OK"; }
 
 .alert-info {
-  background-color: rgba(212, 148, 76, 0.12);
-  color: var(--mix-accent);
-  border-left: 3px solid var(--mix-accent);
+  color: var(--mix-tertiary);
+  border-color: var(--mix-tertiary);
+  background-color: rgba(125, 140, 110, 0.12);
 }
+.alert-info::before { content: "INFO"; }
 
-.btn-close {
-  filter: invert(0.8);
+.alert-warning {
+  color: var(--mix-secondary);
+  border-color: var(--mix-secondary);
+  background-color: rgba(176, 107, 93, 0.12);
 }
+.alert-warning::before { content: "HEADS UP"; }
+
+.alert-danger {
+  color: var(--mix-danger);
+  border-color: var(--mix-danger);
+  background-color: rgba(196, 91, 74, 0.12);
+}
+.alert-danger::before { content: "NOPE"; }
+
+.alert .btn-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  filter: invert(0.3);
+  opacity: 0.6;
+}
+.alert .btn-close:hover { opacity: 1; }
 
 /* ---- Footer ---- */
 footer {
