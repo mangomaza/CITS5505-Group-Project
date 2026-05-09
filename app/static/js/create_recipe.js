@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var uploadArea = document.getElementById('uploadArea');
   var imageInput = document.getElementById('recipeImage');
   var imagePreview = document.getElementById('imagePreview');
-  var uploadPlaceholder = uploadArea ? uploadArea.querySelector('.upload-placeholder') : null;
+  var uploadPlaceholder = document.getElementById('uploadPlaceholder');
   var ingredientList = document.getElementById('ingredientList');
   var addIngredientBtn = document.getElementById('addIngredient');
   var categorySelect = document.getElementById('recipeCategory');
@@ -10,18 +10,69 @@ document.addEventListener('DOMContentLoaded', function () {
   var alcoholTrue = document.getElementById('is_alcoholic-0');
   var alcoholFalse = document.getElementById('is_alcoholic-1');
 
-  function updateImagePreview(file) {
-    if (!file || !imagePreview || !uploadPlaceholder) {
+  function getDefaultPlaceholder() {
+    if (!uploadArea) {
+      return '';
+    }
+    var category = categorySelect ? categorySelect.value : 'cocktail';
+    if (category === 'food') {
+      return uploadArea.getAttribute('data-default-food') || '';
+    }
+    return uploadArea.getAttribute('data-default-cocktail') || '';
+  }
+
+  function setHasPreview(hasPreview) {
+    if (!uploadArea) {
       return;
     }
+    if (hasPreview) {
+      uploadArea.classList.add('has-preview');
+    } else {
+      uploadArea.classList.remove('has-preview');
+    }
+  }
 
+  function showPreviewSrc(src) {
+    if (!imagePreview) {
+      return;
+    }
+    if (src) {
+      imagePreview.src = src;
+      setHasPreview(true);
+    } else {
+      imagePreview.removeAttribute('src');
+      setHasPreview(false);
+    }
+  }
+
+  function updateImagePreview(file) {
+    if (!file) {
+      return;
+    }
     var reader = new FileReader();
     reader.onload = function (event) {
-      imagePreview.src = event.target.result;
-      imagePreview.style.display = 'block';
-      uploadPlaceholder.style.display = 'none';
+      showPreviewSrc(event.target.result);
     };
     reader.readAsDataURL(file);
+  }
+
+  // Seed preview from any pre-set src (e.g. external image URL on prefill)
+  // or fall back to the category-appropriate placeholder asset.
+  if (imagePreview) {
+    imagePreview.addEventListener('error', function () {
+      // Placeholder asset is missing — fall back to the empty upload state.
+      imagePreview.removeAttribute('src');
+      setHasPreview(false);
+    });
+    if (imagePreview.getAttribute('src')) {
+      setHasPreview(true);
+    } else {
+      var placeholder = getDefaultPlaceholder();
+      if (placeholder) {
+        imagePreview.src = placeholder;
+        setHasPreview(true);
+      }
+    }
   }
 
   function buildIngredientRow() {
@@ -43,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     imageInput.addEventListener('change', function () {
       if (imageInput.files && imageInput.files[0]) {
+        if (uploadArea) {
+          uploadArea.dataset.hasUserImage = '1';
+        }
         updateImagePreview(imageInput.files[0]);
       }
     });
@@ -87,7 +141,17 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   if (categorySelect) {
-    categorySelect.addEventListener('change', syncAlcoholChoices);
+    categorySelect.addEventListener('change', function () {
+      syncAlcoholChoices();
+      // Swap default placeholder if the user hasn't picked a real photo yet.
+      if (uploadArea && imagePreview && !uploadArea.dataset.hasUserImage) {
+        var fallback = getDefaultPlaceholder();
+        if (fallback) {
+          imagePreview.src = fallback;
+          setHasPreview(true);
+        }
+      }
+    });
     syncAlcoholChoices();
   }
 });

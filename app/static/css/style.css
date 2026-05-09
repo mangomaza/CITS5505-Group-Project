@@ -176,6 +176,12 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
   color: var(--mix-text-muted);
   margin-bottom: 0.75rem;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .recipe-card .card-footer {
@@ -212,6 +218,34 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.65rem;
   color: var(--mix-text-muted);
   margin-left: 6px;
+}
+
+/* ---- Visibility / Origin Pills ---- */
+.badge-visibility {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.badge-visibility-public {
+  background-color: #4f8a63;
+}
+
+.badge-visibility-private {
+  background-color: #6b513d;
+}
+
+.badge-visibility-shared {
+  background-color: #c9803a;
+}
+
+.badge-visibility-community {
+  background-color: #6e5d9c;
 }
 
 /* ---- Star Ratings ---- */
@@ -582,3 +616,428 @@ footer {
     font-size: 1.4rem;
   }
 }
+
+/* =============================================================
+   Mix It Up random draw modal
+   ============================================================= */
+
+body.mix-modal-open {
+  overflow: hidden;
+}
+
+.random-draw {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.random-draw[hidden] {
+  display: none;
+}
+
+.random-draw-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(26, 22, 20, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.random-draw-modal {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  background-color: var(--mix-card);
+  border: 1px solid var(--mix-card-elevated);
+  border-radius: var(--mix-radius);
+  box-shadow: var(--mix-shadow-hover);
+  padding: 28px;
+  outline: none;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.random-draw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.random-draw-title {
+  font-family: var(--mix-font-display);
+  font-size: 1.6rem;
+  margin: 0;
+  color: var(--mix-text);
+}
+
+.random-draw-close {
+  background: transparent;
+  border: 0;
+  color: var(--mix-text-muted);
+  font-size: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.random-draw-close:hover,
+.random-draw-close:focus-visible {
+  background-color: var(--mix-card-elevated);
+  color: var(--mix-text);
+  outline: none;
+}
+
+.random-draw-status {
+  font-family: var(--mix-font-mono);
+  font-size: 0.9rem;
+  color: var(--mix-text-muted);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: var(--mix-card-elevated);
+}
+
+.random-draw-status.is-error {
+  color: var(--mix-text);
+  background-color: rgba(196, 91, 74, 0.18);
+  border-left: 3px solid var(--mix-danger);
+}
+
+.random-draw-status a {
+  color: var(--mix-accent);
+  margin-left: 6px;
+}
+
+.random-draw-stage {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  justify-content: center;
+  perspective: 1200px;
+  margin: 12px 0 20px;
+}
+
+.draw-card {
+  flex: 1 1 0;
+  min-height: 420px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 2s cubic-bezier(0.25, 0.8, 0.3, 1),
+              opacity 500ms ease,
+              flex-grow 800ms ease;
+}
+
+.draw-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.draw-card.is-faded {
+  opacity: 0.25;
+  flex: 0.6 1 0;
+  pointer-events: none;
+}
+
+.draw-card.is-chosen {
+  flex: 1.6 1 0;
+}
+
+.draw-card-back,
+.draw-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--mix-radius);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cassette cardback (G3 placeholder until PNG drops in). */
+.draw-card-back {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      var(--mix-card-elevated) 0 18px,
+      var(--mix-card) 18px 36px
+    );
+  border: 2px solid var(--mix-accent);
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--mix-shadow);
+}
+
+.draw-card-back::before {
+  content: '';
+  position: absolute;
+  inset: 24px;
+  border: 1px dashed rgba(212, 148, 76, 0.4);
+  border-radius: 10px;
+}
+
+.draw-card-back-label {
+  font-family: var(--mix-font-mono);
+  font-size: 1.1rem;
+  letter-spacing: 0.4em;
+  color: var(--mix-accent);
+  background-color: var(--mix-bg);
+  padding: 8px 18px;
+  border-radius: 4px;
+  border: 1px solid var(--mix-accent);
+}
+
+.draw-card.is-flipped .draw-card-back {
+  visibility: hidden;
+}
+
+/* Front face. */
+.draw-card-face {
+  background-color: var(--mix-card-elevated);
+  border: 1px solid var(--mix-card);
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+
+.draw-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-color: var(--mix-bg);
+  overflow: hidden;
+}
+
+.draw-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.draw-card-image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: var(--mix-text-muted);
+}
+
+.draw-card-body {
+  padding: 16px 18px 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.draw-card-side-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.75rem;
+  color: var(--mix-text-muted);
+  letter-spacing: 0.2em;
+}
+
+.draw-card-name {
+  font-family: var(--mix-font-display);
+  font-size: 1.4rem;
+  margin: 0;
+  color: var(--mix-text);
+}
+
+.draw-card-meta {
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  color: var(--mix-text-muted);
+  margin: 0;
+}
+
+.draw-card-pick {
+  padding: 0 18px 18px;
+}
+
+.draw-card-pick-btn {
+  width: 100%;
+}
+
+.draw-card-actions {
+  padding: 0 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.draw-card-actions-anon {
+  margin: 0;
+  font-family: var(--mix-font-mono);
+  font-size: 0.9rem;
+  color: var(--mix-text-muted);
+  text-align: center;
+}
+
+.draw-card-login-link {
+  color: var(--mix-accent);
+  text-decoration: underline;
+}
+
+.draw-card-actions-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.draw-card-visibility {
+  display: inline-flex;
+  background-color: var(--mix-bg);
+  border: 1px solid var(--mix-card);
+  border-radius: 999px;
+  padding: 3px;
+  align-self: stretch;
+}
+
+.visibility-pill {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: var(--mix-text-muted);
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+}
+
+.visibility-pill.is-active {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  font-weight: 600;
+}
+
+.visibility-pill:focus-visible {
+  outline: 2px solid var(--mix-accent);
+  outline-offset: 2px;
+}
+
+/* Primary / outline buttons used inside the modal. */
+.btn-mix-primary {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  border: 1px solid var(--mix-accent);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: var(--mix-font-body);
+}
+
+.btn-mix-primary:hover,
+.btn-mix-primary:focus-visible {
+  background-color: var(--mix-secondary);
+  border-color: var(--mix-secondary);
+  color: var(--mix-text);
+  outline: none;
+}
+
+.btn-mix-outline {
+  background: transparent;
+  color: var(--mix-text);
+  border: 1px solid var(--mix-text-muted);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: var(--mix-font-body);
+}
+
+.btn-mix-outline:hover,
+.btn-mix-outline:focus-visible {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+  outline: none;
+}
+
+/* Trigger buttons in page headers should have a comfortable hit area. */
+.btn-mix-outline,
+.btn-mix-primary {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Deselect (back) button sits over the chosen card's image. */
+.draw-card-deselect {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--mix-accent);
+  background-color: rgba(26, 22, 20, 0.78);
+  color: var(--mix-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.draw-card-deselect:hover,
+.draw-card-deselect:focus-visible {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  outline: none;
+  transform: rotate(-30deg);
+}
+
+.random-draw-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+@media (max-width: 767.98px) {
+  .random-draw-modal {
+    padding: 18px;
+  }
+  .random-draw-stage {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .draw-card {
+    min-height: 360px;
+  }
+  .draw-card.is-faded {
+    flex: 1 1 0;
+    display: none;
+  }
+  .draw-card.is-chosen {
+    flex: 1 1 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draw-card {
+    transition: opacity 200ms ease;
+  }
+  .draw-card.is-flipped {
+    transform: none;
+  }
+  .draw-card-face {
+    transform: none;
+  }
+  .draw-card.face-down .draw-card-face {
+    display: none;
+  }
+  .draw-card.is-flipped .draw-card-back {
+    display: none;
+  }
+}
+

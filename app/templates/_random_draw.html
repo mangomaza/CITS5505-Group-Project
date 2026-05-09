@@ -1,0 +1,81 @@
+{# Mix It Up modal partial. Included once in base.html. JS in random_draw.js
+   toggles visibility and populates content. Hidden by default. #}
+<div id="randomDraw" class="random-draw" hidden role="dialog" aria-modal="true"
+     aria-labelledby="randomDrawTitle" aria-describedby="randomDrawStatus">
+  <div class="random-draw-backdrop" data-mix-close></div>
+
+  <div class="random-draw-modal" tabindex="-1">
+    <div class="random-draw-header">
+      <h2 id="randomDrawTitle" class="random-draw-title">Tonight's pairing</h2>
+      <button type="button" class="random-draw-close" aria-label="Close" data-mix-close>
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div id="randomDrawStatus" class="random-draw-status" aria-live="polite" hidden></div>
+
+    <div class="random-draw-stage">
+
+      {% for side in ['a', 'b'] %}
+      <article class="draw-card face-down" data-side="{{ side }}" aria-busy="false">
+        <div class="draw-card-back" aria-hidden="true">
+          <span class="draw-card-back-label">MIX TAPE</span>
+        </div>
+
+        <div class="draw-card-face" hidden>
+          <div class="draw-card-image">
+            <img class="draw-card-img" alt="" hidden>
+            <div class="draw-card-image-placeholder">
+              <i class="bi bi-cup-straw"></i>
+            </div>
+            <button type="button" class="draw-card-deselect"
+                    aria-label="Pick the other one" data-mix-deselect hidden>
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+          <div class="draw-card-body">
+            <span class="draw-card-side-label">Side {{ side|upper }}</span>
+            <span class="draw-card-badge"></span>
+            <h3 class="draw-card-name"></h3>
+            <p class="draw-card-meta"></p>
+          </div>
+          <div class="draw-card-pick">
+            <button type="button" class="btn btn-mix-primary draw-card-pick-btn">
+              Pick this one
+            </button>
+          </div>
+
+          <div class="draw-card-actions" hidden>
+            <p class="draw-card-actions-anon" hidden>
+              <a class="draw-card-login-link" href="#">Log in to save</a>
+            </p>
+            <div class="draw-card-actions-auth" hidden>
+              <div class="draw-card-visibility" role="group" aria-label="Visibility">
+                <button type="button" class="visibility-pill is-active" data-visibility="private">
+                  Save private
+                </button>
+                <button type="button" class="visibility-pill" data-visibility="public">
+                  Save public
+                </button>
+              </div>
+              <button type="button" class="btn btn-mix-primary draw-card-save-btn">
+                Save as-is
+              </button>
+              <button type="button" class="btn btn-mix-outline draw-card-edit-btn">
+                Edit and save
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+
+    </div>
+
+    <div class="random-draw-footer">
+      <button type="button" class="btn btn-mix-outline" data-mix-reroll>
+        <i class="bi bi-shuffle me-1"></i> Mix It Up again
+      </button>
+    </div>
+  </div>
+</div>

@@ -23,6 +23,12 @@
 
     <div class="container">
 
+      <div class="d-flex flex-wrap justify-content-end mb-3">
+        <button type="button" class="btn btn-mix-outline" data-mix-trigger>
+          <i class="bi bi-shuffle me-1"></i> Mix It Up
+        </button>
+      </div>
+
       <!-- Recipe Meta -->
       <div class="recipe-meta">
         <div class="d-flex align-items-center gap-2 mb-2">
@@ -50,9 +56,15 @@
         <!-- Left Column - Ingredients & Instructions -->
         <div class="col-lg-8">
 
+          {% if recipe.description %}
+            <div class="recipe-description mb-4">
+              <p class="mb-0">{{ recipe.description }}</p>
+            </div>
+          {% endif %}
+
           <!-- SIDE A: Ingredients -->
           <div class="side-label">Side A &mdash; Ingredients</div>
-          <ul class="ingredients-list">
+          <ul class="ingredients-list" data-category="{{ recipe.category }}">
             {% for ingredient in recipe.ingredients %}
               <li>
                 <img src="https://placehold.co/48x48/f2dfc4/6b513d?text={{ ingredient.name[:1]|upper }}" alt="{{ ingredient.name }}" class="ingredient-thumb">

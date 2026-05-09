@@ -11,7 +11,7 @@
       <div class="form-card">
         <h2 class="text-center mb-4" style="font-size:1.6rem;">Welcome back</h2>
 
-        <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+        <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) if request.args.get('next') else url_for('auth.login') }}" novalidate>
           {{ form.hidden_tag() }}
 
           <div class="mb-3">
