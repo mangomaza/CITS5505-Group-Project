@@ -598,12 +598,15 @@ def create_recipe():
         if not non_empty_rows:
             ingredient_error = 'Please add at least one ingredient.'
         else:
+            is_food = form.category.data == 'food'
+            glass_value = None if is_food else ((form.glass.data or '').strip() or None)
+            is_alcoholic_value = False if is_food else (form.is_alcoholic.data == 'true')
             recipe = Recipe(
                 name=form.name.data.strip(),
                 description=(form.description.data or '').strip() or None,
                 category=form.category.data,
-                glass=(form.glass.data or '').strip() or None,
-                is_alcoholic=(form.is_alcoholic.data == 'true'),
+                glass=glass_value,
+                is_alcoholic=is_alcoholic_value,
                 instructions=form.instructions.data.strip(),
                 is_public=(form.visibility.data == 'public'),
                 creator_id=current_user.id,
