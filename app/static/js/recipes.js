@@ -6,6 +6,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var searchInput = document.getElementById('recipeSearch');
   var searchQuery = '';
+  var countEl = document.getElementById('recipeCount');
+
+  function updateCount() {
+    if (!countEl) return;
+    var visible = 0;
+    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
+      if (item.closest('.my-recipes-section')) return;
+      if (item.style.display !== 'none') visible += 1;
+    });
+    var label;
+    if (visible === 0) label = countEl.dataset.zero || 'no recipes';
+    else if (visible === 1) label = countEl.dataset.one || '1 recipe';
+    else label = (countEl.dataset.many || '{n} recipes').replace('{n}', visible);
+    countEl.textContent = label;
+  }
 
   function applyFilters() {
     var query = searchQuery.trim().toLowerCase();
@@ -16,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var hiddenByFilter = item.dataset.hiddenByFilter === '1';
       item.style.display = (matchesSearch && !hiddenByFilter) ? '' : 'none';
     });
+    updateCount();
   }
 
   if (searchInput) {

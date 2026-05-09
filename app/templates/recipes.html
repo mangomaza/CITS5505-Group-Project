@@ -9,21 +9,27 @@
 {% block content %}
   <main class="container my-4">
 
-    <h1 class="mb-4">Recipes</h1>
+    <section class="search-desk">
+      <div class="search-desk-label">// SIDE A &middot; BROWSE THE STACKS</div>
+      <div class="search-desk-heading">
+        <h1 class="mb-0">Recipes</h1>
+        <span class="result-count" id="recipeCount" data-zero="no recipes" data-one="1 recipe" data-many="{n} recipes">{{ visible_recipes|length }} {{ 'recipe' if visible_recipes|length == 1 else 'recipes' }}</span>
+      </div>
 
-    <!-- Search & Filter -->
-    <div class="search-bar d-flex flex-wrap align-items-center gap-3">
-      <div class="input-group" style="max-width:320px;">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" id="recipeSearch" class="form-control" placeholder="Search recipes..." autocomplete="off" maxlength="100">
+      <!-- Search & Filter -->
+      <div class="search-bar d-flex flex-wrap align-items-center gap-3">
+        <div class="input-group" style="max-width:320px;">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" id="recipeSearch" class="form-control" placeholder="Search recipes..." autocomplete="off" maxlength="100">
+        </div>
+        <div class="filter-pills">
+          <button class="filter-pill active" data-filter="all">All</button>
+          <button class="filter-pill" data-filter="cocktail">Cocktails</button>
+          <button class="filter-pill" data-filter="food">Food</button>
+          <button class="filter-pill" data-filter="my-recipes">My recipes</button>
+        </div>
       </div>
-      <div class="filter-pills">
-        <button class="filter-pill active" data-filter="all">All</button>
-        <button class="filter-pill" data-filter="cocktail">Cocktails</button>
-        <button class="filter-pill" data-filter="food">Food</button>
-        <button class="filter-pill" data-filter="my-recipes">My recipes</button>
-      </div>
-    </div>
+    </section>
 
     <!-- Recipe Grid -->
     {% if visible_recipes|length == 0 %}

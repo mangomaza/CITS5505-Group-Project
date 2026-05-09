@@ -2,13 +2,62 @@
    Mix It Up — Option A: Browse Recipes Page Styles
    ============================================================ */
 
-/* ---- Search & Filter Bar ---- */
-.search-bar {
+/* ---- Search Desk ---- */
+.search-desk {
+  position: relative;
   background-color: var(--mix-card);
   border-radius: var(--mix-radius);
-  padding: 16px 20px;
+  padding: 22px 24px 18px;
   margin-bottom: 32px;
   box-shadow: var(--mix-shadow);
+  background-image: radial-gradient(rgba(212, 148, 76, 0.08) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+.search-desk-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--mix-accent);
+  margin-bottom: 10px;
+}
+
+.search-desk-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px dotted rgba(155, 142, 130, 0.45);
+}
+
+.search-desk-heading h1 {
+  margin: 0;
+}
+
+.result-count {
+  font-family: var(--mix-font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mix-secondary);
+  border: 1px solid rgba(176, 107, 93, 0.4);
+  border-radius: 3px;
+  padding: 4px 10px;
+  background-color: rgba(176, 107, 93, 0.08);
+  white-space: nowrap;
+}
+
+/* ---- Search & Filter Bar ---- */
+.search-bar {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
+  box-shadow: none;
 }
 
 .search-bar .form-control {
