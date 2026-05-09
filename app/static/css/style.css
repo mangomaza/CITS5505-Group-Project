@@ -153,6 +153,29 @@ h1, h2, h3, h4, h5, h6 {
   object-fit: cover;
 }
 
+.card-img-fallback {
+  position: relative;
+  height: 180px;
+  background-color: var(--bs-light, #f8f9fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-img-fallback .text-muted {
+  z-index: 0;
+}
+
+.card-img-default {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
 .recipe-card .card-body {
   padding: 20px;
 }

@@ -42,8 +42,12 @@
                          class="card-img-top"
                          alt="{{ recipe.name }}">
                   {% else %}
-                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                    <div class="card-img-fallback">
                       <span class="text-muted">No image</span>
+                      <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.jpg' if recipe.category == 'cocktail' else 'food-default.jpg')) }}"
+                           class="card-img-top card-img-default"
+                           alt=""
+                           onerror="this.style.display='none'">
                     </div>
                   {% endif %}
 
@@ -121,8 +125,12 @@
                          class="card-img-top"
                          alt="{{ recipe.name }}">
                   {% else %}
-                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 180px;">
+                    <div class="card-img-fallback">
                       <span class="text-muted">No image</span>
+                      <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.jpg' if recipe.category == 'cocktail' else 'food-default.jpg')) }}"
+                           class="card-img-top card-img-default"
+                           alt=""
+                           onerror="this.style.display='none'">
                     </div>
                   {% endif %}
 
@@ -167,7 +175,9 @@
         <div class="col-md-6">
           <a href="{{ url_for('main.recipes') }}" class="text-decoration-none">
             <div class="category-card category-cocktail">
-              <i class="bi bi-cup-straw"></i>
+              <img src="{{ url_for('static', filename='images/category-cocktails.png') }}"
+                   alt="" class="category-card-icon"
+                   onerror="this.outerHTML='<i class=\'bi bi-cup-straw\'></i>'">
               <h3>Cocktails</h3>
             </div>
           </a>
@@ -175,7 +185,9 @@
         <div class="col-md-6">
           <a href="{{ url_for('main.recipes') }}" class="text-decoration-none">
             <div class="category-card category-food">
-              <i class="bi bi-egg-fried"></i>
+              <img src="{{ url_for('static', filename='images/category-food.png') }}"
+                   alt="" class="category-card-icon"
+                   onerror="this.outerHTML='<i class=\'bi bi-egg-fried\'></i>'">
               <h3>Food</h3>
             </div>
           </a>

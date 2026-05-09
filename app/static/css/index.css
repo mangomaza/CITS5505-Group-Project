@@ -88,6 +88,14 @@
 .category-cocktail i { color: var(--mix-secondary); }
 .category-food i     { color: var(--mix-tertiary); }
 
+.category-card-icon {
+  display: block;
+  margin: 0 auto 12px;
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+}
+
 /* ---- Random Section ---- */
 .random-section {
   padding: 48px 0;
