@@ -7,13 +7,6 @@
   and static/images/placeholders/food-default.jpg with the AI-generated default images
   (one for cocktails, one for food). They are referenced from the photo upload area below
   and from create_recipe.js to seed the preview when no real photo is set yet.
-
-  TODO: The form currently shows the same fields regardless of category. Some fields
-  should be conditional on Category (cocktail vs food):
-    - cocktail-only: glass, is_alcoholic
-    - food-only: subcategory
-  Hide/show via JS on category change and skip server-side validation for the hidden
-  branch. Until that is done the user has to manually leave the irrelevant fields blank.
 #}
 
 {% block extra_css %}
@@ -80,7 +73,7 @@
                     <div class="invalid-feedback">{{ error }}</div>
                   {% endfor %}
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6" data-cocktail-only>
                   {{ form.glass.label(class="form-label") }}
                   {{ form.glass(
                     class="form-control" + (" is-invalid" if form.glass.errors else ""),
@@ -93,7 +86,7 @@
                   {% endfor %}
                 </div>
               </div>
-              <div class="mt-3">
+              <div class="mt-3" data-cocktail-only>
                 <label class="form-label d-block">{{ form.is_alcoholic.label.text }}</label>
                 <div class="d-flex gap-4" id="alcoholChoices">
                   {% for subfield in form.is_alcoholic %}

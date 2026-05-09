@@ -140,9 +140,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  function syncCategoryFields() {
+    var isFood = categorySelect && categorySelect.value === 'food';
+    var blocks = document.querySelectorAll('[data-cocktail-only]');
+    blocks.forEach(function (el) {
+      if (isFood) {
+        el.classList.add('d-none');
+      } else {
+        el.classList.remove('d-none');
+      }
+    });
+    if (isFood) {
+      var glassInput = document.getElementById('recipeGlass');
+      if (glassInput) {
+        glassInput.value = '';
+      }
+    }
+  }
+
   if (categorySelect) {
     categorySelect.addEventListener('change', function () {
       syncAlcoholChoices();
+      syncCategoryFields();
       // Swap default placeholder if the user hasn't picked a real photo yet.
       if (uploadArea && imagePreview && !uploadArea.dataset.hasUserImage) {
         var fallback = getDefaultPlaceholder();
@@ -153,5 +172,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
     syncAlcoholChoices();
+    syncCategoryFields();
   }
 });
