@@ -399,8 +399,14 @@ def index():
     featured_recipes = (
         query.order_by(Recipe.created_at.desc()).limit(4).all()
     )
+    rating_map = _rating_map_for([r.id for r in featured_recipes])
     featured = [
-        {'recipe': r, 'origin': _origin_label(r, current_user)}
+        {
+            'recipe': r,
+            'origin': _origin_label(r, current_user),
+            'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+            'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+        }
         for r in featured_recipes
     ]
 
@@ -438,6 +444,18 @@ def _origin_label(recipe, user):
     return 'Shared'
 
 
+def _rating_map_for(recipe_ids):
+    """Return {recipe_id: (avg_stars, count)} for the given recipe ids."""
+    if not recipe_ids:
+        return {}
+    rows = db.session.execute(
+        db.select(Rating.recipe_id, func.avg(Rating.stars), func.count(Rating.id))
+        .where(Rating.recipe_id.in_(recipe_ids))
+        .group_by(Rating.recipe_id)
+    ).all()
+    return {row[0]: (float(row[1] or 0), int(row[2] or 0)) for row in rows}
+
+
 @main_bp.route('/recipes')
 def recipes():
     if current_user.is_authenticated:
@@ -459,14 +477,28 @@ def recipes():
 
     all_recipes = query.order_by(Recipe.created_at.desc()).all()
 
+    rating_map = _rating_map_for([r.id for r in all_recipes])
+
     visible_recipes = [
-        {'recipe': r, 'origin': _origin_label(r, current_user)}
+        {
+            'recipe': r,
+            'origin': _origin_label(r, current_user),
+            'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+            'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+        }
         for r in all_recipes
     ]
 
     my_recipes = []
     if current_user.is_authenticated:
-        my_recipes = [r for r in all_recipes if r.creator_id == current_user.id]
+        my_recipes = [
+            {
+                'recipe': r,
+                'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+                'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+            }
+            for r in all_recipes if r.creator_id == current_user.id
+        ]
 
     return render_template(
         'recipes.html',
