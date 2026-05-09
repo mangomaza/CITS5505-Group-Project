@@ -13,6 +13,7 @@
 
         <h1 class="mb-4">Share a recipe</h1>
 
+        <div class="cassette-insert-label">// SIDE A &middot; SHARE</div>
         <div class="form-card share-form">
           <form method="post" action="{{ url_for('main.share') }}" novalidate>
             {{ form.hidden_tag() }}
@@ -51,6 +52,7 @@
         </div>
 
         <div class="share-history">
+          <div class="cassette-insert-label">// TRACK A &middot; SHARED BY YOU</div>
           <h3>Shared by you</h3>
           <div class="share-table table-responsive">
             <table class="table">
@@ -88,6 +90,7 @@
         </div>
 
         <div class="share-history">
+          <div class="cassette-insert-label">// TRACK B &middot; SHARED WITH YOU</div>
           <h3>Shared with you</h3>
           <div class="share-table table-responsive">
             <table class="table">
