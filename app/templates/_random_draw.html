@@ -19,6 +19,10 @@
       {% for side in ['a', 'b'] %}
       <article class="draw-card face-down" data-side="{{ side }}" aria-busy="false">
         <div class="draw-card-back" aria-hidden="true">
+          <img class="draw-card-back-cassette"
+               src="{{ url_for('static', filename='images/placeholders/cassette-' ~ ('cocktail' if side == 'a' else 'food') ~ '.png') }}"
+               alt=""
+               onerror="this.style.display='none'">
           <span class="draw-card-back-label">MIX TAPE</span>
         </div>
 

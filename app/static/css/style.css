@@ -802,18 +802,29 @@ body.mix-modal-open {
   flex-direction: column;
 }
 
-/* Cassette cardback (G3 placeholder until PNG drops in). */
+/* Cassette cardback: rotated cassette art per side, with MIX TAPE label on top. */
 .draw-card-back {
-  background:
-    repeating-linear-gradient(
-      135deg,
-      var(--mix-card-elevated) 0 18px,
-      var(--mix-card) 18px 36px
-    );
+  background-color: var(--mix-card);
   border: 2px solid var(--mix-accent);
   align-items: center;
   justify-content: center;
   box-shadow: var(--mix-shadow);
+  overflow: hidden;
+}
+
+.draw-card-back-cassette {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 100%;
+  width: auto;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.draw-card[data-side="b"] .draw-card-back-cassette {
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .draw-card-back::before {
@@ -822,9 +833,12 @@ body.mix-modal-open {
   inset: 24px;
   border: 1px dashed rgba(212, 148, 76, 0.4);
   border-radius: 10px;
+  z-index: 1;
 }
 
 .draw-card-back-label {
+  position: relative;
+  z-index: 2;
   font-family: var(--mix-font-mono);
   font-size: 1.1rem;
   letter-spacing: 0.4em;
