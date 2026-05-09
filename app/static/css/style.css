@@ -263,11 +263,20 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.75rem;
   word-wrap: break-word;
   overflow-wrap: anywhere;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  position: relative;
+  max-height: calc(0.9rem * 1.5 * 3);
   min-height: calc(0.9rem * 1.5 * 3);
+  overflow: hidden;
+}
+.recipe-card .card-text::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.6rem;
+  background: linear-gradient(to bottom, transparent, var(--mix-card));
+  pointer-events: none;
 }
 
 .recipe-card .star-rating {
