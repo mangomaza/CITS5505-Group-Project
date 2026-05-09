@@ -403,7 +403,27 @@ def index():
         {'recipe': r, 'origin': _origin_label(r, current_user)}
         for r in featured_recipes
     ]
-    return render_template('index.html', featured=featured)
+
+    # Top rated public recipes (any creator) with at least one rating.
+    top_rows = db.session.execute(
+        db.select(Recipe, func.avg(Rating.stars).label('avg_stars'), func.count(Rating.id).label('rating_count'))
+        .join(Rating, Rating.recipe_id == Recipe.id)
+        .where(Recipe.is_public.is_(True))
+        .group_by(Recipe.id)
+        .order_by(func.avg(Rating.stars).desc(), func.count(Rating.id).desc())
+        .limit(4)
+    ).all()
+    top_rated = [
+        {
+            'recipe': row[0],
+            'avg_rating': float(row[1] or 0),
+            'rating_count': int(row[2] or 0),
+            'origin': _origin_label(row[0], current_user),
+        }
+        for row in top_rows
+    ]
+
+    return render_template('index.html', featured=featured, top_rated=top_rated)
 
 
 def _origin_label(recipe, user):
