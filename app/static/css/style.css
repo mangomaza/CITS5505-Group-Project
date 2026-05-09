@@ -173,6 +173,33 @@ h1, h2, h3, h4, h5, h6 {
 .recipe-card:nth-child(odd)  { transform: rotate(0.7deg); }
 .recipe-card:nth-child(even) { transform: rotate(-0.5deg); }
 .recipe-card:nth-child(3n)   { transform: rotate(1.2deg); }
+
+/* Side A/B sticker on home recipe cards */
+.card-side-sticker {
+  position: absolute;
+  top: 12px;
+  right: -4px;
+  z-index: 3;
+  font-family: var(--mix-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px 4px 14px;
+  border: 1px solid currentColor;
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+  background-color: #F4E9DC;
+  transform: rotate(-2deg);
+  box-shadow: 1px 1px 0 rgba(60, 41, 28, 0.18);
+  pointer-events: none;
+}
+.card-side-sticker-a {
+  color: var(--mix-accent);
+}
+.card-side-sticker-b {
+  color: var(--mix-secondary);
+}
 .recipe-card:nth-child(4n)   { transform: rotate(-1deg); }
 
 .recipe-card:hover {
