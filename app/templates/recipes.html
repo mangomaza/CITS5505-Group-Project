@@ -54,7 +54,6 @@
                        alt="{{ recipe.name }}">
                 {% else %}
                   <div class="card-img-fallback">
-                    <span class="text-muted">No image</span>
                     <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                          class="card-img-top card-img-default"
                          alt=""
@@ -144,7 +143,6 @@
                          alt="{{ recipe.name }}">
                   {% else %}
                     <div class="card-img-fallback">
-                      <span class="text-muted">No image</span>
                       <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                            class="card-img-top card-img-default"
                            alt=""

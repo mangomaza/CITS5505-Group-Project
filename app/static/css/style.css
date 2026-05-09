@@ -118,7 +118,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-nav .nav-username {
-  color: var(--mix-secondary) !important;
+  color: var(--mix-tertiary) !important;
   font-family: var(--mix-font-mono);
   font-size: 0.85rem;
   letter-spacing: 0.5px;
@@ -809,7 +809,8 @@ body.mix-modal-open {
 
 .draw-card {
   flex: 1 1 0;
-  min-height: 420px;
+  aspect-ratio: 2 / 3;
+  max-width: 280px;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 2s cubic-bezier(0.25, 0.8, 0.3, 1),
@@ -856,8 +857,8 @@ body.mix-modal-open {
   position: absolute;
   top: 50%;
   left: 50%;
-  height: 100%;
-  width: auto;
+  width: 150%;
+  height: auto;
   transform: translate(-50%, -50%) rotate(-90deg);
   pointer-events: none;
   user-select: none;
@@ -865,15 +866,6 @@ body.mix-modal-open {
 
 .draw-card[data-side="b"] .draw-card-back-cassette {
   transform: translate(-50%, -50%) rotate(90deg);
-}
-
-.draw-card-back::before {
-  content: '';
-  position: absolute;
-  inset: 24px;
-  border: 1px dashed rgba(212, 148, 76, 0.4);
-  border-radius: 10px;
-  z-index: 1;
 }
 
 .draw-card-back-label {
