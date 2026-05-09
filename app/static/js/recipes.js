@@ -4,6 +4,27 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+  var searchInput = document.getElementById('recipeSearch');
+  var searchQuery = '';
+
+  function applyFilters() {
+    var query = searchQuery.trim().toLowerCase();
+    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
+      var title = item.querySelector('.card-title');
+      var name = title ? title.textContent.toLowerCase() : '';
+      var matchesSearch = !query || name.indexOf(query) !== -1;
+      var hiddenByFilter = item.dataset.hiddenByFilter === '1';
+      item.style.display = (matchesSearch && !hiddenByFilter) ? '' : 'none';
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      searchQuery = searchInput.value || '';
+      applyFilters();
+    });
+  }
+
   // category filter pills
   var pills = document.querySelectorAll('.filter-pill');
   pills.forEach(function (pill) {
