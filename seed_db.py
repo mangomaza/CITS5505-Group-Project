@@ -63,7 +63,6 @@ def build_recipe(spec, creator_id):
         name=data[spec['name_key']],
         category=spec['category'],
         subcategory=data.get('strCategory'),
-        cuisine=data.get('strArea'),
         glass=data.get('strGlass'),
         is_alcoholic=(data.get('strAlcoholic') == 'Alcoholic'),
         image_data=image_data,
