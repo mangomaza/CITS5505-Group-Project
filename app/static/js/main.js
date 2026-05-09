@@ -34,4 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // footer rewind-to-top link
+  document.querySelectorAll('[data-mix-top]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
 });
