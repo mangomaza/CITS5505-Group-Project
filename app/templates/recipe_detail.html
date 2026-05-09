@@ -63,26 +63,26 @@
           {% endif %}
 
           <!-- SIDE A: Ingredients -->
-          <div class="side-label">Side A &mdash; Ingredients</div>
-          <ul class="ingredients-list" data-category="{{ recipe.category }}">
+          <div class="side-label">Side A // Ingredients</div>
+          <ol class="ingredients-list" data-category="{{ recipe.category }}">
             {% for ingredient in recipe.ingredients %}
               <li>
+                <span class="ingredient-track">{{ '%02d.' % loop.index }}</span>
                 <img src="https://placehold.co/48x48/f2dfc4/6b513d?text={{ ingredient.name[:1]|upper }}" alt="{{ ingredient.name }}" class="ingredient-thumb">
-                <span class="ingredient-qty">
-                  {{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}
-                </span>
-                <span>{{ ingredient.name }}</span>
+                <span class="ingredient-name">{{ ingredient.name }}</span>
+                <span class="ingredient-leader" aria-hidden="true"></span>
+                <span class="ingredient-qty">{{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}</span>
               </li>
             {% else %}
-              <li>
-                <span class="ingredient-qty">-</span>
-                <span>No ingredients listed.</span>
+              <li class="ingredients-empty">
+                <span class="ingredient-track">--</span>
+                <span class="ingredient-name">No ingredients listed.</span>
               </li>
             {% endfor %}
-          </ul>
+          </ol>
 
           <!-- SIDE B: Instructions -->
-          <div class="side-label">Side B &mdash; Instructions</div>
+          <div class="side-label">Side B // Instructions</div>
           <div class="instructions-block">
             <p>{{ recipe.instructions }}</p>
           </div>
