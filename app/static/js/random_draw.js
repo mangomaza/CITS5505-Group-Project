@@ -174,8 +174,8 @@
     });
 
     // B2 stagger: side A first, then side B.
-    flipCard(cards[0], 100);
-    flipCard(cards[1], 350);
+    flipCard(cards[0], 2000);
+    flipCard(cards[1], 2250);
   }
 
   // --- pick / D1 fade-and-expand -------------------------------------

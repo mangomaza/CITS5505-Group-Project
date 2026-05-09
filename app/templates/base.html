@@ -69,8 +69,8 @@
           <ul class="navbar-nav align-items-lg-center">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <span class="nav-link pe-none" style="color: var(--mix-text-muted); font-size: 0.9rem;">
-                {{ current_user.username }}
+              <span class="nav-link nav-username pe-none">
+                <i class="bi bi-person-circle me-1"></i>{{ current_user.username }}
               </span>
             </li>
             <li class="nav-item">

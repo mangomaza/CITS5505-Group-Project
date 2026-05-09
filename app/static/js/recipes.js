@@ -29,6 +29,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var pills = document.querySelectorAll('.filter-pill');
   var activeFilter = 'all';
 
+  // honour ?category=cocktail|food from the home page browse-by-category links
+  var urlCategory = (new URLSearchParams(window.location.search)).get('category');
+  if (urlCategory === 'cocktail' || urlCategory === 'food') {
+    activeFilter = urlCategory;
+    pills.forEach(function (p) {
+      p.classList.toggle('active', p.dataset.filter === urlCategory);
+    });
+  }
+
   function applyPillFilter() {
     document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
       var category = item.dataset.category || '';

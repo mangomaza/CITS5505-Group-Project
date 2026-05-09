@@ -84,6 +84,13 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.4rem;
   color: var(--mix-accent) !important;
   letter-spacing: -0.5px;
+  transition: text-shadow 200ms ease, transform 200ms ease;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus-visible {
+  text-shadow: 0 0 18px rgba(212, 148, 76, 0.55), 0 0 4px rgba(212, 148, 76, 0.4);
+  transform: translateY(-1px);
 }
 
 .navbar-nav .nav-link {
@@ -110,12 +117,27 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 1px;
 }
 
+.navbar-nav .nav-username {
+  color: var(--mix-secondary) !important;
+  font-family: var(--mix-font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
 .navbar-toggler {
-  border-color: var(--mix-text-muted);
+  border-color: rgba(212, 148, 76, 0.55);
+  box-shadow: none;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:hover {
+  box-shadow: 0 0 0 0.2rem rgba(212, 148, 76, 0.35);
+  border-color: var(--mix-accent);
 }
 
 .navbar-toggler-icon {
-  filter: brightness(0.8);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23d4944c' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  filter: none;
 }
 
 /* ---- Recipe Cards ---- */
@@ -126,6 +148,16 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--mix-shadow);
   transition: transform 250ms ease-out, box-shadow 250ms ease-out;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.recipe-grid-item,
+.recipe-grid-item > a,
+.row > [class*="col-"] > a.text-decoration-none {
+  height: 100%;
+  display: block;
 }
 
 .recipe-card::after {
@@ -155,7 +187,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .card-img-fallback {
   position: relative;
-  height: 180px;
+  height: 220px;
   background-color: var(--bs-light, #f8f9fa);
   display: flex;
   align-items: center;
@@ -178,6 +210,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .recipe-card .card-body {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
 }
 
 .recipe-card .card-title {
@@ -205,6 +240,11 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: calc(0.9rem * 1.5 * 3);
+}
+
+.recipe-card .star-rating {
+  margin-top: auto;
 }
 
 .recipe-card .card-footer {
@@ -684,7 +724,7 @@ body.mix-modal-open {
 .random-draw-backdrop {
   position: absolute;
   inset: 0;
-  background-color: rgba(26, 22, 20, 0.78);
+  background-color: rgba(26, 22, 20, 0.30);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
