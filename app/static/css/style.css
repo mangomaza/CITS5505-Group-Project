@@ -1033,17 +1033,22 @@ body.mix-modal-open {
   transform: translate(-50%, -50%) rotate(90deg);
 }
 
-.draw-card-back-label {
+.draw-card-back-side-label {
   position: relative;
   z-index: 2;
   font-family: var(--mix-font-mono);
-  font-size: 1.1rem;
-  letter-spacing: 0.4em;
-  color: var(--mix-accent);
-  background-color: var(--mix-bg);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--mix-secondary);
+  background-color: #f4ead8;
   padding: 8px 18px;
-  border-radius: 4px;
-  border: 1px solid var(--mix-accent);
+  border-radius: 2px;
+  border: 1px solid rgba(42, 31, 23, 0.4);
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .draw-card.is-flipped .draw-card-back {
@@ -1101,10 +1106,20 @@ body.mix-modal-open {
 }
 
 .draw-card-side-label {
+  display: inline-block;
+  align-self: flex-start;
   font-family: var(--mix-font-mono);
   font-size: 0.75rem;
-  color: var(--mix-text-muted);
-  letter-spacing: 0.2em;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: #7e5436;
+  background-color: #f4ead8;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(42, 31, 23, 0.4);
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
 }
 
 .draw-card-name {
@@ -1233,18 +1248,21 @@ body.mix-modal-open {
 }
 
 /* Spinning cassette spool ring behind the shuffle icon on Mix It Up triggers. */
-[data-mix-trigger] {
+[data-mix-trigger],
+[data-mix-reroll] {
   position: relative;
 }
 
-[data-mix-trigger] .bi-shuffle {
+[data-mix-trigger] .bi-shuffle,
+[data-mix-reroll] .bi-shuffle {
   position: relative;
   z-index: 1;
   margin-right: 14px !important;
   margin-left: 6px;
 }
 
-[data-mix-trigger] .bi-shuffle::after {
+[data-mix-trigger] .bi-shuffle::after,
+[data-mix-reroll] .bi-shuffle::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -1260,7 +1278,9 @@ body.mix-modal-open {
 }
 
 [data-mix-trigger]:hover .bi-shuffle::after,
-[data-mix-trigger]:focus-visible .bi-shuffle::after {
+[data-mix-trigger]:focus-visible .bi-shuffle::after,
+[data-mix-reroll]:hover .bi-shuffle::after,
+[data-mix-reroll]:focus-visible .bi-shuffle::after {
   border-color: var(--mix-accent);
   opacity: 0.95;
   animation-duration: 1.6s;
