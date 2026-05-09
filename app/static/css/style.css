@@ -53,6 +53,7 @@ body::after {
 
 main {
   flex: 1;
+  padding-bottom: 48px;
   animation: fadeIn 300ms ease-out;
 }
 
@@ -1229,6 +1230,69 @@ body.mix-modal-open {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+/* Spinning cassette spool ring behind the shuffle icon on Mix It Up triggers. */
+[data-mix-trigger] {
+  position: relative;
+}
+
+[data-mix-trigger] .bi-shuffle {
+  position: relative;
+  z-index: 1;
+  margin-right: 14px !important;
+  margin-left: 6px;
+}
+
+[data-mix-trigger] .bi-shuffle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border: 1.5px dashed var(--mix-accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 1;
+  animation: mix-spool-spin 8s linear infinite;
+}
+
+[data-mix-trigger]:hover .bi-shuffle::after,
+[data-mix-trigger]:focus-visible .bi-shuffle::after {
+  border-color: var(--mix-accent);
+  opacity: 0.95;
+  animation-duration: 1.6s;
+}
+
+@keyframes mix-spool-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Larger spool ring for the round hero shuffle button. */
+.btn-shuffle .bi-shuffle {
+  margin: 0 !important;
+}
+
+.btn-shuffle .bi-shuffle::after {
+  width: 84px;
+  height: 84px;
+  border-width: 2px;
+  border-color: var(--mix-accent);
+  opacity: 0.85;
+}
+
+.btn-shuffle:hover .bi-shuffle::after,
+.btn-shuffle:focus-visible .bi-shuffle::after {
+  border-color: var(--mix-accent);
+  opacity: 1;
+}
+
+.btn-shuffle-lg .bi-shuffle::after {
+  width: 100px;
+  height: 100px;
 }
 
 /* Deselect (back) button sits over the chosen card's image. */
