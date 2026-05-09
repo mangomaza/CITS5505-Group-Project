@@ -27,44 +27,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // category filter pills
   var pills = document.querySelectorAll('.filter-pill');
+  var activeFilter = 'all';
+
+  function applyPillFilter() {
+    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
+      var category = item.dataset.category || '';
+      var mine = item.dataset.mine === '1';
+      var matches = true;
+      if (activeFilter === 'cocktail' || activeFilter === 'food') {
+        matches = (category === activeFilter);
+      } else if (activeFilter === 'my-recipes') {
+        matches = mine;
+      }
+      item.dataset.hiddenByFilter = matches ? '0' : '1';
+    });
+    applyFilters();
+  }
+
   pills.forEach(function (pill) {
     pill.addEventListener('click', function () {
-      // toggle active state
-      if (pill.classList.contains('active') && pill.dataset.filter !== 'all') {
-        pill.classList.remove('active');
-        showAllCards();
-        return;
-      }
-
       pills.forEach(function (p) { p.classList.remove('active'); });
       pill.classList.add('active');
-
-      var filter = pill.dataset.filter;
-      if (filter === 'all') {
-        showAllCards();
-      } else {
-        filterCards(filter);
-      }
+      activeFilter = pill.dataset.filter || 'all';
+      applyPillFilter();
     });
   });
 
-  function showAllCards() {
-    document.querySelectorAll('.recipe-card').forEach(function (card) {
-      card.closest('.recipe-grid-item').style.display = '';
-    });
-  }
-
-  function filterCards(category) {
-    document.querySelectorAll('.recipe-card').forEach(function (card) {
-      var wrapper = card.closest('.recipe-grid-item');
-      var badge = card.querySelector('[class^="badge-"]');
-      if (badge && badge.classList.contains('badge-' + category)) {
-        wrapper.style.display = '';
-      } else {
-        wrapper.style.display = 'none';
-      }
-    });
-  }
+  // initialise so the default "All" pill marks every card visible
+  applyPillFilter();
 
   // Mix it up button - pick a random visible recipe and navigate to it
   var mixBtn = document.getElementById('mixItUpBtn');
