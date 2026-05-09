@@ -155,23 +155,7 @@
   padding: 32px 0;
 }
 
-/* ---- Empty State ---- */
-.empty-state {
-  text-align: center;
-  padding: 64px 20px;
-}
-
-.empty-state i {
-  font-size: 3rem;
-  color: var(--mix-accent);
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.empty-state p {
-  color: var(--mix-text-muted);
-  font-size: 1rem;
-}
+/* ---- Empty State (themed in style.css) ---- */
 
 /* ---- Responsive ---- */
 @media (max-width: 767.98px) {

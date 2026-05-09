@@ -1275,3 +1275,47 @@ body.mix-modal-open {
   }
 }
 
+
+/* ---- Themed Empty States ---- */
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  background: var(--mix-card);
+  border: 1px dashed rgba(212, 148, 76, 0.3);
+  border-radius: var(--mix-radius);
+  position: relative;
+}
+
+.empty-state::before {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 60px;
+  margin: 0 auto 18px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 60' fill='none' stroke='%23D4944C' stroke-width='2'><rect x='2' y='6' width='92' height='48' rx='4'/><circle cx='28' cy='30' r='8'/><circle cx='68' cy='30' r='8'/><line x1='28' y1='30' x2='68' y2='30' stroke-dasharray='3 3'/><rect x='14' y='42' width='68' height='6' rx='1' stroke='%23B06B5D'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.85;
+}
+
+.empty-state h3 {
+  font-family: var(--mix-font-mono);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--mix-accent);
+  margin-bottom: 8px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--mix-accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state p {
+  color: var(--mix-text-muted);
+  font-size: 0.92rem;
+  margin-bottom: 1.25rem;
+}
