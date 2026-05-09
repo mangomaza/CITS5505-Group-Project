@@ -106,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--mix-text) !important;
 }
 
-.navbar-nav .nav-link.active::after {
+.navbar-nav .nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -115,6 +115,18 @@ h1, h2, h3, h4, h5, h6 {
   height: 2px;
   background-color: var(--mix-accent);
   border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 250ms ease;
+}
+
+.navbar-nav .nav-link:hover::after,
+.navbar-nav .nav-link.active::after {
+  transform: scaleX(1);
+}
+
+.navbar-nav .nav-username::after {
+  display: none;
 }
 
 .navbar-nav .nav-username {
