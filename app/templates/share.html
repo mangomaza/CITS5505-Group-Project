@@ -52,7 +52,7 @@
 
         <div class="share-history">
           <h3>Shared by you</h3>
-          <div class="share-table">
+          <div class="share-table table-responsive">
             <table class="table">
               <thead>
                 <tr>
@@ -65,8 +65,8 @@
               <tbody>
                 {% for grant in existing_grants %}
                   <tr>
-                    <td>{{ grant.recipe.name }}</td>
-                    <td>{{ grant.shared_with.username }}</td>
+                    <td class="text-break">{{ grant.recipe.name }}</td>
+                    <td class="text-break">{{ grant.shared_with.username }}</td>
                     <td class="font-mono" style="font-size:0.8rem;">
                       {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
                     </td>
@@ -89,7 +89,7 @@
 
         <div class="share-history">
           <h3>Shared with you</h3>
-          <div class="share-table">
+          <div class="share-table table-responsive">
             <table class="table">
               <thead>
                 <tr>
@@ -102,12 +102,12 @@
               <tbody>
                 {% for grant in shared_with_you %}
                   <tr>
-                    <td>
+                    <td class="text-break">
                       <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}">
                         {{ grant.recipe.name }}
                       </a>
                     </td>
-                    <td>{{ grant.granted_by.username }}</td>
+                    <td class="text-break">{{ grant.granted_by.username }}</td>
                     <td class="font-mono" style="font-size:0.8rem;">
                       {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
                     </td>
