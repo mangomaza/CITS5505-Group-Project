@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Ingredient thumbnail random pool.
   // Each category has POOL_SIZE slots. Drop the corresponding AI-generated
   // images into static/images/placeholders/ingredients/{cocktail,food}/
-  // named 1.jpg, 2.jpg ... POOL_SIZE.jpg.
+  // named 1.png, 2.png ... POOL_SIZE.png.
   // Until the assets exist the fallback (placehold.co) is shown automatically.
   var INGREDIENT_POOL_SIZE = 10;
   var ingredientsList = document.querySelector('.ingredients-list');
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
     thumbs.forEach(function (img) {
       var fallbackSrc = img.getAttribute('src');
       var pick = Math.floor(Math.random() * INGREDIENT_POOL_SIZE) + 1;
-      var localSrc = '/static/images/placeholders/ingredients/' + folder + '/' + pick + '.jpg';
+      var localSrc = '/static/images/placeholders/ingredients/' + folder + '/' + pick + '.png';
       img.onerror = function () {
         img.src = fallbackSrc;
         img.onerror = null;
