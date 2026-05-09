@@ -75,9 +75,12 @@
     const face = card.querySelector('.draw-card-face');
     const img = card.querySelector('.draw-card-img');
     const placeholder = card.querySelector('.draw-card-image-placeholder');
+    const cassette = card.querySelector('.draw-card-cassette');
     const badge = card.querySelector('.draw-card-badge');
     const name = card.querySelector('.draw-card-name');
     const meta = card.querySelector('.draw-card-meta');
+
+    const cat = (item.category || '').toLowerCase();
 
     if (item.image_url) {
       img.src = item.image_url;
@@ -88,9 +91,17 @@
       img.hidden = true;
       img.removeAttribute('src');
       if (placeholder) placeholder.hidden = false;
+      if (cassette) {
+        const cassetteSrc = '/static/images/placeholders/cassette-' + (cat === 'cocktail' ? 'cocktail' : 'food') + '.png';
+        cassette.onerror = function () {
+          cassette.hidden = true;
+          cassette.onerror = null;
+        };
+        cassette.hidden = false;
+        cassette.src = cassetteSrc;
+      }
     }
 
-    const cat = (item.category || '').toLowerCase();
     badge.textContent = cat === 'cocktail' ? 'Cocktail' : 'Food';
     badge.className = 'draw-card-badge ' + (cat === 'cocktail' ? 'badge-cocktail' : 'badge-food');
 

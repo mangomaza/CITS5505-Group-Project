@@ -849,6 +849,15 @@ body.mix-modal-open {
   color: var(--mix-text-muted);
 }
 
+.draw-card-cassette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+
 .draw-card-body {
   padding: 16px 18px 12px;
   flex: 1;

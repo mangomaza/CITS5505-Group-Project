@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // images into static/images/placeholders/ingredients/{cocktail,food}/
   // named 1.jpg, 2.jpg ... POOL_SIZE.jpg.
   // Until the assets exist the fallback (placehold.co) is shown automatically.
-  var INGREDIENT_POOL_SIZE = 6;
+  var INGREDIENT_POOL_SIZE = 10;
   var ingredientsList = document.querySelector('.ingredients-list');
   if (ingredientsList) {
     var category = (ingredientsList.dataset.category || 'food').toLowerCase();
