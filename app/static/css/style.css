@@ -467,7 +467,22 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 0 3px rgba(125, 140, 110, 0.15);
 }
 
-.invalid-feedback { color: var(--mix-danger); font-size: 0.8rem; }
+.invalid-feedback {
+  color: var(--mix-danger);
+  font-family: var(--mix-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: rgba(196, 91, 74, 0.1);
+  border-left: 2px solid var(--mix-danger);
+  border-radius: 0 4px 4px 0;
+}
+.invalid-feedback::before {
+  content: "// ";
+  opacity: 0.6;
+}
 .valid-feedback   { color: var(--mix-tertiary); font-size: 0.8rem; }
 
 .form-label {
