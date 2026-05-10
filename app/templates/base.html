@@ -71,9 +71,15 @@
           <ul class="navbar-nav align-items-lg-center">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <span class="nav-link nav-username pe-none">
-                <i class="bi bi-person-circle me-1"></i>{{ current_user.username }}
-              </span>
+              <a class="nav-link nav-username {% if request.endpoint == 'main.profile' %}active{% endif %}"
+                 href="{{ url_for('main.profile') }}">
+                {% if current_user.avatar_data %}
+                  <img class="nav-avatar" src="{{ url_for('main.user_avatar', user_id=current_user.id) }}" alt="">
+                {% else %}
+                  <i class="bi bi-person-circle me-1"></i>
+                {% endif %}
+                <span>{{ current_user.username }}</span>
+              </a>
             </li>
             <li class="nav-item">
               <form method="POST" action="{{ url_for('auth.logout') }}" class="d-inline">

@@ -137,15 +137,27 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 8px rgba(212, 148, 76, 0.5);
 }
 
-.navbar-nav .nav-username::after {
-  display: none;
-}
-
 .navbar-nav .nav-username {
   color: var(--mix-tertiary) !important;
   font-family: var(--mix-font-mono);
   font-size: 0.85rem;
   letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.navbar-nav .nav-username:hover,
+.navbar-nav .nav-username.active {
+  color: var(--mix-accent) !important;
+}
+
+.nav-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(232, 221, 211, 0.2);
 }
 
 .navbar-toggler {
