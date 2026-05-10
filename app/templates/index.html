@@ -13,13 +13,17 @@
     <section class="hero">
       <div class="hero-overlay"></div>
       <div class="container hero-content text-center">
-        <h1 class="hero-title">Mix It Up</h1>
-        <p class="hero-subtitle">Create, share, and discover recipes. Or let fate decide.</p>
+        <p class="hero-eyebrow">// Side A &middot; Mixtape</p>
+        <h1 class="hero-title">
+          <span class="hero-title-line">Mix</span>
+          <span class="hero-title-line hero-title-accent">It Up</span>
+        </h1>
+        <p class="hero-subtitle">Cocktails and meals, hand-rolled or pulled at random. Build a tape, share it with friends, or hit shuffle and see what lands.</p>
         <div class="hero-actions">
           <button class="btn-shuffle" id="heroShuffle" data-mix-trigger title="Mix It Up">
             <i class="bi bi-shuffle"></i>
           </button>
-          <p class="hero-shuffle-label">Mix It Up</p>
+          <p class="hero-shuffle-label">Press shuffle</p>
         </div>
         <a href="{{ url_for('main.recipes') }}" class="btn btn-outline-mix mt-3">Browse Recipes</a>
       </div>
