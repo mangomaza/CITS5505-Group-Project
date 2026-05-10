@@ -152,3 +152,7 @@ class SaveExternalRecipeForm(FlaskForm):
         ],
     )
     confirm_duplicate = HiddenField()
+
+
+class DeleteRecipeForm(FlaskForm):
+    submit = SubmitField('Delete')

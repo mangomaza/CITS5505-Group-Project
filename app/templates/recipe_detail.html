@@ -99,6 +99,13 @@
           {% if current_user.is_authenticated %}
           <div class="detail-actions">
             <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
+            {% if recipe.creator_id == current_user.id %}
+              <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn btn-outline-mix"><i class="bi bi-pencil me-1"></i> Edit</a>
+              <form method="post" action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}" class="d-inline" onsubmit="return confirm('Delete this recipe? This cannot be undone.');">
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-outline-mix"><i class="bi bi-trash me-1"></i> Delete</button>
+              </form>
+            {% endif %}
           </div>
           {% endif %}
 

@@ -10,7 +10,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import func, or_
 
 from app.extensions import db
-from app.forms.recipe_forms import CreateRecipeForm, SaveExternalRecipeForm
+from app.forms.recipe_forms import CreateRecipeForm, DeleteRecipeForm, SaveExternalRecipeForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
 from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
@@ -530,6 +530,7 @@ def recipe_detail(recipe_id):
         average_rating=average_rating,
         rating_count=rating_count,
         user_rating=user_rating,
+        delete_form=DeleteRecipeForm(),
     )
 
 
@@ -710,6 +711,108 @@ def create_recipe():
         ingredient_rows=ingredient_rows,
         ingredient_error=ingredient_error,
     )
+
+
+@main_bp.route('/recipes/<int:recipe_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_recipe(recipe_id):
+    recipe = db.get_or_404(Recipe, recipe_id)
+    if recipe.creator_id != current_user.id:
+        abort(403)
+
+    if request.method == 'POST':
+        form = CreateRecipeForm()
+        ingredient_rows = _normalise_ingredient_rows(request.form)
+    else:
+        form = CreateRecipeForm(data={
+            'name': recipe.name,
+            'description': recipe.description or '',
+            'category': recipe.category,
+            'glass': recipe.glass or '',
+            'instructions': recipe.instructions,
+            'is_alcoholic': 'true' if recipe.is_alcoholic else 'false',
+            'visibility': 'public' if recipe.is_public else 'private',
+        })
+        ingredient_rows = [
+            {'name': i.name, 'quantity': i.quantity or '', 'unit': i.unit or ''}
+            for i in recipe.ingredients
+        ]
+        if not ingredient_rows:
+            ingredient_rows = [{'name': '', 'quantity': '', 'unit': ''} for _ in range(3)]
+
+    ingredient_error = None
+
+    if form.validate_on_submit():
+        non_empty_rows = [
+            row for row in ingredient_rows
+            if row['name'] or row['quantity'] or row['unit']
+        ]
+
+        if not non_empty_rows:
+            ingredient_error = 'Please add at least one ingredient.'
+        else:
+            is_food = form.category.data == 'food'
+            recipe.name = form.name.data.strip()
+            recipe.description = (form.description.data or '').strip() or None
+            recipe.category = form.category.data
+            recipe.glass = None if is_food else ((form.glass.data or '').strip() or None)
+            recipe.is_alcoholic = False if is_food else (form.is_alcoholic.data == 'true')
+            recipe.instructions = form.instructions.data.strip()
+            recipe.is_public = (form.visibility.data == 'public')
+
+            upload = form.image.data
+            if upload is not None and getattr(upload, 'filename', ''):
+                upload.stream.seek(0)
+                recipe.image_data = upload.read()
+                recipe.image_mime = upload.mimetype
+
+            for ing in list(recipe.ingredients):
+                db.session.delete(ing)
+            db.session.flush()
+
+            for index, row in enumerate(non_empty_rows, start=1):
+                if not row['name']:
+                    ingredient_error = 'Each saved ingredient needs a name.'
+                    db.session.rollback()
+                    break
+                db.session.add(Ingredient(
+                    recipe_id=recipe.id,
+                    name=row['name'],
+                    quantity=row['quantity'] or None,
+                    unit=row['unit'] or None,
+                    position=index,
+                ))
+
+            if ingredient_error is None:
+                db.session.commit()
+                flash('Recipe updated.', 'success')
+                return redirect(url_for('main.recipe_detail', recipe_id=recipe.id))
+
+    return render_template(
+        'create_recipe.html',
+        form=form,
+        ingredient_rows=ingredient_rows,
+        ingredient_error=ingredient_error,
+        edit_recipe=recipe,
+    )
+
+
+@main_bp.route('/recipes/<int:recipe_id>/delete', methods=['POST'])
+@login_required
+def delete_recipe(recipe_id):
+    recipe = db.get_or_404(Recipe, recipe_id)
+    if recipe.creator_id != current_user.id:
+        abort(403)
+
+    form = DeleteRecipeForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    name = recipe.name
+    db.session.delete(recipe)
+    db.session.commit()
+    flash(f'Deleted "{name}".', 'success')
+    return redirect(url_for('main.recipes'))
 
 
 @main_bp.route('/share', methods=['GET', 'POST'])
