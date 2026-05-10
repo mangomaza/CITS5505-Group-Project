@@ -1001,7 +1001,7 @@ body.mix-modal-open {
 
 .draw-card {
   flex: 1 1 0;
-  aspect-ratio: 2 / 3;
+  height: 420px;
   max-width: 280px;
   position: relative;
   transform-style: preserve-3d;
@@ -1096,7 +1096,8 @@ body.mix-modal-open {
 .draw-card-image {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 220px;
+  flex: 0 0 220px;
   background-color: var(--mix-bg);
   overflow: hidden;
 }
