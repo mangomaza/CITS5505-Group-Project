@@ -7,6 +7,7 @@ from io import BytesIO
 import requests
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, session, url_for
 from flask_login import current_user, login_required
+from flask_wtf.csrf import CSRFError, validate_csrf
 from sqlalchemy import func, or_
 
 from app.extensions import db
@@ -16,7 +17,6 @@ from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
 from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
 from app.models.user import User
-
 COCKTAIL_API_URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
 MEAL_API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php'
 COCKTAIL_LOOKUP_URL = 'https://www.thecocktaildb.com/api/json/v1/1/lookup.php'
@@ -938,6 +938,17 @@ def profile():
     user = db.session.get(User, current_user.id)
     form = ProfileForm(user, obj=user)
 
+    if request.method == 'POST' and request.form.get('action') == 'remove_avatar':
+        try:
+            validate_csrf(request.form.get('csrf_token'))
+        except CSRFError:
+            abort(400)
+        user.avatar_data = None
+        user.avatar_mime = None
+        db.session.commit()
+        flash('Profile picture removed.', 'success')
+        return redirect(url_for('main.profile'))
+
     if form.validate_on_submit():
         user.username = form.username.data.strip()
         user.email = form.email.data.strip().lower()
@@ -956,20 +967,6 @@ def profile():
         return redirect(url_for('main.profile'))
 
     return render_template('profile.html', form=form, user=user)
-
-
-@main_bp.route('/profile/avatar/remove', methods=['POST'])
-@login_required
-def profile_remove_avatar():
-    form = DeleteRecipeForm()
-    if not form.validate_on_submit():
-        abort(400)
-    user = db.session.get(User, current_user.id)
-    user.avatar_data = None
-    user.avatar_mime = None
-    db.session.commit()
-    flash('Profile picture removed.', 'success')
-    return redirect(url_for('main.profile'))
 
 
 @main_bp.route('/users/<int:user_id>/avatar')

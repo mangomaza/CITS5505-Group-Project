@@ -37,14 +37,13 @@
                   <label for="avatarInput" class="btn btn-mix-outline btn-sm">
                     <i class="bi bi-upload me-1"></i> Upload picture
                   </label>
-                  {{ form.avatar(id="avatarInput", accept="image/png,image/jpeg,image/webp", hidden=True) }}
+                  {{ form.avatar(id="avatarInput", accept="image/png,image/jpeg,image/webp", class="visually-hidden") }}
                   {% if user.avatar_data %}
-                    <form method="post" action="{{ url_for('main.profile_remove_avatar') }}" class="d-inline">
-                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                      <button type="submit" class="btn btn-outline-mix btn-sm">
-                        <i class="bi bi-trash me-1"></i> Remove
-                      </button>
-                    </form>
+                    <button type="submit" name="action" value="remove_avatar" formnovalidate
+                            class="btn btn-outline-mix btn-sm"
+                            onclick="return confirm('Remove your profile picture?');">
+                      <i class="bi bi-trash me-1"></i> Remove
+                    </button>
                   {% endif %}
                   <p class="form-text mb-0">PNG, JPG or WEBP. Up to 2 MB.</p>
                 </div>
@@ -61,7 +60,11 @@
                 {{ form.username.label(class="form-label") }}
                 {{ form.username(
                   class="form-control" + (" is-invalid" if form.username.errors else ""),
-                  minlength="3", maxlength="80", required=True
+                  placeholder="Your username",
+                  autocomplete="username",
+                  minlength="3", maxlength="80",
+                  pattern="[A-Za-z0-9_]+",
+                  required=True
                 ) }}
                 {% for error in form.username.errors %}
                   <div class="invalid-feedback">{{ error }}</div>
@@ -71,6 +74,8 @@
                 {{ form.email.label(class="form-label") }}
                 {{ form.email(
                   class="form-control" + (" is-invalid" if form.email.errors else ""),
+                  placeholder="you@example.com",
+                  autocomplete="email",
                   type="email", maxlength="120", required=True
                 ) }}
                 {% for error in form.email.errors %}
@@ -87,6 +92,7 @@
                 {{ form.current_password.label(class="form-label") }}
                 {{ form.current_password(
                   class="form-control" + (" is-invalid" if form.current_password.errors else ""),
+                  placeholder="Your current password",
                   autocomplete="current-password"
                 ) }}
                 {% for error in form.current_password.errors %}
@@ -98,6 +104,7 @@
                   {{ form.new_password.label(class="form-label") }}
                   {{ form.new_password(
                     class="form-control" + (" is-invalid" if form.new_password.errors else ""),
+                    placeholder="At least 8 characters",
                     minlength="8", maxlength="128", autocomplete="new-password"
                   ) }}
                   {% for error in form.new_password.errors %}
@@ -108,6 +115,7 @@
                   {{ form.confirm_new_password.label(class="form-label") }}
                   {{ form.confirm_new_password(
                     class="form-control" + (" is-invalid" if form.confirm_new_password.errors else ""),
+                    placeholder="Re-enter new password",
                     minlength="8", maxlength="128", autocomplete="new-password"
                   ) }}
                   {% for error in form.confirm_new_password.errors %}

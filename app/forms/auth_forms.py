@@ -126,12 +126,12 @@ class ProfileForm(FlaskForm):
         if existing:
             raise ValidationError('This email is already registered.')
 
-    def validate_new_password(self, field):
-        if not field.data:
+    def validate_current_password(self, field):
+        if not self.new_password.data:
             return
-        if not self.current_password.data:
+        if not field.data:
             raise ValidationError('Enter your current password to change it.')
-        if not self._user.check_password(self.current_password.data):
+        if not self._user.check_password(field.data):
             raise ValidationError('Current password is incorrect.')
 
     def validate_avatar(self, field):

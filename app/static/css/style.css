@@ -1007,7 +1007,8 @@ body.mix-modal-open {
   transform-style: preserve-3d;
   transition: transform 2s cubic-bezier(0.25, 0.8, 0.3, 1),
               opacity 500ms ease,
-              flex-grow 800ms ease;
+              flex-grow 700ms cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 700ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .draw-card.is-flipped {
@@ -1016,12 +1017,14 @@ body.mix-modal-open {
 
 .draw-card.is-faded {
   opacity: 0.25;
-  flex: 0.6 1 0;
+  flex: 0.4 1 0;
+  max-width: 200px;
   pointer-events: none;
 }
 
 .draw-card.is-chosen {
-  flex: 1.6 1 0;
+  flex: 2 1 0;
+  max-width: 400px;
 }
 
 .draw-card-back,

@@ -17,21 +17,6 @@
   display: block;
 }
 
-.detail-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    rgba(15, 10, 8, 0.18) 0px,
-    rgba(15, 10, 8, 0.18) 1px,
-    transparent 1px,
-    transparent 4px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
 .detail-hero::after {
   content: '';
   position: absolute;
