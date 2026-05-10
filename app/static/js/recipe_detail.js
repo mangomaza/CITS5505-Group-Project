@@ -147,23 +147,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // like/favourite toggle
-  var favBtn = document.getElementById('favBtn');
-  if (favBtn) {
-    favBtn.addEventListener('click', function () {
-      var icon = favBtn.querySelector('.bi');
-      if (icon.classList.contains('bi-heart')) {
-        icon.classList.replace('bi-heart', 'bi-heart-fill');
-        icon.style.color = 'var(--mix-danger)';
-        icon.classList.add('heart-bounce');
-      } else {
-        icon.classList.replace('bi-heart-fill', 'bi-heart');
-        icon.style.color = '';
-        icon.classList.remove('heart-bounce');
-      }
-    });
-  }
-
   // Ingredient thumbnail random pool.
   // Each category has POOL_SIZE slots. Drop the corresponding AI-generated
   // images into static/images/placeholders/ingredients/{cocktail,food}/

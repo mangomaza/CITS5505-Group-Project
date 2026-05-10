@@ -96,12 +96,11 @@
           </div>
 
           <!-- Actions -->
+          {% if current_user.is_authenticated %}
           <div class="detail-actions">
-            <button class="btn btn-mix" id="favBtn"><i class="bi bi-heart me-1"></i> Favourite</button>
-            {% if current_user.is_authenticated %}
-              <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
-            {% endif %}
+            <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
           </div>
+          {% endif %}
 
         </div>
 

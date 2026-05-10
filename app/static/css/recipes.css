@@ -64,15 +64,45 @@
   max-width: 300px;
 }
 
+.search-bar .input-group {
+  border-radius: var(--bs-border-radius, 6px);
+  transition: box-shadow 150ms ease;
+}
+
 .search-bar .input-group-text {
   background-color: var(--mix-card-elevated);
   border: 1px solid rgba(155, 142, 130, 0.25);
   border-right: none;
   color: var(--mix-text-muted);
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
 .search-bar .input-group .form-control {
   border-left: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* hover/focus bloom wraps the magnifying glass too */
+.search-bar .input-group:hover .input-group-text,
+.search-bar .input-group:focus-within .input-group-text {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+}
+
+.search-bar .input-group:hover .form-control,
+.search-bar .input-group:focus-within .form-control {
+  border-color: var(--mix-accent);
+  box-shadow: none;
+}
+
+.search-bar .input-group:hover,
+.search-bar .input-group:focus-within {
+  box-shadow: 0 0 0 3px rgba(212, 148, 76, 0.2);
+}
+
+/* override the inner focus ring that would double up */
+.search-bar .input-group .form-control:focus {
+  box-shadow: none;
 }
 
 /* ---- Filter Pills ---- */
