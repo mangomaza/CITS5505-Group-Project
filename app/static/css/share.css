@@ -15,12 +15,6 @@
   -webkit-text-fill-color: var(--mix-text);
 }
 
-.share-form .form-select option,
-.share-form .form-select:disabled option {
-  color: #1a1a1a;
-  background-color: #fff;
-}
-
 .share-form .btn:disabled,
 .share-form .btn.disabled {
   background: rgba(212, 148, 76, 0.12);
