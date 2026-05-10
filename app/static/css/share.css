@@ -110,6 +110,86 @@
   text-decoration: underline;
 }
 
+/* ---- Filter row above shared tables ---- */
+.share-filter {
+  margin-top: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.share-filter .search-bar {
+  background: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.share-filter .input-group {
+  border-radius: var(--bs-border-radius, 6px);
+  transition: box-shadow 150ms ease;
+}
+
+.share-filter .input-group-text {
+  background-color: var(--mix-card-elevated);
+  border: 1px solid rgba(155, 142, 130, 0.25);
+  border-right: none;
+  color: var(--mix-text-muted);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.share-filter .input-group .form-control {
+  border-left: none;
+  transition: border-color 150ms ease;
+}
+
+.share-filter .input-group:hover .input-group-text,
+.share-filter .input-group:focus-within .input-group-text {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+}
+
+.share-filter .input-group:hover .form-control,
+.share-filter .input-group:focus-within .form-control {
+  border-color: var(--mix-accent);
+  box-shadow: none;
+}
+
+.share-filter .input-group:hover,
+.share-filter .input-group:focus-within {
+  box-shadow: 0 0 0 3px rgba(212, 148, 76, 0.2);
+}
+
+.share-filter .input-group .form-control:focus {
+  box-shadow: none;
+}
+
+.share-filter .filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.share-filter .filter-pill {
+  background: transparent;
+  border: 1px solid var(--mix-text-muted);
+  color: var(--mix-text-muted);
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.share-filter .filter-pill:hover {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+}
+
+.share-filter .filter-pill.active {
+  background-color: var(--mix-accent);
+  border-color: var(--mix-accent);
+  color: var(--mix-bg);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 575.98px) {
   .share-form .form-row {

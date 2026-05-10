@@ -157,11 +157,13 @@
                   {% endif %}
 
                   <div class="card-body">
-                    {% if recipe.category == 'cocktail' %}
-                      <span class="badge-cocktail">Cocktail</span>
-                    {% else %}
-                      <span class="badge-food">{{ recipe.category|title }}</span>
-                    {% endif %}
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      {% if recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ recipe.category|title }}</span>
+                      {% endif %}
+                    </div>
 
                     <h3 class="card-title mt-2">{{ recipe.name }}</h3>
 

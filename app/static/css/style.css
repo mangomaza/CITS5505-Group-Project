@@ -317,17 +317,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ---- Category Badges ---- */
+/* cocktail = sage, food = terracotta (matches cassette art) */
+/* align-self keeps the pill intrinsic-width inside flex column parents */
 .badge-cocktail {
-  background-color: var(--mix-secondary);
-  color: var(--mix-text);
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 20px;
-  display: inline-block;
-}
-
-.badge-food {
   background-color: var(--mix-tertiary);
   color: var(--mix-text);
   font-size: 0.7rem;
@@ -335,6 +327,18 @@ h1, h2, h3, h4, h5, h6 {
   padding: 4px 10px;
   border-radius: 20px;
   display: inline-block;
+  align-self: flex-start;
+}
+
+.badge-food {
+  background-color: var(--mix-secondary);
+  color: var(--mix-text);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  align-self: flex-start;
 }
 
 .badge-alcoholic {

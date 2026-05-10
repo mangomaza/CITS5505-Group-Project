@@ -94,11 +94,11 @@
   letter-spacing: 0.5px;
 }
 
-.category-cocktail i { color: var(--mix-secondary); }
-.category-food i     { color: var(--mix-tertiary); }
+.category-cocktail i { color: var(--mix-tertiary); }
+.category-food i     { color: var(--mix-secondary); }
 
-.category-cocktail h3 { color: var(--mix-secondary); }
-.category-food h3     { color: var(--mix-tertiary); }
+.category-cocktail h3 { color: var(--mix-tertiary); }
+.category-food h3     { color: var(--mix-secondary); }
 
 .category-card-icon {
   display: block;

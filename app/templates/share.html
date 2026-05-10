@@ -51,14 +51,29 @@
           </form>
         </div>
 
+        <div class="share-filter">
+          <div class="search-bar d-flex flex-wrap align-items-center gap-3">
+            <div class="input-group" style="width: 300px;">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" id="shareSearch" class="form-control" placeholder="Filter by recipe name..." autocomplete="off" maxlength="100">
+            </div>
+            <div class="filter-pills" id="shareFilterPills">
+              <button type="button" class="filter-pill active" data-filter="all">All</button>
+              <button type="button" class="filter-pill" data-filter="cocktail">Cocktail</button>
+              <button type="button" class="filter-pill" data-filter="food">Food</button>
+            </div>
+          </div>
+        </div>
+
         <div class="share-history">
           <div class="cassette-insert-label">// TRACK A &middot; SHARED BY YOU</div>
           <h3>Shared by you</h3>
           <div class="share-table table-responsive">
-            <table class="table">
+            <table class="table" id="sharedByYouTable">
               <thead>
                 <tr>
                   <th>Recipe</th>
+                  <th>Type</th>
                   <th>Shared with</th>
                   <th>Date</th>
                   <th></th>
@@ -66,8 +81,15 @@
               </thead>
               <tbody>
                 {% for grant in existing_grants %}
-                  <tr>
+                  <tr data-name="{{ grant.recipe.name|lower }}" data-category="{{ grant.recipe.category }}">
                     <td class="text-break">{{ grant.recipe.name }}</td>
+                    <td>
+                      {% if grant.recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ grant.recipe.category|title }}</span>
+                      {% endif %}
+                    </td>
                     <td class="text-break">{{ grant.shared_with.username }}</td>
                     <td class="font-mono" style="font-size:0.8rem;">
                       {{ grant.created_at.strftime('%Y-%m-%d %H:%M') }}
@@ -81,9 +103,12 @@
                   </tr>
                 {% else %}
                   <tr>
-                    <td colspan="4" class="text-muted">You have not shared any private recipes yet.</td>
+                    <td colspan="5" class="text-muted">You have not shared any private recipes yet.</td>
                   </tr>
                 {% endfor %}
+                <tr class="share-empty-filter" hidden>
+                  <td colspan="5" class="text-muted">No matching recipes.</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -93,10 +118,11 @@
           <div class="cassette-insert-label">// TRACK B &middot; SHARED WITH YOU</div>
           <h3>Shared with you</h3>
           <div class="share-table table-responsive">
-            <table class="table">
+            <table class="table" id="sharedWithYouTable">
               <thead>
                 <tr>
                   <th>Recipe</th>
+                  <th>Type</th>
                   <th>From</th>
                   <th>Date</th>
                   <th></th>
@@ -104,11 +130,18 @@
               </thead>
               <tbody>
                 {% for grant in shared_with_you %}
-                  <tr>
+                  <tr data-name="{{ grant.recipe.name|lower }}" data-category="{{ grant.recipe.category }}">
                     <td class="text-break">
                       <a href="{{ url_for('main.recipe_detail', recipe_id=grant.recipe.id) }}">
                         {{ grant.recipe.name }}
                       </a>
+                    </td>
+                    <td>
+                      {% if grant.recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ grant.recipe.category|title }}</span>
+                      {% endif %}
                     </td>
                     <td class="text-break">{{ grant.granted_by.username }}</td>
                     <td class="font-mono" style="font-size:0.8rem;">
@@ -122,9 +155,12 @@
                   </tr>
                 {% else %}
                   <tr>
-                    <td colspan="4" class="text-muted">Nothing has been shared with you yet.</td>
+                    <td colspan="5" class="text-muted">Nothing has been shared with you yet.</td>
                   </tr>
                 {% endfor %}
+                <tr class="share-empty-filter" hidden>
+                  <td colspan="5" class="text-muted">No matching recipes.</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -133,4 +169,8 @@
       </div>
     </div>
   </main>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{{ url_for('static', filename='js/share.js') }}"></script>
 {% endblock %}
