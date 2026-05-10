@@ -30,7 +30,7 @@ def create_app(config_name='default'):
 
     @app.context_processor
     def inject_logout_form():
-        return {'logout_form': LogoutForm()}
+        return {'logout_form': LogoutForm(formdata=None)}
 
     from app.routes.main_routes import main_bp
     from app.routes.auth_routes import auth_bp
@@ -45,6 +45,10 @@ def create_app(config_name='default'):
     @app.errorhandler(403)
     def forbidden_error(error):
         return render_template('errors/403.html'), 403
+
+    @app.errorhandler(413)
+    def request_too_large(error):
+        return render_template('errors/413.html'), 413
 
     @app.errorhandler(500)
     def internal_error(error):
