@@ -102,9 +102,14 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link.active {
+.navbar-nav .nav-link:hover {
   color: var(--mix-text) !important;
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--mix-accent) !important;
+  background-color: rgba(212, 148, 76, 0.08);
+  border-radius: 4px;
 }
 
 .navbar-nav .nav-link::after {
@@ -121,9 +126,15 @@ h1, h2, h3, h4, h5, h6 {
   transition: transform 250ms ease;
 }
 
-.navbar-nav .nav-link:hover::after,
+.navbar-nav .nav-link:hover::after {
+  transform: scaleX(1);
+}
+
 .navbar-nav .nav-link.active::after {
   transform: scaleX(1);
+  height: 3px;
+  background-color: var(--mix-accent);
+  box-shadow: 0 0 8px rgba(212, 148, 76, 0.5);
 }
 
 .navbar-nav .nav-username::after {

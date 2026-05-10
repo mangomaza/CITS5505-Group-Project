@@ -4,17 +4,6 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-  // highlight active nav link based on current page
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.navbar-nav .nav-link').forEach(function (link) {
-    const href = link.getAttribute('href');
-    if (href === currentPage) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
-    }
-  });
-
   // auto-dismiss flash alerts after 5 seconds
   document.querySelectorAll('.alert-dismissible').forEach(function (alert) {
     setTimeout(function () {

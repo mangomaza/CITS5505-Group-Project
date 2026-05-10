@@ -97,6 +97,9 @@
 .category-cocktail i { color: var(--mix-secondary); }
 .category-food i     { color: var(--mix-tertiary); }
 
+.category-cocktail h3 { color: var(--mix-secondary); }
+.category-food h3     { color: var(--mix-tertiary); }
+
 .category-card-icon {
   display: block;
   margin: 0 auto;

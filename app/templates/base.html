@@ -48,7 +48,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'main.recipes' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint in ['main.recipes', 'main.recipe_detail'] %}active{% endif %}"
                 href="{{ url_for('main.recipes') }}">
                 <i class="bi bi-journal-text me-1"></i>Recipes
               </a>
@@ -85,7 +85,7 @@
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint in ['auth.login', 'auth.signup'] %}active{% endif %}"
                 href="{{ url_for('auth.login') }}">
                 <i class="bi bi-box-arrow-in-right me-1"></i>Login
               </a>

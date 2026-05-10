@@ -116,7 +116,7 @@
         <div class="row g-4">
           {% for entry in top_rated %}
             {% set recipe = entry.recipe %}
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6">
               <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
                 <div class="recipe-card">
                   <span class="card-side-sticker card-side-sticker-{{ 'a' if recipe.category == 'cocktail' else 'b' }}">Side {{ 'A' if recipe.category == 'cocktail' else 'B' }}</span>
