@@ -11,9 +11,11 @@ from sqlalchemy import func, or_
 
 from app.extensions import db
 from app.forms.recipe_forms import CreateRecipeForm, DeleteRecipeForm, SaveExternalRecipeForm
+from app.forms.auth_forms import ProfileForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
 from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
+from app.models.user import User
 
 COCKTAIL_API_URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
 MEAL_API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php'
@@ -928,3 +930,55 @@ def rate_recipe(recipe_id):
         'count': count,
         'user_rating': stars,
     })
+
+
+@main_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    user = db.session.get(User, current_user.id)
+    form = ProfileForm(user, obj=user)
+
+    if form.validate_on_submit():
+        user.username = form.username.data.strip()
+        user.email = form.email.data.strip().lower()
+
+        if form.new_password.data:
+            user.set_password(form.new_password.data)
+
+        upload = form.avatar.data
+        if upload is not None and getattr(upload, 'filename', ''):
+            upload.stream.seek(0)
+            user.avatar_data = upload.read()
+            user.avatar_mime = upload.mimetype
+
+        db.session.commit()
+        flash('Profile updated.', 'success')
+        return redirect(url_for('main.profile'))
+
+    return render_template('profile.html', form=form, user=user)
+
+
+@main_bp.route('/profile/avatar/remove', methods=['POST'])
+@login_required
+def profile_remove_avatar():
+    form = DeleteRecipeForm()
+    if not form.validate_on_submit():
+        abort(400)
+    user = db.session.get(User, current_user.id)
+    user.avatar_data = None
+    user.avatar_mime = None
+    db.session.commit()
+    flash('Profile picture removed.', 'success')
+    return redirect(url_for('main.profile'))
+
+
+@main_bp.route('/users/<int:user_id>/avatar')
+def user_avatar(user_id):
+    user = db.get_or_404(User, user_id)
+    if not user.avatar_data or not user.avatar_mime:
+        abort(404)
+    return send_file(
+        BytesIO(user.avatar_data),
+        mimetype=user.avatar_mime,
+        max_age=3600,
+    )
