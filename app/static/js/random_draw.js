@@ -231,18 +231,28 @@
     });
   }
 
-  // Reverse the pick: drop chosen/faded states and bring the pick buttons
-  // back so the user can choose the other card.
+  // Reverse the pick: actions and deselect arrow fade out first, then
+  // the card shrinks back, mirroring the order of the pick animation.
   function deselectCard() {
-    cards.forEach((card) => {
-      card.classList.remove('is-chosen', 'is-faded');
-      const pickWrap = card.querySelector('.draw-card-pick');
-      if (pickWrap) pickWrap.hidden = false;
-      const actions = card.querySelector('.draw-card-actions');
-      if (actions) actions.hidden = true;
-      const deselect = card.querySelector('[data-mix-deselect]');
-      if (deselect) deselect.hidden = true;
-    });
+    // Phase 1: fade out actions and deselect button via .is-deselecting.
+    // Card stays at the chosen height (.is-chosen still present) while
+    // these fade out so it doesn't shrink underneath them.
+    cards.forEach((card) => card.classList.add('is-deselecting'));
+
+    const FADE_OUT_MS = 300;
+    setTimeout(() => {
+      // Phase 2: drop chosen/faded so the card height transitions back
+      // and the sibling card fades back in. Then restore the pick UI.
+      cards.forEach((card) => {
+        card.classList.remove('is-chosen', 'is-faded', 'is-deselecting');
+        const pickWrap = card.querySelector('.draw-card-pick');
+        if (pickWrap) pickWrap.hidden = false;
+        const actions = card.querySelector('.draw-card-actions');
+        if (actions) actions.hidden = true;
+        const deselect = card.querySelector('[data-mix-deselect]');
+        if (deselect) deselect.hidden = true;
+      });
+    }, FADE_OUT_MS);
   }
 
   // --- save -----------------------------------------------------------

@@ -999,32 +999,35 @@ body.mix-modal-open {
   margin: 12px 0 20px;
 }
 
+/* Cards are a fixed size at all times. Both faces are absolutely
+   positioned for the 3D flip, so the card itself needs explicit width
+   and height — flex-basis would let it collapse on a column stage.
+   Default size fits the unpicked content tightly so there is no big
+   empty band under the Pick button. When a card is picked the stage
+   grows both cards together to fit the action buttons. */
 .draw-card {
-  flex: 1 1 0;
-  height: 420px;
-  max-width: 280px;
+  flex: 0 0 auto;
+  width: 280px;
+  height: 380px;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 2s cubic-bezier(0.25, 0.8, 0.3, 1),
-              opacity 500ms ease,
-              flex-grow 700ms cubic-bezier(0.4, 0, 0.2, 1),
-              max-width 700ms cubic-bezier(0.4, 0, 0.2, 1);
+              height 400ms ease,
+              opacity 400ms ease;
+}
+
+.random-draw-stage:has(.is-chosen) .draw-card {
+  height: 470px;
 }
 
 .draw-card.is-flipped {
   transform: rotateY(180deg);
 }
 
+/* Picking a card just dims the other one. No size change either way. */
 .draw-card.is-faded {
   opacity: 0.25;
-  flex: 0.4 1 0;
-  max-width: 200px;
   pointer-events: none;
-}
-
-.draw-card.is-chosen {
-  flex: 2 1 0;
-  max-width: 400px;
 }
 
 .draw-card-back,
@@ -1036,24 +1039,28 @@ body.mix-modal-open {
   -webkit-backface-visibility: hidden;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-/* Cassette cardback: rotated cassette art per side, with MIX TAPE label on top. */
 .draw-card-back {
   background-color: var(--mix-card);
   border: 2px solid var(--mix-accent);
   align-items: center;
   justify-content: center;
   box-shadow: var(--mix-shadow);
-  overflow: hidden;
 }
 
+/* Cassette art rotated to read as a portrait tape. The image is 3:2
+   landscape; we set layout width above 100% so after the 90deg rotation
+   the visual fills most of the portrait card without distortion. Sized
+   so it stays inside the card on both the default and chosen heights. */
 .draw-card-back-cassette {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 150%;
+  width: 153%;
   height: auto;
+  max-width: none;
   transform: translate(-50%, -50%) rotate(-90deg);
   pointer-events: none;
   user-select: none;
@@ -1064,7 +1071,10 @@ body.mix-modal-open {
 }
 
 .draw-card-back-side-label {
-  position: relative;
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
   z-index: 2;
   font-family: var(--mix-font-mono);
   font-size: 0.95rem;
@@ -1075,7 +1085,6 @@ body.mix-modal-open {
   padding: 8px 18px;
   border-radius: 2px;
   border: 1px solid rgba(42, 31, 23, 0.4);
-  transform: rotate(-2deg);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   text-transform: uppercase;
   white-space: nowrap;
@@ -1090,14 +1099,13 @@ body.mix-modal-open {
   background-color: var(--mix-card-elevated);
   border: 1px solid var(--mix-card);
   transform: rotateY(180deg);
-  overflow: hidden;
 }
 
 .draw-card-image {
   position: relative;
   width: 100%;
-  height: 220px;
-  flex: 0 0 220px;
+  height: 180px;
+  flex: 0 0 180px;
   background-color: var(--mix-bg);
   overflow: hidden;
 }
@@ -1129,11 +1137,10 @@ body.mix-modal-open {
 }
 
 .draw-card-body {
-  padding: 16px 18px 12px;
-  flex: 1;
+  padding: 12px 18px 8px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .draw-card-side-label {
@@ -1158,6 +1165,9 @@ body.mix-modal-open {
   font-size: 1.4rem;
   margin: 0;
   color: var(--mix-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .draw-card-meta {
@@ -1180,6 +1190,34 @@ body.mix-modal-open {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* Fade-in for the picked card's actions and the deselect arrow. JS
+   reveals the elements in the same frame the .is-chosen class is added,
+   so the animation runs once with `backwards` fill keeping them at
+   opacity 0 during the small delay before the keyframes start. The
+   delay lets the card height transition begin first. */
+@keyframes draw-card-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes draw-card-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(6px); }
+}
+
+.draw-card.is-chosen .draw-card-actions,
+.draw-card.is-chosen .draw-card-deselect {
+  animation: draw-card-fade-in 300ms ease 200ms backwards;
+}
+
+/* Reverse animation when deselecting. JS adds .is-deselecting before
+   removing .is-chosen so we can play the fade-out and hold the final
+   state with `forwards` until JS clears the class. */
+.draw-card.is-deselecting .draw-card-actions,
+.draw-card.is-deselecting .draw-card-deselect {
+  animation: draw-card-fade-out 300ms ease forwards;
 }
 
 .draw-card-actions-anon {
@@ -1220,6 +1258,7 @@ body.mix-modal-open {
   padding: 6px 12px;
   border-radius: 999px;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .visibility-pill.is-active {
@@ -1385,23 +1424,25 @@ body.mix-modal-open {
   }
   .random-draw-stage {
     flex-direction: column;
+    align-items: center;
     gap: 16px;
   }
-  .draw-card {
-    min-height: 360px;
-  }
+  /* Card stays the exact same fixed size on mobile. The faded sibling is
+     hidden so the chosen card sits alone in the modal. */
   .draw-card.is-faded {
-    flex: 1 1 0;
     display: none;
-  }
-  .draw-card.is-chosen {
-    flex: 1 1 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .draw-card {
     transition: opacity 200ms ease;
+  }
+  .draw-card.is-chosen .draw-card-actions,
+  .draw-card.is-chosen .draw-card-deselect,
+  .draw-card.is-deselecting .draw-card-actions,
+  .draw-card.is-deselecting .draw-card-deselect {
+    animation: none;
   }
   .draw-card.is-flipped {
     transform: none;
