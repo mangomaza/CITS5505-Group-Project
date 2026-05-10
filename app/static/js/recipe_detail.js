@@ -148,10 +148,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Ingredient thumbnail random pool.
-  // Each category has POOL_SIZE slots. Drop the corresponding AI-generated
-  // images into static/images/placeholders/ingredients/{cocktail,food}/
-  // named 1.png, 2.png ... POOL_SIZE.png.
-  // Until the assets exist the fallback (placehold.co) is shown automatically.
+  // Each category has POOL_SIZE slots in static/images/placeholders/ingredients/{cocktail,food}/
+  // named 1.png, 2.png ... POOL_SIZE.png. The template renders a local default
+  // first, so if a random pick fails we fall back to that instead of an
+  // external placeholder.
   var INGREDIENT_POOL_SIZE = 10;
   var ingredientsList = document.querySelector('.ingredients-list');
   if (ingredientsList) {
