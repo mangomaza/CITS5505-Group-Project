@@ -4,46 +4,82 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+  var searchInput = document.getElementById('recipeSearch');
+  var searchQuery = '';
+  var countEl = document.getElementById('recipeCount');
+
+  function updateCount() {
+    if (!countEl) return;
+    var visible = 0;
+    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
+      if (item.closest('.my-recipes-section')) return;
+      if (item.style.display !== 'none') visible += 1;
+    });
+    var label;
+    if (visible === 0) label = countEl.dataset.zero || 'no recipes';
+    else if (visible === 1) label = countEl.dataset.one || '1 recipe';
+    else label = (countEl.dataset.many || '{n} recipes').replace('{n}', visible);
+    countEl.textContent = label;
+  }
+
+  function applyFilters() {
+    var query = searchQuery.trim().toLowerCase();
+    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
+      var title = item.querySelector('.card-title');
+      var name = title ? title.textContent.toLowerCase() : '';
+      var matchesSearch = !query || name.indexOf(query) !== -1;
+      var hiddenByFilter = item.dataset.hiddenByFilter === '1';
+      item.style.display = (matchesSearch && !hiddenByFilter) ? '' : 'none';
+    });
+    updateCount();
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      searchQuery = searchInput.value || '';
+      applyFilters();
+    });
+  }
+
   // category filter pills
   var pills = document.querySelectorAll('.filter-pill');
+  var activeFilter = 'all';
+
+  // honour ?category=cocktail|food from the home page browse-by-category links
+  var urlCategory = (new URLSearchParams(window.location.search)).get('category');
+  if (urlCategory === 'cocktail' || urlCategory === 'food') {
+    activeFilter = urlCategory;
+    pills.forEach(function (p) {
+      p.classList.toggle('active', p.dataset.filter === urlCategory);
+    });
+  }
+
+  function applyPillFilter() {
+    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
+      var category = item.dataset.category || '';
+      var mine = item.dataset.mine === '1';
+      var matches = true;
+      if (activeFilter === 'cocktail' || activeFilter === 'food') {
+        matches = (category === activeFilter);
+      } else if (activeFilter === 'my-recipes') {
+        matches = mine;
+      }
+      item.dataset.hiddenByFilter = matches ? '0' : '1';
+    });
+    applyFilters();
+  }
+
   pills.forEach(function (pill) {
     pill.addEventListener('click', function () {
-      // toggle active state
-      if (pill.classList.contains('active') && pill.dataset.filter !== 'all') {
-        pill.classList.remove('active');
-        showAllCards();
-        return;
-      }
-
       pills.forEach(function (p) { p.classList.remove('active'); });
       pill.classList.add('active');
-
-      var filter = pill.dataset.filter;
-      if (filter === 'all') {
-        showAllCards();
-      } else {
-        filterCards(filter);
-      }
+      activeFilter = pill.dataset.filter || 'all';
+      applyPillFilter();
     });
   });
 
-  function showAllCards() {
-    document.querySelectorAll('.recipe-card').forEach(function (card) {
-      card.closest('.recipe-grid-item').style.display = '';
-    });
-  }
-
-  function filterCards(category) {
-    document.querySelectorAll('.recipe-card').forEach(function (card) {
-      var wrapper = card.closest('.recipe-grid-item');
-      var badge = card.querySelector('[class^="badge-"]');
-      if (badge && badge.classList.contains('badge-' + category)) {
-        wrapper.style.display = '';
-      } else {
-        wrapper.style.display = 'none';
-      }
-    });
-  }
+  // initialise so the default "All" pill marks every card visible
+  applyPillFilter();
 
   // Mix it up button - pick a random visible recipe and navigate to it
   var mixBtn = document.getElementById('mixItUpBtn');

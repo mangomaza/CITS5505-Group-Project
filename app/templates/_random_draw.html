@@ -17,15 +17,21 @@
     <div class="random-draw-stage">
 
       {% for side in ['a', 'b'] %}
+      {% set side_cat = 'COCKTAIL' if side == 'a' else 'FOOD' %}
       <article class="draw-card face-down" data-side="{{ side }}" aria-busy="false">
         <div class="draw-card-back" aria-hidden="true">
-          <span class="draw-card-back-label">MIX TAPE</span>
+          <img class="draw-card-back-cassette"
+               src="{{ url_for('static', filename='images/placeholders/cassette-' ~ ('cocktail' if side == 'a' else 'food') ~ '.png') }}"
+               alt=""
+               onerror="this.style.display='none'">
+          <span class="draw-card-back-side-label">SIDE {{ side|upper }} ({{ side_cat }})</span>
         </div>
 
         <div class="draw-card-face" hidden>
           <div class="draw-card-image">
             <img class="draw-card-img" alt="" hidden>
             <div class="draw-card-image-placeholder">
+              <img class="draw-card-cassette" alt="" hidden>
               <i class="bi bi-cup-straw"></i>
             </div>
             <button type="button" class="draw-card-deselect"
@@ -34,7 +40,7 @@
             </button>
           </div>
           <div class="draw-card-body">
-            <span class="draw-card-side-label">Side {{ side|upper }}</span>
+            <span class="draw-card-side-label">SIDE {{ side|upper }}</span>
             <span class="draw-card-badge"></span>
             <h3 class="draw-card-name"></h3>
             <p class="draw-card-meta"></p>

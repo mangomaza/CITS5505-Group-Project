@@ -93,7 +93,14 @@ class CreateRecipeForm(FlaskForm):
             ),
         ],
     )
-    submit = SubmitField('Create Recipe')
+    submit = SubmitField('Save to mixtape')
+
+    def validate(self, extra_validators=None):
+        # For food recipes the alcohol radio is hidden, so default it to
+        # non-alcoholic before WTForms enforces DataRequired.
+        if (self.category.data or '').strip() == 'food' and not self.is_alcoholic.data:
+            self.is_alcoholic.data = 'false'
+        return super().validate(extra_validators=extra_validators)
 
     def validate_image(self, field):
         upload = field.data

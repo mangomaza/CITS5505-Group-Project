@@ -10,7 +10,6 @@ class Recipe(db.Model):
     description = db.Column(db.Text, nullable=True)
     category = db.Column(db.String(20), nullable=False)
     subcategory = db.Column(db.String(80), nullable=True)
-    cuisine = db.Column(db.String(50), nullable=True)
     glass = db.Column(db.String(50), nullable=True)
     is_alcoholic = db.Column(db.Boolean, default=False, nullable=False)
     image_data = db.Column(db.LargeBinary, nullable=True)

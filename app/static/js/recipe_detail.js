@@ -147,29 +147,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // like/favourite toggle
-  var favBtn = document.getElementById('favBtn');
-  if (favBtn) {
-    favBtn.addEventListener('click', function () {
-      var icon = favBtn.querySelector('.bi');
-      if (icon.classList.contains('bi-heart')) {
-        icon.classList.replace('bi-heart', 'bi-heart-fill');
-        icon.style.color = 'var(--mix-danger)';
-        icon.classList.add('heart-bounce');
-      } else {
-        icon.classList.replace('bi-heart-fill', 'bi-heart');
-        icon.style.color = '';
-        icon.classList.remove('heart-bounce');
-      }
-    });
-  }
-
   // Ingredient thumbnail random pool.
   // Each category has POOL_SIZE slots. Drop the corresponding AI-generated
   // images into static/images/placeholders/ingredients/{cocktail,food}/
-  // named 1.jpg, 2.jpg ... POOL_SIZE.jpg.
+  // named 1.png, 2.png ... POOL_SIZE.png.
   // Until the assets exist the fallback (placehold.co) is shown automatically.
-  var INGREDIENT_POOL_SIZE = 6;
+  var INGREDIENT_POOL_SIZE = 10;
   var ingredientsList = document.querySelector('.ingredients-list');
   if (ingredientsList) {
     var category = (ingredientsList.dataset.category || 'food').toLowerCase();
@@ -178,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
     thumbs.forEach(function (img) {
       var fallbackSrc = img.getAttribute('src');
       var pick = Math.floor(Math.random() * INGREDIENT_POOL_SIZE) + 1;
-      var localSrc = '/static/images/placeholders/ingredients/' + folder + '/' + pick + '.jpg';
+      var localSrc = '/static/images/placeholders/ingredients/' + folder + '/' + pick + '.png';
       img.onerror = function () {
         img.src = fallbackSrc;
         img.onerror = null;

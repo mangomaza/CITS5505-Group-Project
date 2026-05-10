@@ -15,10 +15,18 @@
 
     <!-- Hero Image -->
     <div class="detail-hero">
-      <img
-        src="{% if recipe.image_data %}{{ url_for('main.recipe_image', recipe_id=recipe.id) }}{% else %}https://placehold.co/1200x480/f4efe7/6b513d?text={{ recipe.name|replace(' ', '+') }}{% endif %}"
-        alt="{{ recipe.name }}"
-      >
+      {% if recipe.image_data %}
+        <img
+          src="{{ url_for('main.recipe_image', recipe_id=recipe.id) }}"
+          alt="{{ recipe.name }}"
+        >
+      {% else %}
+        <img
+          src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
+          alt="{{ recipe.name }}"
+          class="detail-hero-placeholder"
+        >
+      {% endif %}
     </div>
 
     <div class="container">
@@ -63,37 +71,36 @@
           {% endif %}
 
           <!-- SIDE A: Ingredients -->
-          <div class="side-label">Side A &mdash; Ingredients</div>
-          <ul class="ingredients-list" data-category="{{ recipe.category }}">
+          <div class="side-label">Side A // Ingredients</div>
+          <ol class="ingredients-list" data-category="{{ recipe.category }}">
             {% for ingredient in recipe.ingredients %}
               <li>
+                <span class="ingredient-track">{{ '%02d.' % loop.index }}</span>
                 <img src="https://placehold.co/48x48/f2dfc4/6b513d?text={{ ingredient.name[:1]|upper }}" alt="{{ ingredient.name }}" class="ingredient-thumb">
-                <span class="ingredient-qty">
-                  {{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}
-                </span>
-                <span>{{ ingredient.name }}</span>
+                <span class="ingredient-name">{{ ingredient.name }}</span>
+                <span class="ingredient-leader" aria-hidden="true"></span>
+                <span class="ingredient-qty">{{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}</span>
               </li>
             {% else %}
-              <li>
-                <span class="ingredient-qty">-</span>
-                <span>No ingredients listed.</span>
+              <li class="ingredients-empty">
+                <span class="ingredient-track">--</span>
+                <span class="ingredient-name">No ingredients listed.</span>
               </li>
             {% endfor %}
-          </ul>
+          </ol>
 
           <!-- SIDE B: Instructions -->
-          <div class="side-label">Side B &mdash; Instructions</div>
+          <div class="side-label">Side B // Instructions</div>
           <div class="instructions-block">
             <p>{{ recipe.instructions }}</p>
           </div>
 
           <!-- Actions -->
+          {% if current_user.is_authenticated %}
           <div class="detail-actions">
-            <button class="btn btn-mix" id="favBtn"><i class="bi bi-heart me-1"></i> Favourite</button>
-            {% if current_user.is_authenticated %}
-              <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
-            {% endif %}
+            <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
           </div>
+          {% endif %}
 
         </div>
 

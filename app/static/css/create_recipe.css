@@ -15,6 +15,10 @@
   padding-bottom: 0;
 }
 
+.create-form {
+  counter-reset: form-section;
+}
+
 .create-form .section-title {
   font-family: var(--mix-font-mono);
   font-size: 0.75rem;
@@ -22,6 +26,13 @@
   letter-spacing: 2px;
   color: var(--mix-accent);
   margin-bottom: 1rem;
+  counter-increment: form-section;
+}
+
+.create-form .section-title::before {
+  content: counter(form-section, decimal-leading-zero) ". ";
+  color: var(--mix-secondary);
+  margin-right: 4px;
 }
 
 /* ---- Image Upload ---- */

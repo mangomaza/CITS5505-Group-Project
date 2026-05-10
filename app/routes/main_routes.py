@@ -56,7 +56,6 @@ def _shape_cocktail(payload):
         'name': (payload.get('strDrink') or '').strip(),
         'category': 'cocktail',
         'subcategory': (payload.get('strCategory') or '').strip() or None,
-        'cuisine': None,
         'glass': (payload.get('strGlass') or '').strip() or None,
         'is_alcoholic': (payload.get('strAlcoholic') or '').strip().lower() == 'alcoholic',
         'instructions': (payload.get('strInstructions') or '').strip(),
@@ -125,7 +124,6 @@ def _shape_internal_recipe(recipe):
         'name': recipe.name,
         'category': recipe.category,
         'subcategory': recipe.subcategory,
-        'cuisine': recipe.cuisine,
         'glass': recipe.glass,
         'is_alcoholic': recipe.is_alcoholic,
         'instructions': recipe.instructions,
@@ -294,7 +292,6 @@ def _save_external_recipe(user_id, payload, visibility):
         description=_synthesise_external_description(payload),
         category=payload['category'],
         subcategory=payload.get('subcategory'),
-        cuisine=payload.get('cuisine'),
         glass=payload.get('glass'),
         is_alcoholic=bool(payload.get('is_alcoholic')),
         instructions=payload['instructions'],
@@ -402,11 +399,37 @@ def index():
     featured_recipes = (
         query.order_by(Recipe.created_at.desc()).limit(4).all()
     )
+    rating_map = _rating_map_for([r.id for r in featured_recipes])
     featured = [
-        {'recipe': r, 'origin': _origin_label(r, current_user)}
+        {
+            'recipe': r,
+            'origin': _origin_label(r, current_user),
+            'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+            'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+        }
         for r in featured_recipes
     ]
-    return render_template('index.html', featured=featured)
+
+    # Top rated public recipes (any creator) with at least one rating.
+    top_rows = db.session.execute(
+        db.select(Recipe, func.avg(Rating.stars).label('avg_stars'), func.count(Rating.id).label('rating_count'))
+        .join(Rating, Rating.recipe_id == Recipe.id)
+        .where(Recipe.is_public.is_(True))
+        .group_by(Recipe.id)
+        .order_by(func.avg(Rating.stars).desc(), func.count(Rating.id).desc())
+        .limit(4)
+    ).all()
+    top_rated = [
+        {
+            'recipe': row[0],
+            'avg_rating': float(row[1] or 0),
+            'rating_count': int(row[2] or 0),
+            'origin': _origin_label(row[0], current_user),
+        }
+        for row in top_rows
+    ]
+
+    return render_template('index.html', featured=featured, top_rated=top_rated)
 
 
 def _origin_label(recipe, user):
@@ -419,6 +442,18 @@ def _origin_label(recipe, user):
     if recipe.is_public:
         return 'Community'
     return 'Shared'
+
+
+def _rating_map_for(recipe_ids):
+    """Return {recipe_id: (avg_stars, count)} for the given recipe ids."""
+    if not recipe_ids:
+        return {}
+    rows = db.session.execute(
+        db.select(Rating.recipe_id, func.avg(Rating.stars), func.count(Rating.id))
+        .where(Rating.recipe_id.in_(recipe_ids))
+        .group_by(Rating.recipe_id)
+    ).all()
+    return {row[0]: (float(row[1] or 0), int(row[2] or 0)) for row in rows}
 
 
 @main_bp.route('/recipes')
@@ -442,14 +477,28 @@ def recipes():
 
     all_recipes = query.order_by(Recipe.created_at.desc()).all()
 
+    rating_map = _rating_map_for([r.id for r in all_recipes])
+
     visible_recipes = [
-        {'recipe': r, 'origin': _origin_label(r, current_user)}
+        {
+            'recipe': r,
+            'origin': _origin_label(r, current_user),
+            'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+            'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+        }
         for r in all_recipes
     ]
 
     my_recipes = []
     if current_user.is_authenticated:
-        my_recipes = [r for r in all_recipes if r.creator_id == current_user.id]
+        my_recipes = [
+            {
+                'recipe': r,
+                'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+                'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+            }
+            for r in all_recipes if r.creator_id == current_user.id
+        ]
 
     return render_template(
         'recipes.html',
@@ -601,12 +650,15 @@ def create_recipe():
         if not non_empty_rows:
             ingredient_error = 'Please add at least one ingredient.'
         else:
+            is_food = form.category.data == 'food'
+            glass_value = None if is_food else ((form.glass.data or '').strip() or None)
+            is_alcoholic_value = False if is_food else (form.is_alcoholic.data == 'true')
             recipe = Recipe(
                 name=form.name.data.strip(),
                 description=(form.description.data or '').strip() or None,
                 category=form.category.data,
-                glass=(form.glass.data or '').strip() or None,
-                is_alcoholic=(form.is_alcoholic.data == 'true'),
+                glass=glass_value,
+                is_alcoholic=is_alcoholic_value,
                 instructions=form.instructions.data.strip(),
                 is_public=(form.visibility.data == 'public'),
                 creator_id=current_user.id,

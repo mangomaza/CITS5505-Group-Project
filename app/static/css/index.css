@@ -61,11 +61,16 @@
 .category-card {
   background-color: var(--mix-card);
   border-radius: var(--mix-radius);
-  padding: 32px 24px;
+  padding: 24px 20px 28px;
   text-align: center;
   box-shadow: var(--mix-shadow);
   transition: transform 250ms ease-out, box-shadow 250ms ease-out;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 340px;
 }
 
 .category-card:hover {
@@ -74,19 +79,36 @@
 }
 
 .category-card i {
-  font-size: 2.4rem;
-  margin-bottom: 12px;
+  font-size: 6rem;
   display: block;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .category-card h3 {
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   font-weight: 600;
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
-.category-cocktail i { color: var(--mix-secondary); }
-.category-food i     { color: var(--mix-tertiary); }
+.category-cocktail i { color: var(--mix-tertiary); }
+.category-food i     { color: var(--mix-secondary); }
+
+.category-cocktail h3 { color: var(--mix-tertiary); }
+.category-food h3     { color: var(--mix-secondary); }
+
+.category-card-icon {
+  display: block;
+  margin: 0 auto;
+  flex: 1 1 auto;
+  max-height: 260px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
 
 /* ---- Random Section ---- */
 .random-section {
