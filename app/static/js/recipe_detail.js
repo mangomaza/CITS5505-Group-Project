@@ -55,10 +55,14 @@ document.addEventListener('DOMContentLoaded', function () {
           ratingMessage.textContent = 'Saving your rating...';
         }
 
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
         fetch('/recipes/' + recipeId + '/rate', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
           },
           body: JSON.stringify({
             stars: stars
