@@ -4,6 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, Regexp, ValidationError
 from app.extensions import db
 from app.models.user import User
+from app.utils.images import validate_image_upload
 
 
 class SignupForm(FlaskForm):
@@ -62,16 +63,6 @@ class LogoutForm(FlaskForm):
 
 MAX_AVATAR_BYTES = 2 * 1024 * 1024
 ALLOWED_AVATAR_TYPES = {'jpeg', 'png', 'webp'}
-
-
-def _detect_image_type(header):
-    if header.startswith(b'\xff\xd8\xff'):
-        return 'jpeg'
-    if header.startswith(b'\x89PNG\r\n\x1a\n'):
-        return 'png'
-    if header.startswith(b'RIFF') and header[8:12] == b'WEBP':
-        return 'webp'
-    return None
 
 
 class ProfileForm(FlaskForm):
@@ -135,26 +126,10 @@ class ProfileForm(FlaskForm):
             raise ValidationError('Current password is incorrect.')
 
     def validate_avatar(self, field):
-        upload = field.data
-        if upload is None or not getattr(upload, 'filename', ''):
-            return
-
-        stream = upload.stream
-        current_pos = stream.tell()
-        stream.seek(0, 2)
-        size = stream.tell()
-        stream.seek(0)
-
-        if size > MAX_AVATAR_BYTES:
-            stream.seek(current_pos)
-            raise ValidationError('Picture must be 2 MB or smaller.')
-
-        header = stream.read(512)
-        stream.seek(0)
-        image_type = _detect_image_type(header)
-        mimetype = (upload.mimetype or '').lower()
-        if image_type not in ALLOWED_AVATAR_TYPES or not mimetype.startswith('image/'):
-            stream.seek(current_pos)
-            raise ValidationError('Please upload a PNG, JPG or WEBP image.')
-
-        stream.seek(current_pos)
+        validate_image_upload(
+            field.data,
+            max_bytes=MAX_AVATAR_BYTES,
+            allowed_types=ALLOWED_AVATAR_TYPES,
+            oversize_message='Picture must be 2 MB or smaller.',
+            invalid_message='Please upload a PNG, JPG or WEBP image.',
+        )

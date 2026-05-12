@@ -1,22 +1,12 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import HiddenField, RadioField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import AnyOf, DataRequired, Length, Optional, Regexp, ValidationError
+from wtforms.validators import AnyOf, DataRequired, Length, Optional, Regexp
+
+from app.utils.images import validate_image_upload
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {'jpeg', 'png', 'gif', 'webp'}
-
-
-def _detect_image_type(header):
-    if header.startswith(b'\xff\xd8\xff'):
-        return 'jpeg'
-    if header.startswith(b'\x89PNG\r\n\x1a\n'):
-        return 'png'
-    if header.startswith((b'GIF87a', b'GIF89a')):
-        return 'gif'
-    if header.startswith(b'RIFF') and header[8:12] == b'WEBP':
-        return 'webp'
-    return None
 
 
 class CreateRecipeForm(FlaskForm):
@@ -103,30 +93,13 @@ class CreateRecipeForm(FlaskForm):
         return super().validate(extra_validators=extra_validators)
 
     def validate_image(self, field):
-        upload = field.data
-        if upload is None or not getattr(upload, 'filename', ''):
-            return
-
-        stream = upload.stream
-        current_pos = stream.tell()
-        stream.seek(0, 2)
-        size = stream.tell()
-        stream.seek(0)
-
-        if size > MAX_IMAGE_BYTES:
-            stream.seek(current_pos)
-            raise ValidationError('Image must be 5 MB or smaller.')
-
-        header = stream.read(512)
-        stream.seek(0)
-        image_type = _detect_image_type(header)
-
-        mimetype = (upload.mimetype or '').lower()
-        if image_type not in ALLOWED_IMAGE_TYPES or not mimetype.startswith('image/'):
-            stream.seek(current_pos)
-            raise ValidationError('Please upload a valid image file.')
-
-        stream.seek(current_pos)
+        validate_image_upload(
+            field.data,
+            max_bytes=MAX_IMAGE_BYTES,
+            allowed_types=ALLOWED_IMAGE_TYPES,
+            oversize_message='Image must be 5 MB or smaller.',
+            invalid_message='Please upload a valid image file.',
+        )
 
 
 class SaveExternalRecipeForm(FlaskForm):
