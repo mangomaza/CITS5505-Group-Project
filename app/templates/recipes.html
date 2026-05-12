@@ -32,6 +32,7 @@
     </section>
 
     <!-- Recipe Grid -->
+    <section class="all-recipes-section" data-recipe-section="all">
     {% if visible_recipes|length == 0 %}
       <div class="empty-state p-4 text-center">
         <h3>No recipes yet</h3>
@@ -115,8 +116,9 @@
         {% endfor %}
       </div>
     {% endif %}
+    </section>
 
-    <section class="my-recipes-section mt-5" data-recipe-section="my-recipes">
+    <section class="my-recipes-section mt-5" data-recipe-section="my-recipes" hidden>
       <h2 class="mb-3">My recipes</h2>
 
       {% if not current_user.is_authenticated %}

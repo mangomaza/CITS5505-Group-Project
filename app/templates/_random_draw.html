@@ -23,6 +23,7 @@
           <img class="draw-card-back-cassette"
                src="{{ url_for('static', filename='images/placeholders/cassette-' ~ ('cocktail' if side == 'a' else 'food') ~ '.png') }}"
                alt=""
+               loading="lazy"
                onerror="this.style.display='none'">
           <span class="draw-card-back-side-label">SIDE {{ side|upper }} ({{ side_cat }})</span>
         </div>
@@ -31,7 +32,7 @@
           <div class="draw-card-image">
             <img class="draw-card-img" alt="" hidden>
             <div class="draw-card-image-placeholder">
-              <img class="draw-card-cassette" alt="" hidden>
+              <img class="draw-card-cassette" alt="" loading="lazy" hidden>
               <i class="bi bi-cup-straw"></i>
             </div>
             <button type="button" class="draw-card-deselect"
@@ -53,7 +54,8 @@
 
           <div class="draw-card-actions" hidden>
             <p class="draw-card-actions-anon" hidden>
-              <a class="draw-card-login-link" href="#">Log in to save</a>
+              <a class="btn btn-mix-primary draw-card-save-btn draw-card-login-link"
+                 href="{{ url_for('auth.login') }}">Login to save</a>
             </p>
             <div class="draw-card-actions-auth" hidden>
               <div class="draw-card-visibility" role="group" aria-label="Visibility">

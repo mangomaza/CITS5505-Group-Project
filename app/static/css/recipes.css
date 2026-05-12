@@ -1,5 +1,5 @@
 /* ============================================================
-   Mix It Up — Option A: Browse Recipes Page Styles
+   Mix It Up: Browse Recipes Page Styles
    ============================================================ */
 
 /* ---- Search Desk ---- */
@@ -202,7 +202,7 @@
 @media (max-width: 767.98px) {
   .btn-mix-it-up {
     width: 100%;
-    margin-left: 0 !important;
+    margin-left: 0;
     justify-content: center;
   }
 }

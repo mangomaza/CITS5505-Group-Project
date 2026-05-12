@@ -1,6 +1,5 @@
 /* ============================================================
-   Mix It Up: Mix Tape Kitchen
-   Shared Styles
+   Mix It Up: Shared Styles
    ============================================================ */
 
 /* ---- Custom Properties ---- */
@@ -1229,8 +1228,8 @@ body.mix-modal-open {
 }
 
 .draw-card-login-link {
-  color: var(--mix-accent);
-  text-decoration: underline;
+  /* picks up .btn .btn-mix-primary .draw-card-save-btn styling; nothing to override */
+  text-decoration: none;
 }
 
 .draw-card-actions-auth {

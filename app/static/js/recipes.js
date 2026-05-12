@@ -7,14 +7,20 @@ document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('recipeSearch');
   var searchQuery = '';
   var countEl = document.getElementById('recipeCount');
+  var allSection = document.querySelector('[data-recipe-section="all"]');
+  var mineSection = document.querySelector('[data-recipe-section="my-recipes"]');
+
+  function activeItems() {
+    var scope = (activeFilter === 'my-recipes' && mineSection) ? mineSection : allSection;
+    if (!scope) return [];
+    return Array.prototype.slice.call(scope.querySelectorAll('.recipe-grid-item'));
+  }
 
   function updateCount() {
     if (!countEl) return;
-    var visible = 0;
-    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
-      if (item.closest('.my-recipes-section')) return;
-      if (item.style.display !== 'none') visible += 1;
-    });
+    var visible = activeItems().filter(function (item) {
+      return item.style.display !== 'none';
+    }).length;
     var label;
     if (visible === 0) label = countEl.dataset.zero || 'no recipes';
     else if (visible === 1) label = countEl.dataset.one || '1 recipe';
@@ -55,14 +61,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function applyPillFilter() {
+    var showMine = activeFilter === 'my-recipes';
+    if (allSection) allSection.hidden = showMine;
+    if (mineSection) mineSection.hidden = !showMine;
+
     document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
       var category = item.dataset.category || '';
-      var mine = item.dataset.mine === '1';
       var matches = true;
       if (activeFilter === 'cocktail' || activeFilter === 'food') {
         matches = (category === activeFilter);
-      } else if (activeFilter === 'my-recipes') {
-        matches = mine;
       }
       item.dataset.hiddenByFilter = matches ? '0' : '1';
     });
@@ -89,10 +96,9 @@ document.addEventListener('DOMContentLoaded', function () {
       mixBtn.disabled = true;
 
       setTimeout(function () {
-        var visibleItems = Array.prototype.filter.call(
-          document.querySelectorAll('.recipe-grid-item'),
-          function (item) { return item.style.display !== 'none'; }
-        );
+        var visibleItems = activeItems().filter(function (item) {
+          return item.style.display !== 'none';
+        });
         if (visibleItems.length > 0) {
           var pick = visibleItems[Math.floor(Math.random() * visibleItems.length)];
           var link = pick.querySelector('a');

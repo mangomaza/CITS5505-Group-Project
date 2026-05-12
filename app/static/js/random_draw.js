@@ -212,7 +212,7 @@
                   try {
                     sessionStorage.setItem('mixResume', JSON.stringify({
                       side: side,
-                      item: item,
+                      draw: drawData,
                       path: window.location.pathname,
                     }));
                   } catch (_) { /* ignore */ }
@@ -412,7 +412,7 @@
       const raw = sessionStorage.getItem('mixResume');
       if (raw) stash = JSON.parse(raw);
     } catch (_) { /* ignore */ }
-    if (!stash || !stash.item || stash.path !== window.location.pathname) return;
+    if (!stash || !stash.draw || stash.path !== window.location.pathname) return;
     sessionStorage.removeItem('mixResume');
 
     // Strip the query param so a refresh is clean.
@@ -423,18 +423,19 @@
     document.body.classList.add('mix-modal-open');
     if (dialog) dialog.focus();
 
-    drawData[stash.side] = stash.item;
+    drawData.a = stash.draw.a || null;
+    drawData.b = stash.draw.b || null;
+
+    let chosenCard = null;
     cards.forEach((card) => {
-      if (card.dataset.side === stash.side) {
-        renderCard(card, stash.item);
-        card.classList.add('is-flipped');
-        card.setAttribute('aria-busy', 'false');
-        pickCard(card);
-      } else {
-        const back = card.querySelector('.draw-card-back-label');
-        if (back) back.textContent = 'B SIDE';
-      }
+      const item = drawData[card.dataset.side];
+      if (!item) return;
+      renderCard(card, item);
+      card.classList.add('is-flipped');
+      card.setAttribute('aria-busy', 'false');
+      if (card.dataset.side === stash.side) chosenCard = card;
     });
+    if (chosenCard) pickCard(chosenCard);
     setStatus("You're back. Save it now or pick something else.", false);
   }
   maybeResume();
