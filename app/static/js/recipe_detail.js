@@ -69,6 +69,12 @@ document.addEventListener('DOMContentLoaded', function () {
           })
         })
           .then(function (response) {
+            if (!response.ok) {
+              return response.json().catch(function () { return {}; }).then(function (body) {
+                var msg = (body && body.error) || 'Rating could not be saved.';
+                throw new Error(msg);
+              });
+            }
             return response.json();
           })
           .then(function (data) {
@@ -94,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function () {
             updateUserStars(data.user_rating);
             updateAverageStars(data.average);
           })
-          .catch(function () {
+          .catch(function (err) {
             if (ratingMessage) {
-              ratingMessage.textContent = 'Something went wrong. Please try again.';
+              ratingMessage.textContent = (err && err.message) || 'Something went wrong. Please try again.';
             }
           });
       });

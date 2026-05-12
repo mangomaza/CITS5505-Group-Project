@@ -25,6 +25,7 @@
           src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
           alt="{{ recipe.name }}"
           class="detail-hero-placeholder"
+          loading="lazy"
         >
       {% endif %}
     </div>
@@ -76,7 +77,7 @@
             {% for ingredient in recipe.ingredients %}
               <li>
                 <span class="ingredient-track">{{ '%02d.' % loop.index }}</span>
-                <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}" alt="{{ ingredient.name }}" class="ingredient-thumb">
+                <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}" alt="{{ ingredient.name }}" class="ingredient-thumb" loading="lazy">
                 <span class="ingredient-name">{{ ingredient.name }}</span>
                 <span class="ingredient-leader" aria-hidden="true"></span>
                 <span class="ingredient-qty">{{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}</span>

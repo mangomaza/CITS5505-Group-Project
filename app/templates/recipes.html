@@ -64,6 +64,7 @@
                     <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                          class="card-img-top card-img-default"
                          alt=""
+                         loading="lazy"
                          onerror="this.style.display='none'">
                   </div>
                 {% endif %}
@@ -154,6 +155,7 @@
                       <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                            class="card-img-top card-img-default"
                            alt=""
+                           loading="lazy"
                            onerror="this.style.display='none'">
                     </div>
                   {% endif %}

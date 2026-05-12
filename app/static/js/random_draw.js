@@ -393,7 +393,7 @@
       });
     });
 
-    const saveBtn = card.querySelector('.draw-card-save-btn');
+    const saveBtn = card.querySelector('.draw-card-actions-auth .draw-card-save-btn');
     if (saveBtn) saveBtn.addEventListener('click', () => postSave(card, false));
 
     const editBtn = card.querySelector('.draw-card-edit-btn');
