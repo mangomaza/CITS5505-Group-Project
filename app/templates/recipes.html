@@ -165,6 +165,9 @@
                       {% else %}
                         <span class="badge-food">{{ recipe.category|title }}</span>
                       {% endif %}
+                      <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                        {{ entry.origin }}
+                      </span>
                     </div>
 
                     <h3 class="card-title mt-2">{{ recipe.name }}</h3>

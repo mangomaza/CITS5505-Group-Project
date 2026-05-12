@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from app.extensions import db
+from app import db
 
 
 class SharedAccess(db.Model):

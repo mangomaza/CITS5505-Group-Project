@@ -179,12 +179,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ---- Load More ---- */
-.load-more {
-  text-align: center;
-  padding: 32px 0;
-}
-
 /* ---- Empty State (themed in style.css) ---- */
 
 /* ---- Responsive ---- */

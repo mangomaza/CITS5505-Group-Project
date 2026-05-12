@@ -10,7 +10,7 @@ from flask_login import current_user, login_required
 from flask_wtf.csrf import CSRFError, validate_csrf
 from sqlalchemy import func, or_
 
-from app.extensions import db
+from app import db
 from app.forms.recipe_forms import CreateRecipeForm, DeleteRecipeForm, SaveExternalRecipeForm
 from app.forms.auth_forms import ProfileForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
@@ -29,6 +29,11 @@ EXTERNAL_IMAGE_URL_RE = re.compile(
 )
 
 main_bp = Blueprint('main', __name__)
+
+
+# ============================================================
+# Shared helpers (ratings, external API shaping, save-external)
+# ============================================================
 
 
 def get_rating_summary(recipe_id):
@@ -150,6 +155,11 @@ def _fallback_from_db(category):
     if not candidates:
         return None
     return _shape_internal_recipe(random.choice(candidates))
+
+
+# ============================================================
+# Random draw (home page widget + save-external endpoint)
+# ============================================================
 
 
 @main_bp.route('/recipes/random.json')
@@ -379,6 +389,11 @@ def save_external_recipe():
     }), 201
 
 
+# ============================================================
+# Home page
+# ============================================================
+
+
 @main_bp.route('/')
 def index():
     if current_user.is_authenticated:
@@ -458,6 +473,11 @@ def _rating_map_for(recipe_ids):
     return {row[0]: (float(row[1] or 0), int(row[2] or 0)) for row in rows}
 
 
+# ============================================================
+# Recipes listing + detail + image
+# ============================================================
+
+
 @main_bp.route('/recipes')
 def recipes():
     if current_user.is_authenticated:
@@ -504,6 +524,7 @@ def recipes():
     my_recipes = [
         {
             'recipe': r,
+            'origin': _origin_label(r, current_user),
             'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
             'rating_count': rating_map.get(r.id, (0.0, 0))[1],
         }
@@ -537,6 +558,7 @@ def recipe_detail(recipe_id):
     return render_template(
         'recipe_detail.html',
         recipe=recipe,
+        origin=_origin_label(recipe, current_user),
         average_rating=average_rating,
         rating_count=rating_count,
         user_rating=user_rating,
@@ -576,6 +598,11 @@ def _normalise_ingredient_rows(form_data):
             'unit': (units[index] if index < len(units) else '').strip(),
         })
     return rows
+
+
+# ============================================================
+# Recipe create / edit / delete
+# ============================================================
 
 
 @main_bp.route('/recipes/external-prefill', methods=['GET'])
@@ -825,6 +852,11 @@ def delete_recipe(recipe_id):
     return redirect(url_for('main.recipes'))
 
 
+# ============================================================
+# Share page (grant + revoke access)
+# ============================================================
+
+
 @main_bp.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
@@ -894,6 +926,11 @@ def remove_share(grant_id):
     return redirect(url_for('main.share'))
 
 
+# ============================================================
+# Ratings
+# ============================================================
+
+
 @main_bp.route('/recipes/<int:recipe_id>/rate', methods=['POST'])
 def rate_recipe(recipe_id):
     if not current_user.is_authenticated:
@@ -938,6 +975,11 @@ def rate_recipe(recipe_id):
         'count': count,
         'user_rating': stars,
     })
+
+
+# ============================================================
+# Profile + user avatar
+# ============================================================
 
 
 @main_bp.route('/profile', methods=['GET', 'POST'])

@@ -12,7 +12,7 @@ from pathlib import Path
 import requests
 
 from app import create_app
-from app.extensions import db
+from app import db
 from app.models import User, Recipe, Ingredient, Rating, SharedAccess
 
 app = create_app()

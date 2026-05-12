@@ -44,6 +44,9 @@
           <span class="{{ 'badge-cocktail' if recipe.category == 'cocktail' else 'badge-food' }}">
             {{ recipe.category|title }}
           </span>
+          <span class="badge-visibility badge-visibility-{{ origin|lower }}">
+            {{ origin }}
+          </span>
           {% if recipe.category == 'cocktail' %}
             <span class="badge-alcoholic">{{ 'Alcoholic' if recipe.is_alcoholic else 'Non-alcoholic' }}</span>
           {% endif %}
