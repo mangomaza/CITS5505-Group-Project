@@ -467,10 +467,12 @@ def recipes():
         ).all()
         shared_ids = [row[0] for row in shared_ids_rows]
 
+        # community + shared-to-me, excluding my own (mine show in the
+        # "My recipes" section instead)
         query = Recipe.query.filter(
+            Recipe.creator_id != current_user.id,
             or_(
                 Recipe.is_public.is_(True),
-                Recipe.creator_id == current_user.id,
                 Recipe.id.in_(shared_ids) if shared_ids else False,
             )
         )
@@ -479,7 +481,15 @@ def recipes():
 
     all_recipes = query.order_by(Recipe.created_at.desc()).all()
 
-    rating_map = _rating_map_for([r.id for r in all_recipes])
+    my_recipe_rows = []
+    if current_user.is_authenticated:
+        my_recipe_rows = Recipe.query.filter(
+            Recipe.creator_id == current_user.id
+        ).order_by(Recipe.created_at.desc()).all()
+
+    rating_map = _rating_map_for(
+        [r.id for r in all_recipes] + [r.id for r in my_recipe_rows]
+    )
 
     visible_recipes = [
         {
@@ -491,16 +501,14 @@ def recipes():
         for r in all_recipes
     ]
 
-    my_recipes = []
-    if current_user.is_authenticated:
-        my_recipes = [
-            {
-                'recipe': r,
-                'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
-                'rating_count': rating_map.get(r.id, (0.0, 0))[1],
-            }
-            for r in all_recipes if r.creator_id == current_user.id
-        ]
+    my_recipes = [
+        {
+            'recipe': r,
+            'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+            'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+        }
+        for r in my_recipe_rows
+    ]
 
     return render_template(
         'recipes.html',

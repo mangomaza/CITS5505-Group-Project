@@ -64,7 +64,6 @@
                     <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                          class="card-img-top card-img-default"
                          alt=""
-                         loading="lazy"
                          onerror="this.style.display='none'">
                   </div>
                 {% endif %}
@@ -119,7 +118,7 @@
     {% endif %}
     </section>
 
-    <section class="my-recipes-section mt-5" data-recipe-section="my-recipes" hidden>
+    <section class="my-recipes-section mt-5" data-recipe-section="my-recipes">
       <h2 class="mb-3">My recipes</h2>
 
       {% if not current_user.is_authenticated %}
@@ -142,7 +141,7 @@
         <div class="recipe-grid">
           {% for entry in my_recipes %}
             {% set recipe = entry.recipe %}
-            <div class="recipe-grid-item">
+            <div class="recipe-grid-item" data-category="{{ recipe.category }}">
               <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
                 <div class="recipe-card">
 
@@ -155,7 +154,6 @@
                       <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                            class="card-img-top card-img-default"
                            alt=""
-                           loading="lazy"
                            onerror="this.style.display='none'">
                     </div>
                   {% endif %}
@@ -206,11 +204,6 @@
         </div>
       {% endif %}
     </section>
-
-    <!-- Load More -->
-    <div class="load-more">
-      <button class="btn btn-ghost">Load more</button>
-    </div>
 
   </main>
 {% endblock %}
