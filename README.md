@@ -20,7 +20,14 @@ For the full workflow, including branch naming, commit messages, and the PR proc
 
 ## Project Features
 
-The app lets users sign up, log in, and manage their own recipe collection. You can create, edit, and delete your recipes, and choose to share them with specific friends rather than making everything public. There's a rating system so people can give feedback on shared recipes, and a random recipe generator that pulls from the community pool when you want something new. The whole thing is responsive so it works on both desktop and mobile.
+User authentication: The app lets users sign up, log in, and manage their own recipe collection. 
+Recipe management: Users can create, edit, and delete their recipes, and choose to share them with specific friends rather than making everything public. There's a rating system so people can give feedback on shared recipes, and a random recipe generator that pulls from the community pool when you want something new.
+My recipe: Logged-in users can generate one cocktail and one food recipe.
+Recipe detail pages: Each recipe has one detail page, including description, ingredients, instructions, category, visibility and rating information.
+Rating system: Logged-in users can rate recipes, and recipe detail pages show the average rating and rating count.
+Responsive design: The whole thing is responsive so it works on both desktop and mobile.
+
+
 
 ## Design and Development
 
@@ -104,4 +111,21 @@ The frontend uses Bootstrap 5 for layout and responsiveness, with custom CSS on 
    Open http://127.0.0.1:5000 in your browser.
 
    By default the app uses the development config. To change it, set `FLASK_CONFIG` before running (`development`, `testing`, or `production`).
+
+## Testing
+1. Sign up for a new account.
+2. Log in and log out.
+3. Create a new cocktail recipe.
+4. Create a new food recipe.
+5. Edit one of your own recipes.
+6. Delete one of your own recipes.
+7. Browse recipes on the home page and recipes page.
+8. Open a recipe detail page.
+9. Check that category badges and visibility badges display correctly.
+10. Test the random draw feature.
+11. Save a randomly drawn recipe and confirm the create form is prefilled.
+12. Share a recipe with another user.
+13. Check that private recipes return 403 for users without permission.
+14. Rate a recipe as a logged-in non-creator.
+15. Check the layout on desktop and mobile screen sizes.
 
