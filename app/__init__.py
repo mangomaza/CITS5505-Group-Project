@@ -1,7 +1,15 @@
 import os
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from config import config
-from app.extensions import db, migrate, login_manager
+
+db = SQLAlchemy()
+migrate = Migrate()
+login_manager = LoginManager()
+csrf = CSRFProtect()
 
 
 def create_app(config_name='default'):
@@ -16,6 +24,7 @@ def create_app(config_name='default'):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    csrf.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
     login_manager.login_message_category = 'warning'
@@ -29,7 +38,7 @@ def create_app(config_name='default'):
 
     @app.context_processor
     def inject_logout_form():
-        return {'logout_form': LogoutForm()}
+        return {'logout_form': LogoutForm(formdata=None)}
 
     from app.routes.main_routes import main_bp
     from app.routes.auth_routes import auth_bp
@@ -44,6 +53,10 @@ def create_app(config_name='default'):
     @app.errorhandler(403)
     def forbidden_error(error):
         return render_template('errors/403.html'), 403
+
+    @app.errorhandler(413)
+    def request_too_large(error):
+        return render_template('errors/413.html'), 413
 
     @app.errorhandler(500)
     def internal_error(error):

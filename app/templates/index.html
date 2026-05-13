@@ -13,163 +13,197 @@
     <section class="hero">
       <div class="hero-overlay"></div>
       <div class="container hero-content text-center">
-        <h1 class="hero-title">Mix It Up</h1>
-        <p class="hero-subtitle">Create, share, and discover recipes. Or let fate decide.</p>
+        <p class="hero-eyebrow">// Side A &middot; Mixtape</p>
+        <h1 class="hero-title">
+          <span class="hero-title-line">Mix</span>
+          <span class="hero-title-line hero-title-accent">It Up</span>
+        </h1>
+        <p class="hero-subtitle">Cocktails and meals, hand-rolled or pulled at random. Build a tape, share it with friends, or hit shuffle and see what lands.</p>
         <div class="hero-actions">
-          <button class="btn-shuffle" id="heroShuffle" title="Surprise me">
+          <button class="btn-shuffle" id="heroShuffle" data-mix-trigger title="Mix It Up">
             <i class="bi bi-shuffle"></i>
           </button>
-          <p class="hero-shuffle-label">Surprise me</p>
+          <p class="hero-shuffle-label">Press shuffle</p>
         </div>
         <a href="{{ url_for('main.recipes') }}" class="btn btn-outline-mix mt-3">Browse Recipes</a>
-      </div>
-    </section>
-
-    <!-- Random result (hidden by default) -->
-    <section class="container my-4 d-none" id="randomResult">
-      <div class="text-center mb-3">
-        <small class="font-mono text-muted">Here's what the universe thinks you should make tonight:</small>
-      </div>
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Old Fashioned</h3>
-                <p class="card-meta">by the universe &middot; just now</p>
-                <p class="card-text">A timeless whiskey cocktail. Simple, strong, and perfect.</p>
-              </div>
-            </div>
-          </a>
-        </div>
       </div>
     </section>
 
     <!-- Featured Recipes -->
     <section class="container my-5">
       <h2 class="mb-4">What people are making</h2>
-      <div class="row g-4">
 
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/5noda61606781084.jpg" class="card-img-top" alt="Margarita">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Margarita</h3>
-                <p class="card-meta">by mixmaster &middot; 2 days ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-half"></i>
-                  <span class="ms-1 font-mono">4.3</span>
+      {% if featured and featured|length > 0 %}
+        <div class="row g-4">
+          {% for entry in featured %}
+            {% set recipe = entry.recipe %}
+            <div class="col-md-6">
+              <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
+                <div class="recipe-card">
+                  <span class="card-side-sticker card-side-sticker-{{ 'a' if recipe.category == 'cocktail' else 'b' }}">Side {{ 'A' if recipe.category == 'cocktail' else 'B' }}</span>
+
+                  {% if recipe.image_data %}
+                    <img src="{{ url_for('main.recipe_image', recipe_id=recipe.id) }}"
+                         class="card-img-top"
+                         alt="{{ recipe.name }}">
+                  {% else %}
+                    <div class="card-img-fallback">
+                      <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
+                           class="card-img-top card-img-default"
+                           alt=""
+                           loading="lazy"
+                           onerror="this.style.display='none'">
+                    </div>
+                  {% endif %}
+
+                  <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      {% if recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ recipe.category|title }}</span>
+                      {% endif %}
+                      <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                        {{ entry.origin }}
+                      </span>
+                    </div>
+
+                    <h3 class="card-title mt-2">{{ recipe.name }}</h3>
+                    <p class="card-meta">
+                      by {{ recipe.creator.username }}
+                      &middot;
+                      {{ recipe.created_at.strftime('%d %b %Y') }}
+                    </p>
+
+                    {% if recipe.description %}
+                      <p class="card-text">{{ recipe.description }}</p>
+                    {% endif %}
+
+                    <div class="star-rating">
+                      {% for star in range(1, 6) %}
+                        {% if star <= entry.avg_rating %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                      <span class="ms-1 font-mono">
+                        {% if entry.rating_count > 0 %}
+                          {{ '%.1f'|format(entry.avg_rating) }} ({{ entry.rating_count }})
+                        {% else %}
+                          Not rated yet
+                        {% endif %}
+                      </span>
+                    </div>
+                  </div>
+
                 </div>
-              </div>
+              </a>
             </div>
-          </a>
+          {% endfor %}
         </div>
-
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/metwgh1606770327.jpg" class="card-img-top" alt="Mojito">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Mojito</h3>
-                <p class="card-meta">by limelife &middot; 5 days ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star"></i>
-                  <span class="ms-1 font-mono">4.0</span>
-                </div>
-              </div>
-            </div>
-          </a>
+      {% else %}
+        <div class="empty-state p-4 text-center">
+          <p class="mb-2">No public recipes yet.</p>
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.create_recipe') }}" class="btn btn-mix-primary">Create the first one</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-mix-primary">Log in to create one</a>
+          {% endif %}
         </div>
-
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg" class="card-img-top" alt="Spicy Arrabiata Penne">
-              <div class="card-body">
-                <span class="badge-food">Food</span>
-                <h3 class="card-title mt-2">Spicy Arrabiata Penne</h3>
-                <p class="card-meta">by pastaqueen &middot; 1 week ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <span class="ms-1 font-mono">4.8</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-md-6">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=1) }}" class="text-decoration-none">
-            <div class="recipe-card">
-              <img src="https://www.thecocktaildb.com/images/media/drink/vrwquq1478252802.jpg" class="card-img-top" alt="Old Fashioned">
-              <div class="card-body">
-                <span class="badge-cocktail">Cocktail</span>
-                <h3 class="card-title mt-2">Old Fashioned</h3>
-                <p class="card-meta">by bourbonboy &middot; 3 days ago</p>
-                <div class="star-rating">
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star-fill"></i>
-                  <i class="bi bi-star"></i>
-                  <span class="ms-1 font-mono">4.1</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-
-      </div>
+      {% endif %}
     </section>
+
+    <!-- Top rated -->
+    {% if top_rated and top_rated|length > 0 %}
+      <section class="container my-5">
+        <h2 class="mb-4">Top rated</h2>
+        <div class="row g-4">
+          {% for entry in top_rated %}
+            {% set recipe = entry.recipe %}
+            <div class="col-md-6">
+              <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
+                <div class="recipe-card">
+                  <span class="card-side-sticker card-side-sticker-{{ 'a' if recipe.category == 'cocktail' else 'b' }}">Side {{ 'A' if recipe.category == 'cocktail' else 'B' }}</span>
+
+                  {% if recipe.image_data %}
+                    <img src="{{ url_for('main.recipe_image', recipe_id=recipe.id) }}"
+                         class="card-img-top"
+                         alt="{{ recipe.name }}">
+                  {% else %}
+                    <div class="card-img-fallback">
+                      <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
+                           class="card-img-top card-img-default"
+                           alt=""
+                           loading="lazy"
+                           onerror="this.style.display='none'">
+                    </div>
+                  {% endif %}
+
+                  <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      {% if recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ recipe.category|title }}</span>
+                      {% endif %}
+                      <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                        {{ entry.origin }}
+                      </span>
+                    </div>
+
+                    <h3 class="card-title mt-2">{{ recipe.name }}</h3>
+                    <p class="card-meta">
+                      by {{ recipe.creator.username }}
+                    </p>
+
+                    <div class="star-rating">
+                      {% for star in range(1, 6) %}
+                        {% if star <= entry.avg_rating %}
+                          <i class="bi bi-star-fill"></i>
+                        {% else %}
+                          <i class="bi bi-star"></i>
+                        {% endif %}
+                      {% endfor %}
+                      <span class="ms-1 font-mono">
+                        {{ '%.1f'|format(entry.avg_rating) }} ({{ entry.rating_count }})
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
 
     <!-- Browse by Category -->
     <section class="container my-5">
       <h2 class="mb-4">Browse by category</h2>
       <div class="row g-4">
         <div class="col-md-6">
-          <a href="{{ url_for('main.recipes') }}" class="text-decoration-none">
+          <a href="{{ url_for('main.recipes', category='cocktail') }}" class="text-decoration-none">
             <div class="category-card category-cocktail">
-              <i class="bi bi-cup-straw"></i>
+              <img src="{{ url_for('static', filename='images/category-cocktails.png') }}"
+                   alt="" class="category-card-icon"
+                   onerror="this.outerHTML='<i class=\'bi bi-cup-straw\'></i>'">
               <h3>Cocktails</h3>
             </div>
           </a>
         </div>
         <div class="col-md-6">
-          <a href="{{ url_for('main.recipes') }}" class="text-decoration-none">
+          <a href="{{ url_for('main.recipes', category='food') }}" class="text-decoration-none">
             <div class="category-card category-food">
-              <i class="bi bi-egg-fried"></i>
+              <img src="{{ url_for('static', filename='images/category-food.png') }}"
+                   alt="" class="category-card-icon"
+                   onerror="this.outerHTML='<i class=\'bi bi-egg-fried\'></i>'">
               <h3>Food</h3>
             </div>
           </a>
         </div>
       </div>
-    </section>
-
-    <!-- Feeling Adventurous -->
-    <section class="container my-5 text-center random-section">
-      <h2>Feeling adventurous?</h2>
-      <p class="text-muted mb-4">Let us pick something random for you. Could be a cocktail, could be dinner. Who knows.</p>
-      <button class="btn-shuffle btn-shuffle-lg" id="randomShuffle" title="Surprise me">
-        <i class="bi bi-shuffle"></i>
-      </button>
-      <p class="mt-2"><small class="font-mono text-muted">Lucky dip</small></p>
     </section>
 
   </main>

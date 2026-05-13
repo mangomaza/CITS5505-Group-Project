@@ -1,6 +1,5 @@
 /* ============================================================
-   Mix It Up: Mix Tape Kitchen
-   Shared Styles
+   Mix It Up: Shared Styles
    ============================================================ */
 
 /* ---- Custom Properties ---- */
@@ -53,6 +52,7 @@ body::after {
 
 main {
   flex: 1;
+  padding-bottom: 48px;
   animation: fadeIn 300ms ease-out;
 }
 
@@ -84,6 +84,13 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.4rem;
   color: var(--mix-accent) !important;
   letter-spacing: -0.5px;
+  transition: text-shadow 200ms ease, transform 200ms ease;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus-visible {
+  text-shadow: 0 0 18px rgba(212, 148, 76, 0.55), 0 0 4px rgba(212, 148, 76, 0.4);
+  transform: translateY(-1px);
 }
 
 .navbar-nav .nav-link {
@@ -94,12 +101,17 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link.active {
+.navbar-nav .nav-link:hover {
   color: var(--mix-text) !important;
 }
 
-.navbar-nav .nav-link.active::after {
+.navbar-nav .nav-link.active {
+  color: var(--mix-accent) !important;
+  background-color: rgba(212, 148, 76, 0.08);
+  border-radius: 4px;
+}
+
+.navbar-nav .nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -108,14 +120,59 @@ h1, h2, h3, h4, h5, h6 {
   height: 2px;
   background-color: var(--mix-accent);
   border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 250ms ease;
+}
+
+.navbar-nav .nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.navbar-nav .nav-link.active::after {
+  transform: scaleX(1);
+  height: 3px;
+  background-color: var(--mix-accent);
+  box-shadow: 0 0 8px rgba(212, 148, 76, 0.5);
+}
+
+.navbar-nav .nav-username {
+  color: var(--mix-tertiary) !important;
+  font-family: var(--mix-font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.navbar-nav .nav-username:hover,
+.navbar-nav .nav-username.active {
+  color: var(--mix-accent) !important;
+}
+
+.nav-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(232, 221, 211, 0.2);
 }
 
 .navbar-toggler {
-  border-color: var(--mix-text-muted);
+  border-color: rgba(212, 148, 76, 0.55);
+  box-shadow: none;
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:hover {
+  box-shadow: 0 0 0 0.2rem rgba(212, 148, 76, 0.35);
+  border-color: var(--mix-accent);
 }
 
 .navbar-toggler-icon {
-  filter: brightness(0.8);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23d4944c' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  filter: none;
 }
 
 /* ---- Recipe Cards ---- */
@@ -126,6 +183,16 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--mix-shadow);
   transition: transform 250ms ease-out, box-shadow 250ms ease-out;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.recipe-grid-item,
+.recipe-grid-item > a,
+.row > [class*="col-"] > a.text-decoration-none {
+  height: 100%;
+  display: block;
 }
 
 .recipe-card::after {
@@ -141,6 +208,33 @@ h1, h2, h3, h4, h5, h6 {
 .recipe-card:nth-child(odd)  { transform: rotate(0.7deg); }
 .recipe-card:nth-child(even) { transform: rotate(-0.5deg); }
 .recipe-card:nth-child(3n)   { transform: rotate(1.2deg); }
+
+/* Side A/B sticker on home recipe cards */
+.card-side-sticker {
+  position: absolute;
+  top: 12px;
+  right: -4px;
+  z-index: 3;
+  font-family: var(--mix-font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px 4px 14px;
+  border: 1px solid currentColor;
+  border-right: none;
+  border-radius: 3px 0 0 3px;
+  background-color: #F4E9DC;
+  transform: rotate(-2deg);
+  box-shadow: 1px 1px 0 rgba(60, 41, 28, 0.18);
+  pointer-events: none;
+}
+.card-side-sticker-a {
+  color: var(--mix-accent);
+}
+.card-side-sticker-b {
+  color: var(--mix-secondary);
+}
 .recipe-card:nth-child(4n)   { transform: rotate(-1deg); }
 
 .recipe-card:hover {
@@ -153,8 +247,34 @@ h1, h2, h3, h4, h5, h6 {
   object-fit: cover;
 }
 
+.card-img-fallback {
+  position: relative;
+  height: 220px;
+  background-color: var(--bs-light, #f8f9fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-img-fallback .text-muted {
+  z-index: 0;
+}
+
+.card-img-default {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
 .recipe-card .card-body {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
 }
 
 .recipe-card .card-title {
@@ -176,6 +296,26 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.9rem;
   color: var(--mix-text-muted);
   margin-bottom: 0.75rem;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  position: relative;
+  max-height: calc(0.9rem * 1.5 * 3);
+  min-height: calc(0.9rem * 1.5 * 3);
+  overflow: hidden;
+}
+.recipe-card .card-text::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.6rem;
+  background: linear-gradient(to bottom, transparent, var(--mix-card));
+  pointer-events: none;
+}
+
+.recipe-card .star-rating {
+  margin-top: auto;
 }
 
 .recipe-card .card-footer {
@@ -188,17 +328,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ---- Category Badges ---- */
+/* cocktail = sage, food = terracotta (matches cassette art) */
+/* align-self keeps the pill intrinsic-width inside flex column parents */
 .badge-cocktail {
-  background-color: var(--mix-secondary);
-  color: var(--mix-text);
-  font-size: 0.7rem;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 20px;
-  display: inline-block;
-}
-
-.badge-food {
   background-color: var(--mix-tertiary);
   color: var(--mix-text);
   font-size: 0.7rem;
@@ -206,12 +338,52 @@ h1, h2, h3, h4, h5, h6 {
   padding: 4px 10px;
   border-radius: 20px;
   display: inline-block;
+  align-self: flex-start;
+}
+
+.badge-food {
+  background-color: var(--mix-secondary);
+  color: var(--mix-text);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  align-self: flex-start;
 }
 
 .badge-alcoholic {
   font-size: 0.65rem;
   color: var(--mix-text-muted);
   margin-left: 6px;
+}
+
+/* ---- Visibility / Origin Pills ---- */
+.badge-visibility {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.badge-visibility-public {
+  background-color: #4f8a63;
+}
+
+.badge-visibility-private {
+  background-color: #6b513d;
+}
+
+.badge-visibility-shared {
+  background-color: #c9803a;
+}
+
+.badge-visibility-community {
+  background-color: #6e5d9c;
 }
 
 /* ---- Star Ratings ---- */
@@ -232,9 +404,6 @@ h1, h2, h3, h4, h5, h6 {
 .star-rating .bi-star      { color: var(--mix-text-muted); }
 
 /* star input (interactive) */
-/* TODO: restyle .rating-star-button so the interactive star widget (leave-a-rating) matches
-   the central Mix It Up theme — hover/active colours, sizing, and button reset should use
-   --mix-accent, --mix-accent-dark, and --mix-radius to align with btn-mix. */
 .star-input {
   display: inline-flex;
   gap: 4px;
@@ -252,7 +421,40 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--mix-accent);
 }
 
+.rating-star-button {
+  background: transparent;
+  border: 0;
+  padding: 2px 4px;
+  border-radius: var(--mix-radius);
+  color: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 120ms ease, color 150ms ease;
+}
+
+.rating-star-button:hover,
+.rating-star-button:focus-visible {
+  transform: scale(1.1);
+  color: var(--mix-accent-dark);
+  outline: none;
+}
+
+.rating-star-button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(212, 148, 76, 0.35);
+}
+
 /* ---- Forms ---- */
+.cassette-insert-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--mix-accent);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px dotted rgba(212, 148, 76, 0.4);
+}
+
 .form-card {
   background-color: var(--mix-card);
   border-radius: var(--mix-radius);
@@ -304,7 +506,22 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 0 3px rgba(125, 140, 110, 0.15);
 }
 
-.invalid-feedback { color: var(--mix-danger); font-size: 0.8rem; }
+.invalid-feedback {
+  color: var(--mix-danger);
+  font-family: var(--mix-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: rgba(196, 91, 74, 0.1);
+  border-left: 2px solid var(--mix-danger);
+  border-radius: 0 4px 4px 0;
+}
+.invalid-feedback::before {
+  content: "// ";
+  opacity: 0.6;
+}
 .valid-feedback   { color: var(--mix-tertiary); font-size: 0.8rem; }
 
 .form-label {
@@ -449,49 +666,139 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 2rem;
 }
 
-/* ---- Flash Alerts ---- */
+/* ---- Flash Alerts (cassette stickers) ---- */
 .alert {
-  border: none;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  padding: 14px 20px;
+  border: 1px solid;
+  border-left-width: 6px;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  padding: 12px 44px 12px 18px;
+  position: relative;
+  background-color: var(--mix-card);
+  box-shadow: 2px 2px 0 rgba(60, 41, 28, 0.18);
+}
+
+.alert::before {
+  font-family: var(--mix-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-right: 10px;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
 }
 
 .alert-success {
-  background-color: rgba(125, 140, 110, 0.2);
-  color: var(--mix-tertiary);
-  border-left: 3px solid var(--mix-tertiary);
+  color: var(--mix-accent);
+  border-color: var(--mix-accent);
+  background-color: rgba(212, 148, 76, 0.10);
 }
-
-.alert-danger {
-  background-color: rgba(196, 91, 74, 0.15);
-  color: var(--mix-danger);
-  border-left: 3px solid var(--mix-danger);
-}
-
-.alert-warning {
-  background-color: rgba(176, 107, 93, 0.15);
-  color: var(--mix-secondary);
-  border-left: 3px solid var(--mix-secondary);
-}
+.alert-success::before { content: "OK"; }
 
 .alert-info {
-  background-color: rgba(212, 148, 76, 0.12);
-  color: var(--mix-accent);
-  border-left: 3px solid var(--mix-accent);
+  color: var(--mix-tertiary);
+  border-color: var(--mix-tertiary);
+  background-color: rgba(125, 140, 110, 0.12);
 }
+.alert-info::before { content: "INFO"; }
 
-.btn-close {
-  filter: invert(0.8);
+.alert-warning {
+  color: var(--mix-secondary);
+  border-color: var(--mix-secondary);
+  background-color: rgba(176, 107, 93, 0.12);
 }
+.alert-warning::before { content: "HEADS UP"; }
+
+.alert-danger {
+  color: var(--mix-danger);
+  border-color: var(--mix-danger);
+  background-color: rgba(196, 91, 74, 0.12);
+}
+.alert-danger::before { content: "NOPE"; }
+
+.alert .btn-close {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  filter: invert(0.3);
+  opacity: 0.6;
+}
+.alert .btn-close:hover { opacity: 1; }
 
 /* ---- Footer ---- */
-footer {
+.mix-footer {
   background-color: var(--mix-card) !important;
-  border-top: 1px solid rgba(155, 142, 130, 0.1);
+  border-top: 3px solid var(--mix-accent);
   color: var(--mix-text-muted);
   font-size: 0.85rem;
   margin-top: auto;
+  padding: 28px 0 18px;
+  position: relative;
+}
+
+.mix-footer::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--mix-accent) 0 14px,
+    transparent 14px 18px
+  );
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.mix-footer-tagline {
+  font-family: var(--mix-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--mix-accent);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.mix-footer-grid {
+  border-top: 1px dashed rgba(155, 142, 130, 0.25);
+  border-bottom: 1px dashed rgba(155, 142, 130, 0.25);
+  padding: 14px 0;
+}
+
+.mix-footer-label {
+  font-family: var(--mix-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: var(--mix-secondary);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.mix-footer-link {
+  font-family: var(--mix-font-mono);
+  color: var(--mix-tertiary);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+}
+.mix-footer-link:hover {
+  color: var(--mix-accent);
+  text-decoration: underline;
+}
+
+.mix-footer-baseline {
+  font-family: var(--mix-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--mix-text-muted);
+  text-transform: uppercase;
+  margin-top: 14px;
+  text-align: center;
+  opacity: 0.8;
 }
 
 /* ---- Animations ---- */
@@ -556,7 +863,7 @@ footer {
 
 /* ---- Responsive ---- */
 @media (max-width: 991.98px) {
-  footer {
+  .mix-footer {
     margin-bottom: 0;
   }
 }
@@ -581,4 +888,616 @@ footer {
     height: 64px;
     font-size: 1.4rem;
   }
+}
+
+/* =============================================================
+   Mix It Up random draw modal
+   ============================================================= */
+
+body.mix-modal-open {
+  overflow: hidden;
+}
+
+.random-draw {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.random-draw[hidden] {
+  display: none;
+}
+
+.random-draw-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(26, 22, 20, 0.30);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.random-draw-modal {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  background-color: var(--mix-card);
+  border: 1px solid var(--mix-card-elevated);
+  border-radius: var(--mix-radius);
+  box-shadow: var(--mix-shadow-hover);
+  padding: 28px;
+  outline: none;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.random-draw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.random-draw-title {
+  font-family: var(--mix-font-display);
+  font-size: 1.6rem;
+  margin: 0;
+  color: var(--mix-text);
+}
+
+.random-draw-close {
+  background: transparent;
+  border: 0;
+  color: var(--mix-text-muted);
+  font-size: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.random-draw-close:hover,
+.random-draw-close:focus-visible {
+  background-color: var(--mix-card-elevated);
+  color: var(--mix-text);
+  outline: none;
+}
+
+.random-draw-status {
+  font-family: var(--mix-font-mono);
+  font-size: 0.9rem;
+  color: var(--mix-text-muted);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: var(--mix-card-elevated);
+}
+
+.random-draw-status.is-error {
+  color: var(--mix-text);
+  background-color: rgba(196, 91, 74, 0.18);
+  border-left: 3px solid var(--mix-danger);
+}
+
+.random-draw-status a {
+  color: var(--mix-accent);
+  margin-left: 6px;
+}
+
+.random-draw-stage {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  justify-content: center;
+  perspective: 1200px;
+  margin: 12px 0 20px;
+}
+
+/* Cards are a fixed size at all times. Both faces are absolutely
+   positioned for the 3D flip, so the card itself needs explicit width
+   and height — flex-basis would let it collapse on a column stage.
+   Default size fits the unpicked content tightly so there is no big
+   empty band under the Pick button. When a card is picked the stage
+   grows both cards together to fit the action buttons. */
+.draw-card {
+  flex: 0 0 auto;
+  width: 280px;
+  height: 380px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 2s cubic-bezier(0.25, 0.8, 0.3, 1),
+              height 400ms ease,
+              opacity 400ms ease;
+}
+
+.random-draw-stage:has(.is-chosen) .draw-card {
+  height: 470px;
+}
+
+.draw-card.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Picking a card just dims the other one. No size change either way. */
+.draw-card.is-faded {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.draw-card-back,
+.draw-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--mix-radius);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.draw-card-back {
+  background-color: var(--mix-card);
+  border: 2px solid var(--mix-accent);
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--mix-shadow);
+}
+
+/* Cassette art rotated to read as a portrait tape. The image is 3:2
+   landscape; we set layout width above 100% so after the 90deg rotation
+   the visual fills most of the portrait card without distortion. Sized
+   so it stays inside the card on both the default and chosen heights. */
+.draw-card-back-cassette {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 153%;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.draw-card[data-side="b"] .draw-card-back-cassette {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.draw-card-back-side-label {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  z-index: 2;
+  font-family: var(--mix-font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--mix-secondary);
+  background-color: #f4ead8;
+  padding: 8px 18px;
+  border-radius: 2px;
+  border: 1px solid rgba(42, 31, 23, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.draw-card.is-flipped .draw-card-back {
+  visibility: hidden;
+}
+
+/* Front face. */
+.draw-card-face {
+  background-color: var(--mix-card-elevated);
+  border: 1px solid var(--mix-card);
+  transform: rotateY(180deg);
+}
+
+.draw-card-image {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  flex: 0 0 180px;
+  background-color: var(--mix-bg);
+  overflow: hidden;
+}
+
+.draw-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.draw-card-image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: var(--mix-text-muted);
+}
+
+.draw-card-cassette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+
+.draw-card-body {
+  padding: 12px 18px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.draw-card-side-label {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--mix-font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: #7e5436;
+  background-color: #f4ead8;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(42, 31, 23, 0.4);
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+}
+
+.draw-card-name {
+  font-family: var(--mix-font-display);
+  font-size: 1.4rem;
+  margin: 0;
+  color: var(--mix-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.draw-card-meta {
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  color: var(--mix-text-muted);
+  margin: 0;
+}
+
+.draw-card-pick {
+  padding: 0 18px 18px;
+}
+
+.draw-card-pick-btn {
+  width: 100%;
+}
+
+.draw-card-actions {
+  padding: 0 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Fade-in for the picked card's actions and the deselect arrow. JS
+   reveals the elements in the same frame the .is-chosen class is added,
+   so the animation runs once with `backwards` fill keeping them at
+   opacity 0 during the small delay before the keyframes start. The
+   delay lets the card height transition begin first. */
+@keyframes draw-card-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes draw-card-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(6px); }
+}
+
+.draw-card.is-chosen .draw-card-actions,
+.draw-card.is-chosen .draw-card-deselect {
+  animation: draw-card-fade-in 300ms ease 200ms backwards;
+}
+
+/* Reverse animation when deselecting. JS adds .is-deselecting before
+   removing .is-chosen so we can play the fade-out and hold the final
+   state with `forwards` until JS clears the class. */
+.draw-card.is-deselecting .draw-card-actions,
+.draw-card.is-deselecting .draw-card-deselect {
+  animation: draw-card-fade-out 300ms ease forwards;
+}
+
+.draw-card-actions-anon {
+  margin: 0;
+  font-family: var(--mix-font-mono);
+  font-size: 0.9rem;
+  color: var(--mix-text-muted);
+  text-align: center;
+}
+
+.draw-card-login-link {
+  /* picks up .btn .btn-mix-primary .draw-card-save-btn styling; nothing to override */
+  text-decoration: none;
+}
+
+.draw-card-actions-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.draw-card-visibility {
+  display: inline-flex;
+  background-color: var(--mix-bg);
+  border: 1px solid var(--mix-card);
+  border-radius: 999px;
+  padding: 3px;
+  align-self: stretch;
+}
+
+.visibility-pill {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: var(--mix-text-muted);
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.visibility-pill.is-active {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  font-weight: 600;
+}
+
+.visibility-pill:focus-visible {
+  outline: 2px solid var(--mix-accent);
+  outline-offset: 2px;
+}
+
+/* Primary / outline buttons used inside the modal. */
+.btn-mix-primary {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  border: 1px solid var(--mix-accent);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: var(--mix-font-body);
+}
+
+.btn-mix-primary:hover,
+.btn-mix-primary:focus-visible {
+  background-color: var(--mix-secondary);
+  border-color: var(--mix-secondary);
+  color: var(--mix-text);
+  outline: none;
+}
+
+.btn-mix-outline {
+  background: transparent;
+  color: var(--mix-text);
+  border: 1px solid var(--mix-text-muted);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: var(--mix-font-body);
+}
+
+.btn-mix-outline:hover,
+.btn-mix-outline:focus-visible {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+  outline: none;
+}
+
+/* Trigger buttons in page headers should have a comfortable hit area. */
+.btn-mix-outline,
+.btn-mix-primary {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Spinning cassette spool ring behind the shuffle icon on Mix It Up triggers. */
+[data-mix-trigger],
+[data-mix-reroll] {
+  position: relative;
+}
+
+[data-mix-trigger] .bi-shuffle,
+[data-mix-reroll] .bi-shuffle {
+  position: relative;
+  z-index: 1;
+  margin-right: 14px !important;
+  margin-left: 6px;
+}
+
+[data-mix-trigger] .bi-shuffle::after,
+[data-mix-reroll] .bi-shuffle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border: 1.5px dashed var(--mix-accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 1;
+  animation: mix-spool-spin 8s linear infinite;
+}
+
+[data-mix-trigger]:hover .bi-shuffle::after,
+[data-mix-trigger]:focus-visible .bi-shuffle::after,
+[data-mix-reroll]:hover .bi-shuffle::after,
+[data-mix-reroll]:focus-visible .bi-shuffle::after {
+  border-color: var(--mix-accent);
+  opacity: 0.95;
+  animation-duration: 1.6s;
+}
+
+@keyframes mix-spool-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Larger spool ring for the round hero shuffle button. */
+.btn-shuffle .bi-shuffle {
+  margin: 0 !important;
+}
+
+.btn-shuffle .bi-shuffle::after {
+  width: 84px;
+  height: 84px;
+  border-width: 2px;
+  border-color: var(--mix-accent);
+  opacity: 0.85;
+}
+
+.btn-shuffle:hover .bi-shuffle::after,
+.btn-shuffle:focus-visible .bi-shuffle::after {
+  border-color: var(--mix-accent);
+  opacity: 1;
+}
+
+.btn-shuffle-lg .bi-shuffle::after {
+  width: 100px;
+  height: 100px;
+}
+
+/* Deselect (back) button sits over the chosen card's image. */
+.draw-card-deselect {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--mix-accent);
+  background-color: rgba(26, 22, 20, 0.78);
+  color: var(--mix-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.draw-card-deselect:hover,
+.draw-card-deselect:focus-visible {
+  background-color: var(--mix-accent);
+  color: var(--mix-bg);
+  outline: none;
+  transform: rotate(-30deg);
+}
+
+.random-draw-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+@media (max-width: 767.98px) {
+  .random-draw-modal {
+    padding: 18px;
+  }
+  .random-draw-stage {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  /* Card stays the exact same fixed size on mobile. The faded sibling is
+     hidden so the chosen card sits alone in the modal. */
+  .draw-card.is-faded {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draw-card {
+    transition: opacity 200ms ease;
+  }
+  .draw-card.is-chosen .draw-card-actions,
+  .draw-card.is-chosen .draw-card-deselect,
+  .draw-card.is-deselecting .draw-card-actions,
+  .draw-card.is-deselecting .draw-card-deselect {
+    animation: none;
+  }
+  .draw-card.is-flipped {
+    transform: none;
+  }
+  .draw-card-face {
+    transform: none;
+  }
+  .draw-card.face-down .draw-card-face {
+    display: none;
+  }
+  .draw-card.is-flipped .draw-card-back {
+    display: none;
+  }
+}
+
+
+/* ---- Themed Empty States ---- */
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  background: var(--mix-card);
+  border: 1px dashed rgba(212, 148, 76, 0.3);
+  border-radius: var(--mix-radius);
+  position: relative;
+}
+
+.empty-state::before {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 60px;
+  margin: 0 auto 18px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 60' fill='none' stroke='%23D4944C' stroke-width='2'><rect x='2' y='6' width='92' height='48' rx='4'/><circle cx='28' cy='30' r='8'/><circle cx='68' cy='30' r='8'/><line x1='28' y1='30' x2='68' y2='30' stroke-dasharray='3 3'/><rect x='14' y='42' width='68' height='6' rx='1' stroke='%23B06B5D'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.85;
+}
+
+.empty-state h3 {
+  font-family: var(--mix-font-mono);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--mix-accent);
+  margin-bottom: 8px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--mix-accent);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.empty-state p {
+  color: var(--mix-text-muted);
+  font-size: 0.92rem;
+  margin-bottom: 1.25rem;
 }

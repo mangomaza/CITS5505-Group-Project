@@ -1,5 +1,5 @@
-from datetime import datetime
-from app.extensions import db
+from datetime import datetime, timezone
+from app import db
 
 
 class Recipe(db.Model):
@@ -10,7 +10,6 @@ class Recipe(db.Model):
     description = db.Column(db.Text, nullable=True)
     category = db.Column(db.String(20), nullable=False)
     subcategory = db.Column(db.String(80), nullable=True)
-    cuisine = db.Column(db.String(50), nullable=True)
     glass = db.Column(db.String(50), nullable=True)
     is_alcoholic = db.Column(db.Boolean, default=False, nullable=False)
     image_data = db.Column(db.LargeBinary, nullable=True)
@@ -21,7 +20,7 @@ class Recipe(db.Model):
     external_source = db.Column(db.String(20), nullable=True)
     external_id = db.Column(db.String(20), nullable=True)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     creator = db.relationship('User', backref=db.backref('recipes', lazy=True))
 

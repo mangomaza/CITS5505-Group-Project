@@ -63,54 +63,45 @@ The frontend uses Bootstrap 5 for layout and responsiveness, with custom CSS on 
    pip install -r requirements.txt
    ```
 
-4. Set the secret key.
+4. Create the `.env` file.
 
-   The app requires a `SECRET_KEY` environment variable for session signing and CSRF protection. Create a `.env` file in the project root (it's already in `.gitignore` so it won't be committed):
-
-   ```
-   SECRET_KEY=some-long-random-string
-   ```
-
-   Then load it before running the app. On macOS/Linux you can export it directly:
+   The app needs a `SECRET_KEY` for session signing and CSRF protection. Run the helper and it'll prompt you for the string and write `.env` for you (it's already gitignored):
 
    ```
-   export SECRET_KEY=some-long-random-string
+   python setup_env.py
    ```
 
-   On Windows (PowerShell):
+   When prompted, paste in any long random string. Example of what to enter:
 
    ```
-   $env:SECRET_KEY = "some-long-random-string"
+   3f8a9c2e1b4d6f7a8c9e0b1d2f3a4c5e6b7d8f9a0c1e2b3d4f5a6c7e8b9d0f1a
    ```
 
-   Pick any random string — it just needs to be kept off the repo.
+   The exact value doesn't matter as long as it's long and kept off the repo. The app reads `.env` automatically on startup.
 
-## Database Setup
+5. Create the database.
 
-After installing dependencies, create the database:
+   ```
+   flask --app app.py db upgrade
+   ```
 
-```
-flask --app manage.py db upgrade
-```
+   This creates `instance/mixitup.db` with the latest schema.
 
-This creates `instance/mixitup.db` with the latest schema.
+6. (Optional) Load sample data.
 
-To load some sample users to play with, run:
+   ```
+   python seed_db.py
+   ```
 
-```
-python seed_db.py
-```
+   This wipes the database and inserts four test users with sample recipes, ratings, and shares. Skip if you want to start empty.
 
-This wipes the database and inserts four test users (one per team member). Skip this step if you want to start with an empty database.
+7. Run the app.
 
-## Running the App
+   ```
+   python app.py
+   ```
 
-With your virtual environment activated, run:
+   Open http://127.0.0.1:5000 in your browser.
 
-```
-python manage.py
-```
+   By default the app uses the development config. To change it, set `FLASK_CONFIG` before running (`development`, `testing`, or `production`).
 
-Then open http://127.0.0.1:5000 in your browser.
-
-By default the app uses the development config. To change it, set `FLASK_CONFIG` before running (`development`, `testing`, or `production`).

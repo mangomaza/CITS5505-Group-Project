@@ -4,7 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{% block title %}Mix It Up{% endblock %}</title>
+
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.svg') }}">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +32,7 @@
   <header>
     <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">Mix It Up</a>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}"><i class="bi bi-house-heart-fill me-2"></i>Mix It Up</a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
@@ -41,25 +45,25 @@
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
                 href="{{ url_for('main.index') }}">
-                Home
+                <i class="bi bi-house-door me-1"></i>Home
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'main.recipes' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint in ['main.recipes', 'main.recipe_detail'] %}active{% endif %}"
                 href="{{ url_for('main.recipes') }}">
-                Recipes
+                <i class="bi bi-journal-text me-1"></i>Recipes
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'main.create_recipe' %}active{% endif %}"
                 href="{{ url_for('main.create_recipe') }}">
-                Create
+                <i class="bi bi-plus-square me-1"></i>Create
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'main.share' %}active{% endif %}"
                 href="{{ url_for('main.share') }}">
-                Share
+                <i class="bi bi-share me-1"></i>Share
               </a>
             </li>
           </ul>
@@ -68,15 +72,21 @@
           <ul class="navbar-nav align-items-lg-center">
             {% if current_user.is_authenticated %}
             <li class="nav-item">
-              <span class="nav-link pe-none" style="color: var(--mix-text-muted); font-size: 0.9rem;">
-                {{ current_user.username }}
-              </span>
+              <a class="nav-link nav-username {% if request.endpoint == 'main.profile' %}active{% endif %}"
+                 href="{{ url_for('main.profile') }}">
+                {% if current_user.avatar_data %}
+                  <img class="nav-avatar" src="{{ url_for('main.user_avatar', user_id=current_user.id) }}" alt="">
+                {% else %}
+                  <i class="bi bi-person-circle me-1"></i>
+                {% endif %}
+                <span>{{ current_user.username }}</span>
+              </a>
             </li>
             <li class="nav-item">
               <form method="POST" action="{{ url_for('auth.logout') }}" class="d-inline">
                 {{ logout_form.hidden_tag() }}
                 <button type="submit" class="nav-link btn btn-link p-0 align-baseline">
-                  Logout
+                  <i class="bi bi-box-arrow-right me-1"></i>Logout
                 </button>
               </form>
             </li>
@@ -84,13 +94,13 @@
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}"
                 href="{{ url_for('auth.login') }}">
-                Login
+                <i class="bi bi-box-arrow-in-right me-1"></i>Login
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link {% if request.endpoint == 'auth.signup' %}active{% endif %}"
                 href="{{ url_for('auth.signup') }}">
-                Sign Up
+                <i class="bi bi-person-plus me-1"></i>Sign Up
               </a>
             </li>
             {% endif %}
@@ -121,15 +131,35 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="py-3 mt-auto">
-    <div class="container text-center">
-      <p class="mb-0">&copy; 2026 Mix It Up</p>
+  <footer class="mix-footer mt-auto" id="mix-footer">
+    <div class="container">
+      <div class="mix-footer-tagline">// MIX IT UP // TRACKLIST 2026</div>
+      <div class="row gy-3 mix-footer-grid">
+        <div class="col-12 col-md-4">
+          <div class="mix-footer-label">A. ABOUT</div>
+          <p class="mb-0">A small recipe sharing project. Save your mixes, share them with friends, or let the shuffle pick your next meal.</p>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="mix-footer-label">B. CREDITS</div>
+          <p class="mb-0">Built by the Mix It Up team</p>
+        </div>
+        <div class="col-6 col-md-4 text-md-end">
+          <div class="mix-footer-label">C. SIDE B</div>
+          <p class="mb-0"><a href="#" class="mix-footer-link" data-mix-top>&laquo; rewind to top</a></p>
+        </div>
+      </div>
+      <div class="mix-footer-baseline">&copy; 2026 Mix It Up</div>
     </div>
   </footer>
 
+  {% include '_random_draw.html' %}
+
   <!-- JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Local scripts first so [data-mix-trigger] click handlers attach before the
+       Bootstrap CDN bundle finishes downloading. -->
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/random_draw.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
 
 </body>

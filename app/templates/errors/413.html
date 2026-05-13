@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Upload Too Large &mdash; Mix It Up</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <main class="container my-5 text-center">
+    <div class="form-card mx-auto" style="max-width: 560px;">
+      <h1 class="mb-3" style="font-size: 3rem;">413</h1>
+      <h2 class="mb-3">That file is too big</h2>
+      <p style="color: var(--mix-text-muted);">
+        Uploads are capped at 6 MB. Recipe photos can be up to 5 MB and profile pictures up to 2 MB.
+        Try a smaller image and submit again.
+      </p>
+      <a href="{{ url_for('main.index') }}" class="btn btn-mix mt-3">Back to home</a>
+    </div>
+  </main>
+</body>
+</html>
+

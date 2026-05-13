@@ -7,6 +7,29 @@
   max-width: 600px;
 }
 
+.share-form .form-select:disabled,
+.share-form .form-control:disabled {
+  background-color: var(--mix-card-elevated);
+  color: var(--mix-text);
+  opacity: 0.85;
+  -webkit-text-fill-color: var(--mix-text);
+}
+
+.share-form .btn:disabled,
+.share-form .btn.disabled {
+  background: rgba(212, 148, 76, 0.12);
+  color: var(--mix-accent);
+  border: 1px solid rgba(212, 148, 76, 0.5);
+  font-family: var(--mix-font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  padding: 10px 22px;
+  border-radius: var(--mix-radius);
+  opacity: 1;
+  cursor: not-allowed;
+}
+
 .share-form .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -28,15 +51,42 @@
   background-color: var(--mix-card);
   border-radius: var(--mix-radius);
   overflow: hidden;
+  border: 1px solid rgba(212, 148, 76, 0.18);
 }
 
 .share-table .table {
   margin-bottom: 0;
+  --bs-table-bg: transparent;
+}
+
+.share-table .table thead th {
+  font-family: var(--mix-font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--mix-text-muted);
+  border-bottom: 1px dotted rgba(212, 148, 76, 0.4);
+  background: rgba(212, 148, 76, 0.05);
 }
 
 .share-table .table td,
 .share-table .table th {
   padding: 14px 20px;
+  border-color: rgba(212, 148, 76, 0.12);
+  color: var(--mix-text-muted);
+}
+
+.share-table .table tbody tr {
+  position: relative;
+}
+
+.share-table .table tbody tr td:first-child {
+  border-left: 3px solid var(--mix-accent);
+  font-weight: 500;
+}
+
+.share-table .table tbody tr:hover {
+  background: rgba(212, 148, 76, 0.04);
 }
 
 .share-table .btn-unshare {
@@ -52,6 +102,86 @@
 .share-table .btn-unshare:hover {
   color: #E06050;
   text-decoration: underline;
+}
+
+/* ---- Filter row above shared tables ---- */
+.share-filter {
+  margin-top: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.share-filter .search-bar {
+  background: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.share-filter .input-group {
+  border-radius: var(--bs-border-radius, 6px);
+  transition: box-shadow 150ms ease;
+}
+
+.share-filter .input-group-text {
+  background-color: var(--mix-card-elevated);
+  border: 1px solid rgba(155, 142, 130, 0.25);
+  border-right: none;
+  color: var(--mix-text-muted);
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.share-filter .input-group .form-control {
+  border-left: none;
+  transition: border-color 150ms ease;
+}
+
+.share-filter .input-group:hover .input-group-text,
+.share-filter .input-group:focus-within .input-group-text {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+}
+
+.share-filter .input-group:hover .form-control,
+.share-filter .input-group:focus-within .form-control {
+  border-color: var(--mix-accent);
+  box-shadow: none;
+}
+
+.share-filter .input-group:hover,
+.share-filter .input-group:focus-within {
+  box-shadow: 0 0 0 3px rgba(212, 148, 76, 0.2);
+}
+
+.share-filter .input-group .form-control:focus {
+  box-shadow: none;
+}
+
+.share-filter .filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.share-filter .filter-pill {
+  background: transparent;
+  border: 1px solid var(--mix-text-muted);
+  color: var(--mix-text-muted);
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.share-filter .filter-pill:hover {
+  border-color: var(--mix-accent);
+  color: var(--mix-accent);
+}
+
+.share-filter .filter-pill.active {
+  background-color: var(--mix-accent);
+  border-color: var(--mix-accent);
+  color: var(--mix-bg);
 }
 
 /* ---- Responsive ---- */

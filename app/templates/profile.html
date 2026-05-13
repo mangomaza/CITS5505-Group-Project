@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile &mdash; Mix It Up{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/create_recipe.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+  <main class="container my-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+          <h1 class="mb-0">Your profile</h1>
+        </div>
+
+        <div class="cassette-insert-label">// SIDE A &middot; ACCOUNT</div>
+        <div class="form-card create-form">
+          <form method="post" action="{{ url_for('main.profile') }}" enctype="multipart/form-data" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!-- Avatar -->
+            <div class="form-section">
+              <div class="section-title">Profile picture</div>
+              <div class="profile-avatar-row">
+                <div class="profile-avatar-preview">
+                  {% if user.avatar_data %}
+                    <img id="avatarPreview" src="{{ url_for('main.user_avatar', user_id=user.id) }}" alt="">
+                  {% else %}
+                    <img id="avatarPreview" alt="" hidden>
+                    <i class="bi bi-person-circle" id="avatarPlaceholder"></i>
+                  {% endif %}
+                </div>
+                <div class="profile-avatar-actions">
+                  <label for="avatarInput" class="btn btn-mix-outline btn-sm">
+                    <i class="bi bi-upload me-1"></i> Upload picture
+                  </label>
+                  {{ form.avatar(id="avatarInput", accept="image/png,image/jpeg,image/webp", class="visually-hidden") }}
+                  {% if user.avatar_data %}
+                    <button type="submit" name="action" value="remove_avatar" formnovalidate
+                            class="btn btn-outline-mix btn-sm"
+                            onclick="return confirm('Remove your profile picture?');">
+                      <i class="bi bi-trash me-1"></i> Remove
+                    </button>
+                  {% endif %}
+                  <p class="form-text mb-0">PNG, JPG or WEBP. Up to 2 MB.</p>
+                </div>
+              </div>
+              {% for error in form.avatar.errors %}
+                <div class="text-danger small mt-2">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <!-- Account -->
+            <div class="form-section">
+              <div class="section-title">Account</div>
+              <div class="mb-3">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(
+                  class="form-control" + (" is-invalid" if form.username.errors else ""),
+                  placeholder="Your username",
+                  autocomplete="username",
+                  minlength="3", maxlength="80",
+                  pattern="[A-Za-z0-9_]+",
+                  required=True
+                ) }}
+                {% for error in form.username.errors %}
+                  <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="mb-3">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(
+                  class="form-control" + (" is-invalid" if form.email.errors else ""),
+                  placeholder="you@example.com",
+                  autocomplete="email",
+                  type="email", maxlength="120", required=True
+                ) }}
+                {% for error in form.email.errors %}
+                  <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-section">
+              <div class="section-title">Change password</div>
+              <p class="form-text mt-0 mb-3">Leave blank to keep your current password.</p>
+              <div class="mb-3">
+                {{ form.current_password.label(class="form-label") }}
+                {{ form.current_password(
+                  class="form-control" + (" is-invalid" if form.current_password.errors else ""),
+                  placeholder="Your current password",
+                  autocomplete="current-password"
+                ) }}
+                {% for error in form.current_password.errors %}
+                  <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  {{ form.new_password.label(class="form-label") }}
+                  {{ form.new_password(
+                    class="form-control" + (" is-invalid" if form.new_password.errors else ""),
+                    placeholder="At least 8 characters",
+                    minlength="8", maxlength="128", autocomplete="new-password"
+                  ) }}
+                  {% for error in form.new_password.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="col-md-6">
+                  {{ form.confirm_new_password.label(class="form-label") }}
+                  {{ form.confirm_new_password(
+                    class="form-control" + (" is-invalid" if form.confirm_new_password.errors else ""),
+                    placeholder="Re-enter new password",
+                    minlength="8", maxlength="128", autocomplete="new-password"
+                  ) }}
+                  {% for error in form.confirm_new_password.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              {{ form.submit(class="btn btn-mix") }}
+              <a href="{{ url_for('main.index') }}" class="cancel-link">Cancel</a>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var input = document.getElementById('avatarInput');
+      var preview = document.getElementById('avatarPreview');
+      var placeholder = document.getElementById('avatarPlaceholder');
+      if (!input || !preview) return;
+      input.addEventListener('change', function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          preview.src = ev.target.result;
+          preview.hidden = false;
+          if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      });
+    })();
+  </script>
+{% endblock %}

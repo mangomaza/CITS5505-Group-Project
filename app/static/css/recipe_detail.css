@@ -1,5 +1,5 @@
 /* ============================================================
-   Mix It Up — Option A: Recipe Detail Page Styles
+   Mix It Up: Recipe Detail Page Styles
    ============================================================ */
 
 /* ---- Detail Hero ---- */
@@ -25,6 +25,7 @@
   right: 0;
   height: 60%;
   background: linear-gradient(to top, var(--mix-bg) 0%, transparent 100%);
+  z-index: 1;
 }
 
 /* ---- Metadata Bar ---- */
@@ -52,6 +53,18 @@
   font-family: var(--mix-font-mono);
 }
 
+/* ---- Recipe Description blurb ---- */
+.recipe-description {
+  background-color: var(--mix-card-elevated);
+  border-left: 3px solid var(--mix-accent);
+  border-radius: var(--mix-radius);
+  padding: 14px 18px;
+  font-style: italic;
+  color: var(--mix-text);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
 /* ---- Side A / Side B Section Labels ---- */
 .side-label {
   font-family: var(--mix-font-mono);
@@ -65,7 +78,7 @@
   margin-top: 2rem;
 }
 
-/* ---- Ingredients List ---- */
+/* ---- Ingredients List (tracklist) ---- */
 .ingredients-list {
   list-style: none;
   padding: 0;
@@ -74,15 +87,23 @@
 
 .ingredients-list li {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(155, 142, 130, 0.1);
-  font-size: 0.9rem;
+  align-items: baseline;
+  gap: 14px;
+  padding: 10px 2px;
+  border-bottom: 1px dashed rgba(155, 142, 130, 0.25);
+  font-size: 0.95rem;
 }
 
 .ingredients-list li:last-child {
   border-bottom: none;
+}
+
+.ingredient-track {
+  font-family: var(--mix-font-mono);
+  font-size: 0.78rem;
+  color: var(--mix-accent);
+  letter-spacing: 0.08em;
+  min-width: 2.4rem;
 }
 
 .ingredient-thumb {
@@ -92,13 +113,33 @@
   border-radius: 6px;
   background-color: var(--mix-card-elevated);
   padding: 2px;
+  flex-shrink: 0;
+}
+
+.ingredient-name {
+  color: var(--mix-text);
+  flex-shrink: 0;
+}
+
+.ingredient-leader {
+  flex: 1 1 auto;
+  align-self: end;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px dotted rgba(155, 142, 130, 0.45);
+  min-width: 1.5rem;
 }
 
 .ingredient-qty {
   font-family: var(--mix-font-mono);
   font-size: 0.8rem;
-  color: var(--mix-accent);
-  min-width: 60px;
+  color: var(--mix-text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ingredients-empty {
+  color: var(--mix-text-muted);
+  font-style: italic;
 }
 
 /* ---- Instructions ---- */

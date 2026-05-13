@@ -55,16 +55,26 @@ document.addEventListener('DOMContentLoaded', function () {
           ratingMessage.textContent = 'Saving your rating...';
         }
 
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
         fetch('/recipes/' + recipeId + '/rate', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
           },
           body: JSON.stringify({
             stars: stars
           })
         })
           .then(function (response) {
+            if (!response.ok) {
+              return response.json().catch(function () { return {}; }).then(function (body) {
+                var msg = (body && body.error) || 'Rating could not be saved.';
+                throw new Error(msg);
+              });
+            }
             return response.json();
           })
           .then(function (data) {
@@ -90,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function () {
             updateUserStars(data.user_rating);
             updateAverageStars(data.average);
           })
-          .catch(function () {
+          .catch(function (err) {
             if (ratingMessage) {
-              ratingMessage.textContent = 'Something went wrong. Please try again.';
+              ratingMessage.textContent = (err && err.message) || 'Something went wrong. Please try again.';
             }
           });
       });
@@ -147,20 +157,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // like/favourite toggle
-  var favBtn = document.getElementById('favBtn');
-  if (favBtn) {
-    favBtn.addEventListener('click', function () {
-      var icon = favBtn.querySelector('.bi');
-      if (icon.classList.contains('bi-heart')) {
-        icon.classList.replace('bi-heart', 'bi-heart-fill');
-        icon.style.color = 'var(--mix-danger)';
-        icon.classList.add('heart-bounce');
-      } else {
-        icon.classList.replace('bi-heart-fill', 'bi-heart');
-        icon.style.color = '';
-        icon.classList.remove('heart-bounce');
-      }
+  // Ingredient thumbnail random pool.
+  // Each category has POOL_SIZE slots in static/images/placeholders/ingredients/{cocktail,food}/
+  // named 1.png, 2.png ... POOL_SIZE.png. The template renders a local default
+  // first, so if a random pick fails we fall back to that instead of an
+  // external placeholder.
+  var INGREDIENT_POOL_SIZE = 10;
+  var ingredientsList = document.querySelector('.ingredients-list');
+  if (ingredientsList) {
+    var category = (ingredientsList.dataset.category || 'food').toLowerCase();
+    var folder = (category === 'cocktail') ? 'cocktail' : 'food';
+    var thumbs = ingredientsList.querySelectorAll('.ingredient-thumb');
+    thumbs.forEach(function (img) {
+      var fallbackSrc = img.getAttribute('src');
+      var pick = Math.floor(Math.random() * INGREDIENT_POOL_SIZE) + 1;
+      var localSrc = '/static/images/placeholders/ingredients/' + folder + '/' + pick + '.png';
+      img.onerror = function () {
+        img.src = fallbackSrc;
+        img.onerror = null;
+      };
+      img.src = localSrc;
     });
   }
 });

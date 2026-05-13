@@ -10,6 +10,10 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'instance', 'mixitup.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Hard request size cap. Recipe photos cap at 5 MB and avatars at 2 MB
+    # at the form layer, this is defense in depth so oversized uploads are
+    # rejected before they hit form validation.
+    MAX_CONTENT_LENGTH = 6 * 1024 * 1024
     DEBUG = True
 
 
@@ -20,7 +24,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
-    DEBUG = True
+    DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False
 
