@@ -1,5 +1,5 @@
 /* ============================================================
-   Mix It Up — Option A: Browse Recipes Page Styles
+   Mix It Up: Browse Recipes Page Styles
    ============================================================ */
 
 /* ---- Search Desk ---- */
@@ -179,12 +179,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ---- Load More ---- */
-.load-more {
-  text-align: center;
-  padding: 32px 0;
-}
-
 /* ---- Empty State (themed in style.css) ---- */
 
 /* ---- Responsive ---- */
@@ -202,7 +196,7 @@
 @media (max-width: 767.98px) {
   .btn-mix-it-up {
     width: 100%;
-    margin-left: 0 !important;
+    margin-left: 0;
     justify-content: center;
   }
 }

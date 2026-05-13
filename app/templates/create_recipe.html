@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Recipe &mdash; Mix It Up{% endblock %}
+{% block title %}{{ 'Edit Recipe' if edit_recipe else 'Create Recipe' }} &mdash; Mix It Up{% endblock %}
 
 {#
   TODO: Replace the placeholder asset paths static/images/placeholders/cocktail-default.jpg
@@ -23,15 +23,17 @@
       <div class="col-lg-8">
 
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-          <h1 class="mb-0">Create a recipe</h1>
+          <h1 class="mb-0">{{ 'Edit recipe' if edit_recipe else 'Create a recipe' }}</h1>
+          {% if not edit_recipe %}
           <button type="button" class="btn btn-mix-outline" data-mix-trigger>
             <i class="bi bi-shuffle me-1"></i> Mix It Up
           </button>
+          {% endif %}
         </div>
 
-        <div class="cassette-insert-label">// SIDE A &middot; NEW MIX</div>
+        <div class="cassette-insert-label">// SIDE A &middot; {{ 'EDIT MIX' if edit_recipe else 'NEW MIX' }}</div>
         <div class="form-card create-form">
-          <form method="post" action="{{ url_for('main.create_recipe') }}" enctype="multipart/form-data" novalidate>
+          <form method="post" action="{{ url_for('main.edit_recipe', recipe_id=edit_recipe.id) if edit_recipe else url_for('main.create_recipe') }}" enctype="multipart/form-data" novalidate>
             {{ form.hidden_tag() }}
 
             <!-- Basic Info -->
@@ -125,7 +127,7 @@
                    data-default-cocktail="{{ url_for('static', filename='images/placeholders/cocktail-default.jpg') }}"
                    data-default-food="{{ url_for('static', filename='images/placeholders/food-default.jpg') }}">
                 <img class="upload-preview" id="imagePreview" alt=""
-                     {% if form.external_image_url.data %}src="{{ form.external_image_url.data }}"{% endif %}>
+                     {% if edit_recipe and edit_recipe.image_data %}src="{{ url_for('main.recipe_image', recipe_id=edit_recipe.id) }}"{% elif form.external_image_url.data %}src="{{ form.external_image_url.data }}"{% endif %}>
                 <div class="upload-placeholder" id="uploadPlaceholder">
                   <i class="bi bi-camera"></i>
                   <p>Click to upload a photo</p>
@@ -177,8 +179,13 @@
 
             <!-- Submit -->
             <div class="form-actions">
-              {{ form.submit(class="btn btn-mix") }}
-              <a href="{{ url_for('main.recipes') }}" class="cancel-link">Cancel</a>
+              {% if edit_recipe %}
+                {{ form.submit(class="btn btn-mix", value="Save changes") }}
+                <a href="{{ url_for('main.recipe_detail', recipe_id=edit_recipe.id) }}" class="cancel-link">Cancel</a>
+              {% else %}
+                {{ form.submit(class="btn btn-mix") }}
+                <a href="{{ url_for('main.recipes') }}" class="cancel-link">Cancel</a>
+              {% endif %}
             </div>
 
           </form>

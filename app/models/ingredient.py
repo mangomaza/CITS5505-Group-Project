@@ -1,4 +1,4 @@
-from app.extensions import db
+from app import db
 
 
 class Ingredient(db.Model):

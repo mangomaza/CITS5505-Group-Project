@@ -13,13 +13,17 @@
     <section class="hero">
       <div class="hero-overlay"></div>
       <div class="container hero-content text-center">
-        <h1 class="hero-title">Mix It Up</h1>
-        <p class="hero-subtitle">Create, share, and discover recipes. Or let fate decide.</p>
+        <p class="hero-eyebrow">// Side A &middot; Mixtape</p>
+        <h1 class="hero-title">
+          <span class="hero-title-line">Mix</span>
+          <span class="hero-title-line hero-title-accent">It Up</span>
+        </h1>
+        <p class="hero-subtitle">Cocktails and meals, hand-rolled or pulled at random. Build a tape, share it with friends, or hit shuffle and see what lands.</p>
         <div class="hero-actions">
           <button class="btn-shuffle" id="heroShuffle" data-mix-trigger title="Mix It Up">
             <i class="bi bi-shuffle"></i>
           </button>
-          <p class="hero-shuffle-label">Mix It Up</p>
+          <p class="hero-shuffle-label">Press shuffle</p>
         </div>
         <a href="{{ url_for('main.recipes') }}" class="btn btn-outline-mix mt-3">Browse Recipes</a>
       </div>
@@ -47,6 +51,7 @@
                       <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                            class="card-img-top card-img-default"
                            alt=""
+                           loading="lazy"
                            onerror="this.style.display='none'">
                     </div>
                   {% endif %}
@@ -130,16 +135,22 @@
                       <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
                            class="card-img-top card-img-default"
                            alt=""
+                           loading="lazy"
                            onerror="this.style.display='none'">
                     </div>
                   {% endif %}
 
                   <div class="card-body">
-                    {% if recipe.category == 'cocktail' %}
-                      <span class="badge-cocktail">Cocktail</span>
-                    {% else %}
-                      <span class="badge-food">{{ recipe.category|title }}</span>
-                    {% endif %}
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      {% if recipe.category == 'cocktail' %}
+                        <span class="badge-cocktail">Cocktail</span>
+                      {% else %}
+                        <span class="badge-food">{{ recipe.category|title }}</span>
+                      {% endif %}
+                      <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                        {{ entry.origin }}
+                      </span>
+                    </div>
 
                     <h3 class="card-title mt-2">{{ recipe.name }}</h3>
                     <p class="card-meta">

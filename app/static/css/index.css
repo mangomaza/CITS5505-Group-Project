@@ -30,20 +30,40 @@
   padding: 60px 20px 80px;
 }
 
+.hero-eyebrow {
+  font-family: var(--mix-font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mix-text-muted);
+  margin-bottom: 0.75rem;
+}
+
 .hero-title {
   font-family: var(--mix-font-display);
-  font-size: 3.2rem;
+  font-size: 4.5rem;
   font-weight: 700;
-  letter-spacing: -1px;
-  margin-bottom: 0.5rem;
+  line-height: 0.95;
+  letter-spacing: -2px;
+  margin-bottom: 1rem;
   color: var(--mix-text);
+}
+
+.hero-title-line {
+  display: block;
+}
+
+.hero-title-accent {
+  color: var(--mix-accent);
+  font-style: italic;
 }
 
 .hero-subtitle {
   font-size: 1.1rem;
   color: var(--mix-text-muted);
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto 2rem;
+  line-height: 1.5;
 }
 
 .hero-actions {

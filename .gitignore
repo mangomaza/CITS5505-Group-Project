@@ -18,6 +18,7 @@ instance/
 # OS
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
 
 # Local-only working notes
 temporary/

@@ -55,16 +55,26 @@ document.addEventListener('DOMContentLoaded', function () {
           ratingMessage.textContent = 'Saving your rating...';
         }
 
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
         fetch('/recipes/' + recipeId + '/rate', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
           },
           body: JSON.stringify({
             stars: stars
           })
         })
           .then(function (response) {
+            if (!response.ok) {
+              return response.json().catch(function () { return {}; }).then(function (body) {
+                var msg = (body && body.error) || 'Rating could not be saved.';
+                throw new Error(msg);
+              });
+            }
             return response.json();
           })
           .then(function (data) {
@@ -90,9 +100,9 @@ document.addEventListener('DOMContentLoaded', function () {
             updateUserStars(data.user_rating);
             updateAverageStars(data.average);
           })
-          .catch(function () {
+          .catch(function (err) {
             if (ratingMessage) {
-              ratingMessage.textContent = 'Something went wrong. Please try again.';
+              ratingMessage.textContent = (err && err.message) || 'Something went wrong. Please try again.';
             }
           });
       });
@@ -148,10 +158,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Ingredient thumbnail random pool.
-  // Each category has POOL_SIZE slots. Drop the corresponding AI-generated
-  // images into static/images/placeholders/ingredients/{cocktail,food}/
-  // named 1.png, 2.png ... POOL_SIZE.png.
-  // Until the assets exist the fallback (placehold.co) is shown automatically.
+  // Each category has POOL_SIZE slots in static/images/placeholders/ingredients/{cocktail,food}/
+  // named 1.png, 2.png ... POOL_SIZE.png. The template renders a local default
+  // first, so if a random pick fails we fall back to that instead of an
+  // external placeholder.
   var INGREDIENT_POOL_SIZE = 10;
   var ingredientsList = document.querySelector('.ingredients-list');
   if (ingredientsList) {

@@ -29,6 +29,7 @@
             {{ form.email.label(class="form-label") }}
             {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""),
                           id="signupEmail", placeholder="you@example.com",
+                          type="email",
                           autocomplete="email", required=True, maxlength=120) }}
             {% for error in form.email.errors %}
             <div class="invalid-feedback">{{ error }}</div>

@@ -212,7 +212,7 @@
                   try {
                     sessionStorage.setItem('mixResume', JSON.stringify({
                       side: side,
-                      item: item,
+                      draw: drawData,
                       path: window.location.pathname,
                     }));
                   } catch (_) { /* ignore */ }
@@ -231,18 +231,28 @@
     });
   }
 
-  // Reverse the pick: drop chosen/faded states and bring the pick buttons
-  // back so the user can choose the other card.
+  // Reverse the pick: actions and deselect arrow fade out first, then
+  // the card shrinks back, mirroring the order of the pick animation.
   function deselectCard() {
-    cards.forEach((card) => {
-      card.classList.remove('is-chosen', 'is-faded');
-      const pickWrap = card.querySelector('.draw-card-pick');
-      if (pickWrap) pickWrap.hidden = false;
-      const actions = card.querySelector('.draw-card-actions');
-      if (actions) actions.hidden = true;
-      const deselect = card.querySelector('[data-mix-deselect]');
-      if (deselect) deselect.hidden = true;
-    });
+    // Phase 1: fade out actions and deselect button via .is-deselecting.
+    // Card stays at the chosen height (.is-chosen still present) while
+    // these fade out so it doesn't shrink underneath them.
+    cards.forEach((card) => card.classList.add('is-deselecting'));
+
+    const FADE_OUT_MS = 300;
+    setTimeout(() => {
+      // Phase 2: drop chosen/faded so the card height transitions back
+      // and the sibling card fades back in. Then restore the pick UI.
+      cards.forEach((card) => {
+        card.classList.remove('is-chosen', 'is-faded', 'is-deselecting');
+        const pickWrap = card.querySelector('.draw-card-pick');
+        if (pickWrap) pickWrap.hidden = false;
+        const actions = card.querySelector('.draw-card-actions');
+        if (actions) actions.hidden = true;
+        const deselect = card.querySelector('[data-mix-deselect]');
+        if (deselect) deselect.hidden = true;
+      });
+    }, FADE_OUT_MS);
   }
 
   // --- save -----------------------------------------------------------
@@ -383,7 +393,7 @@
       });
     });
 
-    const saveBtn = card.querySelector('.draw-card-save-btn');
+    const saveBtn = card.querySelector('.draw-card-actions-auth .draw-card-save-btn');
     if (saveBtn) saveBtn.addEventListener('click', () => postSave(card, false));
 
     const editBtn = card.querySelector('.draw-card-edit-btn');
@@ -402,7 +412,7 @@
       const raw = sessionStorage.getItem('mixResume');
       if (raw) stash = JSON.parse(raw);
     } catch (_) { /* ignore */ }
-    if (!stash || !stash.item || stash.path !== window.location.pathname) return;
+    if (!stash || !stash.draw || stash.path !== window.location.pathname) return;
     sessionStorage.removeItem('mixResume');
 
     // Strip the query param so a refresh is clean.
@@ -413,18 +423,19 @@
     document.body.classList.add('mix-modal-open');
     if (dialog) dialog.focus();
 
-    drawData[stash.side] = stash.item;
+    drawData.a = stash.draw.a || null;
+    drawData.b = stash.draw.b || null;
+
+    let chosenCard = null;
     cards.forEach((card) => {
-      if (card.dataset.side === stash.side) {
-        renderCard(card, stash.item);
-        card.classList.add('is-flipped');
-        card.setAttribute('aria-busy', 'false');
-        pickCard(card);
-      } else {
-        const back = card.querySelector('.draw-card-back-label');
-        if (back) back.textContent = 'B SIDE';
-      }
+      const item = drawData[card.dataset.side];
+      if (!item) return;
+      renderCard(card, item);
+      card.classList.add('is-flipped');
+      card.setAttribute('aria-busy', 'false');
+      if (card.dataset.side === stash.side) chosenCard = card;
     });
+    if (chosenCard) pickCard(chosenCard);
     setStatus("You're back. Save it now or pick something else.", false);
   }
   maybeResume();

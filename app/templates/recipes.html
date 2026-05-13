@@ -32,6 +32,7 @@
     </section>
 
     <!-- Recipe Grid -->
+    <section class="all-recipes-section" data-recipe-section="all">
     {% if visible_recipes|length == 0 %}
       <div class="empty-state p-4 text-center">
         <h3>No recipes yet</h3>
@@ -115,6 +116,7 @@
         {% endfor %}
       </div>
     {% endif %}
+    </section>
 
     <section class="my-recipes-section mt-5" data-recipe-section="my-recipes">
       <h2 class="mb-3">My recipes</h2>
@@ -139,7 +141,7 @@
         <div class="recipe-grid">
           {% for entry in my_recipes %}
             {% set recipe = entry.recipe %}
-            <div class="recipe-grid-item">
+            <div class="recipe-grid-item" data-category="{{ recipe.category }}">
               <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="text-decoration-none">
                 <div class="recipe-card">
 
@@ -163,6 +165,9 @@
                       {% else %}
                         <span class="badge-food">{{ recipe.category|title }}</span>
                       {% endif %}
+                      <span class="badge-visibility badge-visibility-{{ entry.origin|lower }}">
+                        {{ entry.origin }}
+                      </span>
                     </div>
 
                     <h3 class="card-title mt-2">{{ recipe.name }}</h3>
@@ -202,11 +207,6 @@
         </div>
       {% endif %}
     </section>
-
-    <!-- Load More -->
-    <div class="load-more">
-      <button class="btn btn-ghost">Load more</button>
-    </div>
 
   </main>
 {% endblock %}

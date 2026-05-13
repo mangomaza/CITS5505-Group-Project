@@ -7,14 +7,16 @@ from io import BytesIO
 import requests
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, session, url_for
 from flask_login import current_user, login_required
+from flask_wtf.csrf import CSRFError, validate_csrf
 from sqlalchemy import func, or_
 
-from app.extensions import db
-from app.forms.recipe_forms import CreateRecipeForm, SaveExternalRecipeForm
+from app import db
+from app.forms.recipe_forms import CreateRecipeForm, DeleteRecipeForm, SaveExternalRecipeForm
+from app.forms.auth_forms import ProfileForm
 from app.forms.share_forms import RevokeShareForm, ShareRecipeForm
 from app.models import Ingredient, Rating, Recipe, SharedAccess
 from app.models.recipe import can_view_recipe
-
+from app.models.user import User
 COCKTAIL_API_URL = 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
 MEAL_API_URL = 'https://www.themealdb.com/api/json/v1/1/random.php'
 COCKTAIL_LOOKUP_URL = 'https://www.thecocktaildb.com/api/json/v1/1/lookup.php'
@@ -27,6 +29,11 @@ EXTERNAL_IMAGE_URL_RE = re.compile(
 )
 
 main_bp = Blueprint('main', __name__)
+
+
+# ============================================================
+# Shared helpers (ratings, external API shaping, save-external)
+# ============================================================
 
 
 def get_rating_summary(recipe_id):
@@ -148,6 +155,11 @@ def _fallback_from_db(category):
     if not candidates:
         return None
     return _shape_internal_recipe(random.choice(candidates))
+
+
+# ============================================================
+# Random draw (home page widget + save-external endpoint)
+# ============================================================
 
 
 @main_bp.route('/recipes/random.json')
@@ -377,6 +389,11 @@ def save_external_recipe():
     }), 201
 
 
+# ============================================================
+# Home page
+# ============================================================
+
+
 @main_bp.route('/')
 def index():
     if current_user.is_authenticated:
@@ -456,6 +473,11 @@ def _rating_map_for(recipe_ids):
     return {row[0]: (float(row[1] or 0), int(row[2] or 0)) for row in rows}
 
 
+# ============================================================
+# Recipes listing + detail + image
+# ============================================================
+
+
 @main_bp.route('/recipes')
 def recipes():
     if current_user.is_authenticated:
@@ -465,10 +487,12 @@ def recipes():
         ).all()
         shared_ids = [row[0] for row in shared_ids_rows]
 
+        # community + shared-to-me, excluding my own (mine show in the
+        # "My recipes" section instead)
         query = Recipe.query.filter(
+            Recipe.creator_id != current_user.id,
             or_(
                 Recipe.is_public.is_(True),
-                Recipe.creator_id == current_user.id,
                 Recipe.id.in_(shared_ids) if shared_ids else False,
             )
         )
@@ -477,7 +501,15 @@ def recipes():
 
     all_recipes = query.order_by(Recipe.created_at.desc()).all()
 
-    rating_map = _rating_map_for([r.id for r in all_recipes])
+    my_recipe_rows = []
+    if current_user.is_authenticated:
+        my_recipe_rows = Recipe.query.filter(
+            Recipe.creator_id == current_user.id
+        ).order_by(Recipe.created_at.desc()).all()
+
+    rating_map = _rating_map_for(
+        [r.id for r in all_recipes] + [r.id for r in my_recipe_rows]
+    )
 
     visible_recipes = [
         {
@@ -489,16 +521,15 @@ def recipes():
         for r in all_recipes
     ]
 
-    my_recipes = []
-    if current_user.is_authenticated:
-        my_recipes = [
-            {
-                'recipe': r,
-                'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
-                'rating_count': rating_map.get(r.id, (0.0, 0))[1],
-            }
-            for r in all_recipes if r.creator_id == current_user.id
-        ]
+    my_recipes = [
+        {
+            'recipe': r,
+            'origin': _origin_label(r, current_user),
+            'avg_rating': rating_map.get(r.id, (0.0, 0))[0],
+            'rating_count': rating_map.get(r.id, (0.0, 0))[1],
+        }
+        for r in my_recipe_rows
+    ]
 
     return render_template(
         'recipes.html',
@@ -527,9 +558,11 @@ def recipe_detail(recipe_id):
     return render_template(
         'recipe_detail.html',
         recipe=recipe,
+        origin=_origin_label(recipe, current_user),
         average_rating=average_rating,
         rating_count=rating_count,
         user_rating=user_rating,
+        delete_form=DeleteRecipeForm(),
     )
 
 
@@ -565,6 +598,11 @@ def _normalise_ingredient_rows(form_data):
             'unit': (units[index] if index < len(units) else '').strip(),
         })
     return rows
+
+
+# ============================================================
+# Recipe create / edit / delete
+# ============================================================
 
 
 @main_bp.route('/recipes/external-prefill', methods=['GET'])
@@ -712,6 +750,113 @@ def create_recipe():
     )
 
 
+@main_bp.route('/recipes/<int:recipe_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_recipe(recipe_id):
+    recipe = db.get_or_404(Recipe, recipe_id)
+    if recipe.creator_id != current_user.id:
+        abort(403)
+
+    if request.method == 'POST':
+        form = CreateRecipeForm()
+        ingredient_rows = _normalise_ingredient_rows(request.form)
+    else:
+        form = CreateRecipeForm(data={
+            'name': recipe.name,
+            'description': recipe.description or '',
+            'category': recipe.category,
+            'glass': recipe.glass or '',
+            'instructions': recipe.instructions,
+            'is_alcoholic': 'true' if recipe.is_alcoholic else 'false',
+            'visibility': 'public' if recipe.is_public else 'private',
+        })
+        ingredient_rows = [
+            {'name': i.name, 'quantity': i.quantity or '', 'unit': i.unit or ''}
+            for i in recipe.ingredients
+        ]
+        if not ingredient_rows:
+            ingredient_rows = [{'name': '', 'quantity': '', 'unit': ''} for _ in range(3)]
+
+    ingredient_error = None
+
+    if form.validate_on_submit():
+        non_empty_rows = [
+            row for row in ingredient_rows
+            if row['name'] or row['quantity'] or row['unit']
+        ]
+
+        if not non_empty_rows:
+            ingredient_error = 'Please add at least one ingredient.'
+        else:
+            is_food = form.category.data == 'food'
+            recipe.name = form.name.data.strip()
+            recipe.description = (form.description.data or '').strip() or None
+            recipe.category = form.category.data
+            recipe.glass = None if is_food else ((form.glass.data or '').strip() or None)
+            recipe.is_alcoholic = False if is_food else (form.is_alcoholic.data == 'true')
+            recipe.instructions = form.instructions.data.strip()
+            recipe.is_public = (form.visibility.data == 'public')
+
+            upload = form.image.data
+            if upload is not None and getattr(upload, 'filename', ''):
+                upload.stream.seek(0)
+                recipe.image_data = upload.read()
+                recipe.image_mime = upload.mimetype
+
+            for ing in list(recipe.ingredients):
+                db.session.delete(ing)
+            db.session.flush()
+
+            for index, row in enumerate(non_empty_rows, start=1):
+                if not row['name']:
+                    ingredient_error = 'Each saved ingredient needs a name.'
+                    db.session.rollback()
+                    break
+                db.session.add(Ingredient(
+                    recipe_id=recipe.id,
+                    name=row['name'],
+                    quantity=row['quantity'] or None,
+                    unit=row['unit'] or None,
+                    position=index,
+                ))
+
+            if ingredient_error is None:
+                db.session.commit()
+                flash('Recipe updated.', 'success')
+                return redirect(url_for('main.recipe_detail', recipe_id=recipe.id))
+
+    return render_template(
+        'create_recipe.html',
+        form=form,
+        ingredient_rows=ingredient_rows,
+        ingredient_error=ingredient_error,
+        edit_recipe=recipe,
+    )
+
+
+@main_bp.route('/recipes/<int:recipe_id>/delete', methods=['POST'])
+@login_required
+def delete_recipe(recipe_id):
+    recipe = db.get_or_404(Recipe, recipe_id)
+    if recipe.creator_id != current_user.id:
+        abort(403)
+
+    form = DeleteRecipeForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    name = recipe.name
+    db.session.delete(recipe)
+    db.session.commit()
+    flash(f'Deleted "{name}".', 'success')
+    return redirect(url_for('main.recipes'))
+
+
+# ============================================================
+# Share page (grant + revoke access)
+# ============================================================
+
+
 @main_bp.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
@@ -781,6 +926,11 @@ def remove_share(grant_id):
     return redirect(url_for('main.share'))
 
 
+# ============================================================
+# Ratings
+# ============================================================
+
+
 @main_bp.route('/recipes/<int:recipe_id>/rate', methods=['POST'])
 def rate_recipe(recipe_id):
     if not current_user.is_authenticated:
@@ -825,3 +975,57 @@ def rate_recipe(recipe_id):
         'count': count,
         'user_rating': stars,
     })
+
+
+# ============================================================
+# Profile + user avatar
+# ============================================================
+
+
+@main_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    user = db.session.get(User, current_user.id)
+    form = ProfileForm(user, obj=user)
+
+    if request.method == 'POST' and request.form.get('action') == 'remove_avatar':
+        try:
+            validate_csrf(request.form.get('csrf_token'))
+        except CSRFError:
+            abort(400)
+        user.avatar_data = None
+        user.avatar_mime = None
+        db.session.commit()
+        flash('Profile picture removed.', 'success')
+        return redirect(url_for('main.profile'))
+
+    if form.validate_on_submit():
+        user.username = form.username.data.strip()
+        user.email = form.email.data.strip().lower()
+
+        if form.new_password.data:
+            user.set_password(form.new_password.data)
+
+        upload = form.avatar.data
+        if upload is not None and getattr(upload, 'filename', ''):
+            upload.stream.seek(0)
+            user.avatar_data = upload.read()
+            user.avatar_mime = upload.mimetype
+
+        db.session.commit()
+        flash('Profile updated.', 'success')
+        return redirect(url_for('main.profile'))
+
+    return render_template('profile.html', form=form, user=user)
+
+
+@main_bp.route('/users/<int:user_id>/avatar')
+def user_avatar(user_id):
+    user = db.get_or_404(User, user_id)
+    if not user.avatar_data or not user.avatar_mime:
+        abort(404)
+    return send_file(
+        BytesIO(user.avatar_data),
+        mimetype=user.avatar_mime,
+        max_age=3600,
+    )

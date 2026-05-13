@@ -25,6 +25,7 @@
           src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}"
           alt="{{ recipe.name }}"
           class="detail-hero-placeholder"
+          loading="lazy"
         >
       {% endif %}
     </div>
@@ -42,6 +43,9 @@
         <div class="d-flex align-items-center gap-2 mb-2">
           <span class="{{ 'badge-cocktail' if recipe.category == 'cocktail' else 'badge-food' }}">
             {{ recipe.category|title }}
+          </span>
+          <span class="badge-visibility badge-visibility-{{ origin|lower }}">
+            {{ origin }}
           </span>
           {% if recipe.category == 'cocktail' %}
             <span class="badge-alcoholic">{{ 'Alcoholic' if recipe.is_alcoholic else 'Non-alcoholic' }}</span>
@@ -76,7 +80,7 @@
             {% for ingredient in recipe.ingredients %}
               <li>
                 <span class="ingredient-track">{{ '%02d.' % loop.index }}</span>
-                <img src="https://placehold.co/48x48/f2dfc4/6b513d?text={{ ingredient.name[:1]|upper }}" alt="{{ ingredient.name }}" class="ingredient-thumb">
+                <img src="{{ url_for('static', filename='images/placeholders/' ~ ('cocktail-default.png' if recipe.category == 'cocktail' else 'food-default.png')) }}" alt="{{ ingredient.name }}" class="ingredient-thumb" loading="lazy">
                 <span class="ingredient-name">{{ ingredient.name }}</span>
                 <span class="ingredient-leader" aria-hidden="true"></span>
                 <span class="ingredient-qty">{{ ingredient.quantity or '' }}{% if ingredient.unit %} {{ ingredient.unit }}{% endif %}</span>
@@ -99,6 +103,13 @@
           {% if current_user.is_authenticated %}
           <div class="detail-actions">
             <a href="{{ url_for('main.share') }}" class="btn btn-outline-mix"><i class="bi bi-share me-1"></i> Share</a>
+            {% if recipe.creator_id == current_user.id %}
+              <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn btn-outline-mix"><i class="bi bi-pencil me-1"></i> Edit</a>
+              <form method="post" action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}" class="d-inline" onsubmit="return confirm('Delete this recipe? This cannot be undone.');">
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-outline-mix"><i class="bi bi-trash me-1"></i> Delete</button>
+              </form>
+            {% endif %}
           </div>
           {% endif %}
 

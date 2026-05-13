@@ -7,14 +7,24 @@ document.addEventListener('DOMContentLoaded', function () {
   var searchInput = document.getElementById('recipeSearch');
   var searchQuery = '';
   var countEl = document.getElementById('recipeCount');
+  var allSection = document.querySelector('[data-recipe-section="all"]');
+  var mineSection = document.querySelector('[data-recipe-section="my-recipes"]');
+  var activeFilter = 'all';
+
+  function visibleItems() {
+    var items = [];
+    if (allSection && !allSection.hidden) {
+      items = items.concat(Array.prototype.slice.call(allSection.querySelectorAll('.recipe-grid-item')));
+    }
+    if (mineSection && !mineSection.hidden) {
+      items = items.concat(Array.prototype.slice.call(mineSection.querySelectorAll('.recipe-grid-item')));
+    }
+    return items.filter(function (item) { return item.style.display !== 'none'; });
+  }
 
   function updateCount() {
     if (!countEl) return;
-    var visible = 0;
-    document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
-      if (item.closest('.my-recipes-section')) return;
-      if (item.style.display !== 'none') visible += 1;
-    });
+    var visible = visibleItems().length;
     var label;
     if (visible === 0) label = countEl.dataset.zero || 'no recipes';
     else if (visible === 1) label = countEl.dataset.one || '1 recipe';
@@ -43,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // category filter pills
   var pills = document.querySelectorAll('.filter-pill');
-  var activeFilter = 'all';
 
   // honour ?category=cocktail|food from the home page browse-by-category links
   var urlCategory = (new URLSearchParams(window.location.search)).get('category');
@@ -55,14 +64,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function applyPillFilter() {
+    var onlyMine = activeFilter === 'my-recipes';
+    if (allSection) allSection.hidden = onlyMine;
+    if (mineSection) mineSection.hidden = false;
+
     document.querySelectorAll('.recipe-grid-item').forEach(function (item) {
       var category = item.dataset.category || '';
-      var mine = item.dataset.mine === '1';
       var matches = true;
       if (activeFilter === 'cocktail' || activeFilter === 'food') {
         matches = (category === activeFilter);
-      } else if (activeFilter === 'my-recipes') {
-        matches = mine;
       }
       item.dataset.hiddenByFilter = matches ? '0' : '1';
     });
@@ -78,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // initialise so the default "All" pill marks every card visible
   applyPillFilter();
 
   // Mix it up button - pick a random visible recipe and navigate to it
@@ -89,12 +98,9 @@ document.addEventListener('DOMContentLoaded', function () {
       mixBtn.disabled = true;
 
       setTimeout(function () {
-        var visibleItems = Array.prototype.filter.call(
-          document.querySelectorAll('.recipe-grid-item'),
-          function (item) { return item.style.display !== 'none'; }
-        );
-        if (visibleItems.length > 0) {
-          var pick = visibleItems[Math.floor(Math.random() * visibleItems.length)];
+        var pool = visibleItems();
+        if (pool.length > 0) {
+          var pick = pool[Math.floor(Math.random() * pool.length)];
           var link = pick.querySelector('a');
           if (link) { window.location.href = link.getAttribute('href'); return; }
         }

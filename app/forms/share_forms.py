@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, ValidationError
 
-from app.extensions import db
+from app import db
 from app.models import Recipe, SharedAccess, User
 
 
