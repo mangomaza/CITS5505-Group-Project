@@ -21,6 +21,10 @@ def create_app(config_name='default'):
 
     app.config.from_object(config[config_name])
 
+    # make sure the instance folder exists so sqlite can create its db file
+    instance_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'instance')
+    os.makedirs(instance_dir, exist_ok=True)
+
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
