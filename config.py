@@ -29,6 +29,16 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
 
 
+class SeleniumTestingConfig(Config):
+    # File-backed sqlite so the server thread and the test thread see the
+    # same rows. :memory: doesn't share across threads.
+    TESTING = True
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SELENIUM_DATABASE_URL') or \
+        'sqlite:///' + os.path.join(basedir, 'instance', 'selenium_test.db')
+    WTF_CSRF_ENABLED = False
+
+
 class ProductionConfig(Config):
     DEBUG = False
     FLASK_ENV = 'production'
@@ -39,6 +49,7 @@ class ProductionConfig(Config):
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
+    'selenium': SeleniumTestingConfig,
     'production': ProductionConfig,
     'default': DevelopmentConfig,
 }
