@@ -105,3 +105,21 @@ The frontend uses Bootstrap 5 for layout and responsiveness, with custom CSS on 
 
    By default the app uses the development config. To change it, set `FLASK_CONFIG` before running (`development`, `testing`, or `production`).
 
+## Running the tests
+
+The test suite has 10 unit tests and 10 Selenium system tests. The Selenium tests need Google Chrome installed (selenium 4 finds its own driver).
+
+**Tests load `SECRET_KEY` from `.env` the same way the app does, so make sure step 4 above is done first.**
+
+Run everything:
+
+```
+python -m unittest tests.test_suite
+```
+
+Or run the layers separately:
+
+```
+python -m unittest tests.test_issue_unit
+python -m unittest tests.test_selenium_system
+```
