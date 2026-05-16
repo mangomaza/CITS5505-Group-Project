@@ -646,7 +646,7 @@ def create_recipe():
             'instructions': prefill_payload.get('instructions') or '',
             'is_alcoholic': is_alc,
             'visibility': 'private',
-            'external_source': prefill_payload.get('source', ''),
+            'external_source': prefill_payload.get('external_source', ''),
             'external_id': prefill_payload.get('external_id', ''),
             'external_image_url': prefill_payload.get('image_url') or '',
         })

@@ -2,6 +2,8 @@ import os
 import unittest
 from io import BytesIO
 
+from unittest.mock import patch
+
 from dotenv import load_dotenv
 
 # Load SECRET_KEY (and anything else) from .env, same as app.py does.
@@ -93,6 +95,35 @@ class IssueUnitTests(unittest.TestCase):
             'ingredient_quantity': ['30'],
             'ingredient_unit': ['ml'],
         }
+    
+    def test_external_prefill_keeps_external_source(self):
+        self.login('owner@example.com')
+
+        payload = {
+            'name': 'Mock Mojito',
+            'description': 'Saved from API.',
+            'category': 'cocktail',
+            'glass': 'Highball',
+            'is_alcoholic': True,
+            'instructions': 'Muddle, stir, and serve.',
+            'external_source': 'thecocktaildb',
+            'external_id': '12345',
+            'image_url': '',
+            'ingredients': [
+                {'name': 'Mint', 'quantity': '6', 'unit': 'leaves'},
+            ],
+        }
+        with patch('app.routes.main_routes._lookup_external', return_value=payload):
+            response = self.client.get(
+                '/recipes/external-prefill?source=thecocktaildb&external_id=12345',
+                follow_redirects=True,
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'name="external_source"', response.data)
+        self.assertIn(b'value="thecocktaildb"', response.data)
+        self.assertIn(b'name="external_id"', response.data)
+        self.assertIn(b'value="12345"', response.data)
 
     # 1. Helper coverage: visibility matrix
     def test_can_view_recipe_helper_matrix(self):
