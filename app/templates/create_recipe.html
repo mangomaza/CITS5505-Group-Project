@@ -124,8 +124,8 @@
             <div class="form-section">
               <div class="section-title">Photo</div>
               <div class="upload-area" id="uploadArea"
-                   data-default-cocktail="{{ url_for('static', filename='images/placeholders/cocktail-default.jpg') }}"
-                   data-default-food="{{ url_for('static', filename='images/placeholders/food-default.jpg') }}">
+                   data-default-cocktail="{{ url_for('static', filename='images/placeholders/cocktail-default.png') }}"
+                   data-default-food="{{ url_for('static', filename='images/placeholders/food-default.png') }}">
                 <img class="upload-preview" id="imagePreview" alt=""
                      {% if edit_recipe and edit_recipe.image_data %}src="{{ url_for('main.recipe_image', recipe_id=edit_recipe.id) }}"{% elif form.external_image_url.data %}src="{{ form.external_image_url.data }}"{% endif %}>
                 <div class="upload-placeholder" id="uploadPlaceholder">
